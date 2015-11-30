@@ -1,8 +1,13 @@
+ActionDispatch::Callbacks.to_prepare do
+  require_dependency 'redmine_admin_activity/projects_controller_patch' # unless Rails.env.test?
+  require_dependency 'redmine_admin_activity/project_patch'
+  require_dependency 'redmine_admin_activity/projects_helper_patch'
+end
+
 Redmine::Plugin.register :redmine_admin_activity do
   name 'Redmine Admin Activity plugin'
-  author 'Author name'
+  author 'Vincent ROBERT'
   description 'This is a plugin for Redmine'
-  version '0.0.1'
-  url 'http://example.com/path/to/plugin'
-  author_url 'http://example.com/about'
+  version '1.0.0'
+  url 'https://github.com/nanego/redmine_admin_activity'
 end
