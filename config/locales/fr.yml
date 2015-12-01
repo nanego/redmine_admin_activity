@@ -1,2 +1,5 @@
 fr:
   project_module_admin_activity: "Historique"
+  text_journal_modules_changed: "Modification des modules actifs : %{deleted} %{new}"
+  text_journal_modules_removed: "désactivation de [%{value}] %{and}"
+  text_journal_modules_added: "activation de [%{value}]"
