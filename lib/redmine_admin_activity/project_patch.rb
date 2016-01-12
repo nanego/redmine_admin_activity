@@ -31,4 +31,9 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def each_notification(users, &block)
+    # Do not send any notification after create project's journals
+    nil
+  end
+
 end
