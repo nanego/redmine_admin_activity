@@ -1,3 +1,0 @@
-= redmine_admin_activity
-
-Description goes here
