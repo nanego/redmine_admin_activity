@@ -7,6 +7,6 @@ This Redmine plugin keeps a log of all admin actions:
 - Members added or removed
 - ...
 
-### Requirements
+Requirements:
 
-![ruby > 2.1](http://messages.hellobits.com/warning.svg?message=ruby%20%3E%202.1)
+    ruby >= 2.1.0
