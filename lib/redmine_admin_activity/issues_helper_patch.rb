@@ -35,4 +35,4 @@ module PluginAdminActivity
 end
 
 IssuesHelper.prepend PluginAdminActivity::IssuesHelper
-
+ActionView::Base.prepend IssuesHelper
