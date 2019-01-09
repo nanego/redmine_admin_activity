@@ -2,6 +2,8 @@ require_dependency 'project'
 
 class Project < ActiveRecord::Base
 
+  acts_as_watchable
+
   has_many :journals, :as => :journalized, :dependent => :destroy, :inverse_of => :journalized
 
   attr_reader :current_journal
@@ -29,11 +31,6 @@ class Project < ActiveRecord::Base
     if current_journal
       current_journal.save
     end
-  end
-
-  def each_notification(users, &block)
-    # Do not send any notification after create project's journals
-    nil
   end
 
 end

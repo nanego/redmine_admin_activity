@@ -3,9 +3,9 @@ require_dependency 'project'
 
 class ProjectsController
 
-  before_filter :init_journal, :only => [:update]
-  before_filter :init_modules_journal, :only => [:modules]
-  after_filter :update_modules_journal, :only => [:modules]
+  before_action :init_journal, :only => [:update]
+  before_action :init_modules_journal, :only => [:modules]
+  after_action :update_modules_journal, :only => [:modules]
 
   def init_journal
     @project.init_journal(User.current)
