@@ -4,27 +4,23 @@ require_dependency 'project'
 class ProjectsController
 
   before_action :init_journal, :only => [:update]
-  before_action :init_modules_journal, :only => [:modules]
-  after_action :update_modules_journal, :only => [:modules]
+  after_action :update_journal, :only => [:update]
 
   def init_journal
     @project.init_journal(User.current)
+    @previous_enabled_module_names = @project.enabled_module_names
   end
 
-  # Called after a relation is added
-  def init_modules_journal
-    init_journal
-    # key = (added_or_removed == :removed ? :old_value : :value)
-    @project.current_journal.details << JournalDetail.new(
-        :property  => 'modules',
-        :prop_key  => 'modules',
-        :old_value => @project.enabled_module_names.join(',')
-    )
-  end
-
-  def update_modules_journal
-    @project.current_journal.details.first[:value] = @project.enabled_module_names.join(',')
-    @project.current_journal.save
+  def update_journal
+    if @previous_enabled_module_names != @project.enabled_module_names
+      @project.current_journal.details << JournalDetail.new(
+          :property  => 'modules',
+          :prop_key  => 'modules',
+          :old_value => @previous_enabled_module_names.join(','),
+          :value => @project.enabled_module_names.join(',')
+      )
+      @project.current_journal.save
+    end
   end
 
 end

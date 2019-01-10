@@ -13,8 +13,8 @@ describe ProjectsController, type: :controller do
 
   before do
     @controller = ProjectsController.new
-    @request    = ActionDispatch::TestRequest.create
-    @response   = ActionDispatch::TestResponse.new
+    @request = ActionDispatch::TestRequest.create
+    @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 2 #permissions are hard
   end
@@ -23,7 +23,7 @@ describe ProjectsController, type: :controller do
 
     it "logs any enabled module" do
       Project.find(1).enabled_module_names = ['issue_tracking', 'news']
-      patch :update, params: {id: 1, enabled_module_names: ['issue_tracking', 'repository', 'documents']}
+      patch :update, params: {id: 1, project: {enabled_module_names: ['issue_tracking', 'repository', 'documents']}}
 
       project = Project.find(1)
       expect(response).to redirect_to('/projects/ecookbook/settings')
@@ -34,7 +34,7 @@ describe ProjectsController, type: :controller do
 
     it "logs any disabled module" do
       Project.find(1).enabled_module_names = ['issue_tracking', 'news']
-      patch :update, params: {id: 1, :enabled_module_names => ['issue_tracking']}
+      patch :update, params: {id: 1, project: {:enabled_module_names => ['issue_tracking']}}
 
       project = Project.find(1)
       expect(response).to redirect_to('/projects/ecookbook/settings')
