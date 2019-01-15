@@ -12,6 +12,6 @@ Redmine::Plugin.register :redmine_admin_activity do
   name 'Redmine Admin Activity plugin'
   author 'Vincent ROBERT'
   description 'This plugin keeps a log of all admin actions'
-  version '1.0.0'
+  version '4.0.0'
   url 'https://github.com/nanego/redmine_admin_activity'
 end
