@@ -4,4 +4,7 @@ en:
   text_journal_modules_changed: "Enabled modules changed: %{deleted} %{new}"
   text_journal_modules_removed: "removed [%{value}] %{and}"
   text_journal_modules_added: "added [%{value}]"
+  text_journal_members_changed: "Members changed: %{deleted} %{new}"
+  text_journal_members_removed: "removed [%{value}] %{and}"
+  text_journal_members_added: "added [%{value}]"
   and: and

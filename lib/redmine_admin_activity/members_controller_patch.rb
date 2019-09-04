@@ -11,8 +11,8 @@ class MembersController
     project.init_journal(User.current)
     # key = (added_or_removed == :removed ? :old_value : :value)
     project.current_journal.details << JournalDetail.new(
-      :property  => 'attr',
-      :prop_key  => 'member',
+      :property  => 'members',
+      :prop_key  => 'members',
       :old_value => @member.principal
     )
     project.current_journal.save
@@ -33,7 +33,7 @@ class MembersController
 
     @project.init_journal(User.current)
     @project.current_journal.details << JournalDetail.new(
-      :property  => 'attr',
+      :property  => 'members',
       :prop_key  => 'members',
       :value => members.map{|m|m.principal.to_s}.join(', ')
     )

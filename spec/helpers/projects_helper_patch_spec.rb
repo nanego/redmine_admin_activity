@@ -4,6 +4,9 @@ describe ProjectsHelper, :type => :controller do
 
   render_views
 
+  fixtures :users, :roles, :projects, :members,
+           :member_roles, :enabled_modules, :issues
+
   before do
     @controller = ProjectsController.new
     @request    = ActionDispatch::TestRequest.create
