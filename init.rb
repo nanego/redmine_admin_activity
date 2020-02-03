@@ -14,4 +14,5 @@ Redmine::Plugin.register :redmine_admin_activity do
   description 'This plugin keeps a log of all admin actions'
   version '4.0.0'
   url 'https://github.com/nanego/redmine_admin_activity'
+  permission :see_project_activity, {  }
 end
