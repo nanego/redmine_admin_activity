@@ -1,5 +1,4 @@
 require_dependency 'issue_categories_controller'
-# require_dependency 'issue_category'
 
 class IssueCategoriesController
   after_action :journalized_issue_categories_creation, :only => [:create]
