@@ -11,6 +11,9 @@ This Redmine plugin keeps a log of all admin actions:
 
     ruby >= 2.1.0
 
+
+To run tests, install the redmine_base_rspec plugin (https://github.com/jbbarth/redmine_base_rspec)
+
 ## Test status
 
 |Plugin branch| Redmine Version   | Test Status       |

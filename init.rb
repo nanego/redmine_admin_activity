@@ -15,4 +15,5 @@ Redmine::Plugin.register :redmine_admin_activity do
   version '4.0.0'
   url 'https://github.com/nanego/redmine_admin_activity'
   permission :see_project_activity, {  }
+  # requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?
 end
