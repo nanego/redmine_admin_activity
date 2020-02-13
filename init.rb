@@ -2,6 +2,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/projects_controller_patch' # unless Rails.env.test?
   require_dependency 'redmine_admin_activity/project_patch'
   require_dependency 'redmine_admin_activity/projects_helper_patch'
+  require_dependency 'redmine_admin_activity/issue_categories_controller_patch'
   require_dependency 'redmine_admin_activity/issues_helper_patch'
   require_dependency 'redmine_admin_activity/member_patch'
   require_dependency 'redmine_admin_activity/members_controller_patch'
