@@ -23,16 +23,8 @@ module PluginAdminActivity
     private
 
     def show_modules_details(detail, no_html = false, options = {})
-      if detail.value.present?
-        value = detail.value.split(',')
-      else
-        value = []
-      end
-      if detail.old_value.present?
-        old_value = detail.old_value.split(',')
-      else
-        old_value = []
-      end
+      value = string_list_to_array(detail.value)
+      old_value = string_list_to_array(detail.old_value)
       deleted_values = old_value - value
       new_values = value - old_value
 
@@ -43,16 +35,8 @@ module PluginAdminActivity
     end
 
     def show_members_details(detail, no_html = false, options = {})
-      if detail.value.present?
-        value = detail.value.split(',')
-      else
-        value = []
-      end
-      if detail.old_value.present?
-        old_value = detail.old_value.split(',')
-      else
-        old_value = []
-      end
+      value = string_list_to_array(detail.value)
+      old_value = string_list_to_array(detail.old_value)
       deleted_values = old_value - value
       new_values = value - old_value
 
@@ -63,23 +47,23 @@ module PluginAdminActivity
     end
 
     def show_issue_category_details(detail, no_html = false, options = {})
-      if detail.value.present?
-        value = detail.value.split(',')
-      else
-        value = []
-      end
-      if detail.old_value.present?
-        old_value = detail.old_value.split(',')
-      else
-        old_value = []
-      end
-      deleted_values = old_value - value
-      new_values = value - old_value
+      value = detail.value
+      old_value = detail.old_value
+      data = { :old_value => old_value, :value => value }
 
-      deleted_values = deleted_values.any? ? l(:text_journal_issue_category_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')).html_safe : ""
-      new_values = new_values.any? ? l(:text_journal_issue_category_added, :value => new_values.join(', ')).html_safe : ""
+      if value.present? && old_value.present?
+        l(:text_journal_issue_category_changed, data)
+      elsif value.present? && old_value.blank?
+        l(:text_journal_issue_category_added, data)
+      elsif value.blank? && old_value.present?
+        l(:text_journal_issue_category_removed, data)
+      end.html_safe
+    end
 
-      l(:text_journal_issue_category_changed, :deleted => deleted_values, :new => new_values).html_safe
+    def string_list_to_array(value)
+      return [] if value.blank?
+
+      value.split(",")
     end
   end
 end
