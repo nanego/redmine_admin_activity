@@ -19,6 +19,7 @@ describe IssueCategoriesController, type: :controller do
   end
 
   let(:project) { Project.find(1) }
+  let(:issue_category) { project.issue_categories.find_by(name: "Printing") }
 
   describe "POST /" do
     before { post :create, params: { project_id: project.id, issue_category: { name: "Issue Category" } } }
@@ -26,6 +27,14 @@ describe IssueCategoriesController, type: :controller do
     it { expect(response).to redirect_to('/projects/ecookbook/settings/categories') }
     it { expect(project.journals).to_not be_nil }
     it { expect(project.journals.last.details.last).to have_attributes(:value => "Issue Category", :old_value => nil) }
+  end
+
+  describe "PATCH /:id" do
+    before { patch :update, params: { project_id: project.id, id: issue_category.id, issue_category: { name: "New name" } } }
+
+    it { expect(response).to redirect_to('/projects/ecookbook/settings/categories') }
+    it { expect(project.journals).to_not be_nil }
+    it { expect(project.journals.last.details.last).to have_attributes(:value => "New name", :old_value => "Printing") }
   end
 
   describe "DELETE /:id" do
