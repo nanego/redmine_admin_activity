@@ -18,5 +18,8 @@ en:
   text_journal_custom_fields_added: "added [%{value}]"
   text_journal_copy_project: "Project copy from %{value}"
   permission_see_project_activity: "See projects activity"
+  text_journal_trackers_changed: "Trackers changed: %{deleted} %{new}"
+  text_journal_trackers_removed: "removed [%{value}] %{and}"
+  text_journal_trackers_added: "added [%{value}]"
   and: and
   text_setting_journal_entry: "%{field} changed from <i>%{old_value}</i> to <i>%{value}</i>."
