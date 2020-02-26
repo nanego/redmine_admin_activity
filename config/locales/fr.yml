@@ -10,6 +10,6 @@ fr:
   text_journal_issue_category_removed: "La catégorie %{old_value} a été supprimée"
   text_journal_issue_category_added: "La catégorie %{value} a été créée"
   text_journal_trackers_changed: "Trackers modifiés : %{deleted} %{new}"
-  text_journal_trackers_removed: "désactivation de %{value} %{and}"
-  text_journal_trackers_added: "activation de %{value}"
+  text_journal_trackers_removed: "désactivation de [%{value}] %{and}"
+  text_journal_trackers_added: "activation de [%{value}]"
   and: et
