@@ -16,8 +16,6 @@ describe CustomFieldsController, type: :controller do
     @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 1 #permissions are hard
-
-    binding.irb
   end
 
   let(:custom_fields_project) { custom_fields_projects(:custom_fields_projects_001) }
