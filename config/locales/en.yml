@@ -10,4 +10,5 @@ en:
   text_journal_issue_category_changed: "Category name changed from %{old_value} to %{value}"
   text_journal_issue_category_removed: "Category %{old_value} removed"
   text_journal_issue_category_added: "Category %{value} added"
+  permission_see_project_activity: "See projects activity"
   and: and

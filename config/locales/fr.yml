@@ -9,4 +9,5 @@ fr:
   text_journal_issue_category_changed: "La catégorie %{old_value} a été renommée %{value}"
   text_journal_issue_category_removed: "La catégorie %{old_value} a été supprimée"
   text_journal_issue_category_added: "La catégorie %{value} a été créée"
+  permission_see_project_activity: "Voir l'historique des projets"
   and: et
