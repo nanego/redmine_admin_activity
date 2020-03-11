@@ -12,4 +12,7 @@ fr:
   text_journal_trackers_changed: "Trackers modifiés : %{deleted} %{new}"
   text_journal_trackers_removed: "désactivation de [%{value}] %{and}"
   text_journal_trackers_added: "activation de [%{value}]"
+  text_journal_custom_fields_changed: "Champs personnalisés modifiés : %{deleted} %{new}"
+  text_journal_custom_fields_removed: "désactivation de [%{value}] %{and}"
+  text_journal_custom_fields_added: "activation de [%{value}]"
   and: et
