@@ -12,4 +12,5 @@ fr:
   text_journal_custom_fields_changed: "Champs personnalisés modifiés : %{deleted} %{new}"
   text_journal_custom_fields_removed: "désactivation de [%{value}] %{and}"
   text_journal_custom_fields_added: "activation de [%{value}]"
+  permission_see_project_activity: "Voir l'historique des projets"
   and: et
