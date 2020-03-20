@@ -1,4 +1,5 @@
 require_dependency 'issues_helper'
+require 'json'
 
 module PluginAdminActivity
   module IssuesHelper
@@ -41,15 +42,31 @@ module PluginAdminActivity
     end
 
     def show_members_details(detail, no_html = false, options = {})
-      value = string_list_to_array(detail.value)
-      old_value = string_list_to_array(detail.old_value)
-      deleted_values = old_value - value
-      new_values = value - old_value
+      begin
+        value = JSON.parse(detail.value || "{}")
+        old_value = JSON.parse(detail.old_value || "{}")
+        name = value["name"] || old_value["name"]
+        new_roles = value.fetch("roles", []).join(", ")
+        old_roles = old_value.fetch("roles", []).join(", ")
 
-      deleted_values = deleted_values.any? ? l(:text_journal_members_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')).html_safe : ""
-      new_values = new_values.any? ? l(:text_journal_members_added, :value => new_values.join(', ')).html_safe : ""
+        if new_roles.present? && old_roles.present?
+          l(:text_journal_member_changed, :name => name, :new => new_roles, :old => old_roles).html_safe
+        elsif new_roles.present? && old_roles.empty?
+          l(:text_journal_member_added, :name => name, :new => new_roles).html_safe
+        else
+          l(:text_journal_member_removed, :name => name, :old => old_roles).html_safe
+        end
+      rescue JSON::ParserError => _e
+        value = string_list_to_array(detail.value)
+        old_value = string_list_to_array(detail.old_value)
+        deleted_values = old_value - value
+        new_values = value - old_value
 
-      l(:text_journal_members_changed, :deleted => deleted_values, :new => new_values).html_safe
+        deleted_values = deleted_values.any? ? l(:text_journal_members_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')).html_safe : ""
+        new_values = new_values.any? ? l(:text_journal_members_added, :value => new_values.join(', ')).html_safe : ""
+
+        l(:text_journal_members_changed, :deleted => deleted_values, :new => new_values).html_safe
+      end
     end
 
     def show_issue_category_details(detail, no_html = false, options = {})
