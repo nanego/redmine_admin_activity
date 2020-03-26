@@ -18,9 +18,8 @@ describe CustomFieldsController, type: :controller do
     @request.session[:user_id] = 1 #permissions are hard
   end
 
-  let(:custom_fields_project) { custom_fields_projects(:custom_fields_projects_001) }
-  let(:project) { custom_fields_project.project }
-  let(:custom_field) { custom_fields_project.custom_field }
+  let(:project) { projects(:projects_001) }
+  let(:custom_field) { custom_fields(:custom_fields_009) }
 
   describe "POST /" do
     before { post :create, params: { custom_field: { name: "CustomField", type: "IssueCustomField", project_ids: [project.id] } } }
@@ -31,20 +30,20 @@ describe CustomFieldsController, type: :controller do
   end
 
   describe "PATCH /:id" do
-    let(:custom_field) { custom_fields(:custom_fields_003) }
+    let(:custom_field) { custom_fields(:custom_fields_002) }
     before { patch :update, params: { id: custom_field.id, custom_field: { project_ids: [project.id] } } }
 
-    it { expect(response).to redirect_to('/custom_fields') }
+    it { expect(response).to redirect_to('/custom_fields/2/edit') }
     it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "Support request", :old_value => nil) }
+    it { expect(project.journals.last.details.last).to have_attributes(:value => "Searchable field", :old_value => nil) }
   end
 
   describe "DELETE /:id" do
-    let(:custom_field) { CustomField.create(name: "To Be Removed CustomField", type: "IssueCustomField", projects: [project]) }
+    let(:custom_field) { CustomField.create(name: "To Be Removed CustomField", field_format: "string", visible: "1", type: "IssueCustomField", projects: [project]) }
 
     before { delete :destroy, params: { id: custom_field.id } }
 
-    it { expect(response).to redirect_to('/custom_fields') }
+    it { expect(response).to redirect_to('/custom_fields?tab=IssueCustomField') }
     it { expect(project.journals).to_not be_nil }
     it { expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "To Be Removed CustomField") }
   end
