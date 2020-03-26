@@ -13,5 +13,8 @@ en:
   text_journal_trackers_changed: "Trackers changed: %{deleted} %{new}"
   text_journal_trackers_removed: "removed [%{value}] %{and}"
   text_journal_trackers_added: "added [%{value}]"
+  text_journal_custom_fields_changed: "Custom fields changed: %{deleted} %{new}"
+  text_journal_custom_fields_removed: "removed [%{value}] %{and}"
+  text_journal_custom_fields_added: "added [%{value}]"
   permission_see_project_activity: "See projects activity"
   and: and

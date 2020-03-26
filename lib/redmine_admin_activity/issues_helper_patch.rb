@@ -16,6 +16,8 @@ module PluginAdminActivity
         show_issue_category_details(detail, no_html, options)
       when 'trackers'
         show_trackers_details(detail, no_html, options)
+      when 'custom_fields'
+        show_custom_fields_details(detail, no_html, options)
       else
         # Process standard properties like 'attr', 'attachment' or 'cf'
         super
@@ -51,7 +53,7 @@ module PluginAdminActivity
     def show_issue_category_details(detail, no_html = false, options = {})
       value = detail.value
       old_value = detail.old_value
-      data = { :old_value => old_value, :value => value }
+      data = {:old_value => old_value, :value => value}
 
       if value.present? && old_value.present?
         l(:text_journal_issue_category_changed, data)
@@ -72,6 +74,18 @@ module PluginAdminActivity
       new_values = new_values.any? ? l(:text_journal_trackers_added, :value => new_values.join(', ')).html_safe : ""
 
       l(:text_journal_trackers_changed, :deleted => deleted_values, :new => new_values).html_safe
+    end
+
+    def show_custom_fields_details(detail, no_html = false, options = {})
+      value = string_list_to_array(detail.value)
+      old_value = string_list_to_array(detail.old_value)
+      deleted_values = old_value - value
+      new_values = value - old_value
+
+      deleted_values = deleted_values.any? ? l(:text_journal_custom_fields_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')).html_safe : ""
+      new_values = new_values.any? ? l(:text_journal_custom_fields_added, :value => new_values.join(', ')).html_safe : ""
+
+      l(:text_journal_custom_fields_changed, :deleted => deleted_values, :new => new_values).html_safe
     end
 
     def string_list_to_array(value)
