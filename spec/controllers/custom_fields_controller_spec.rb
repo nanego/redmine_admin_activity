@@ -19,14 +19,16 @@ describe CustomFieldsController, type: :controller do
   end
 
   let(:project) { projects(:projects_001) }
-  let(:custom_field) { custom_fields(:custom_fields_009) }
 
   describe "POST /" do
-    before { post :create, params: { custom_field: { name: "CustomField", type: "IssueCustomField", project_ids: [project.id] } } }
-
-    it { expect(response).to redirect_to('/custom_fields') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "CustomField", :old_value => nil) }
+    it "creates a new custom_field and a new entry in the project journal" do
+      post :create, params: { type: "IssueCustomField", custom_field: { name: "CustomField",
+                                                                        project_ids: [project.id],
+                                                                        field_format: "string" } }
+      expect(response).to redirect_to(edit_custom_field_path(assigns(:custom_field)))
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "CustomField", :old_value => nil)
+    end
   end
 
   describe "PATCH /:id" do
