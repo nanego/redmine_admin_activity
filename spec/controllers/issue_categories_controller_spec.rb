@@ -22,28 +22,30 @@ describe IssueCategoriesController, type: :controller do
   let(:issue_category) { project.issue_categories.find_by(name: "Printing") }
 
   describe "POST /" do
-    before { post :create, params: { project_id: project.id, issue_category: { name: "Issue Category" } } }
-
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/categories') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "Issue Category", :old_value => nil) }
+    it "creates a new category and a new entry in the project journal" do
+      post :create, params: { project_id: project.id, issue_category: { name: "Issue Category" } }
+      expect(response).to redirect_to('/projects/ecookbook/settings/categories')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "Issue Category", :old_value => nil)
+    end
   end
 
   describe "PATCH /:id" do
-    before { patch :update, params: { project_id: project.id, id: issue_category.id, issue_category: { name: "New name" } } }
-
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/categories') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "New name", :old_value => "Printing") }
+    it "updates a category and adds a new entry in the project journal" do
+      patch :update, params: { project_id: project.id, id: issue_category.id, issue_category: { name: "New name" } }
+      expect(response).to redirect_to('/projects/ecookbook/settings/categories')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "New name", :old_value => "Printing")
+    end
   end
 
   describe "DELETE /:id" do
     let(:issue_category) { IssueCategory.create(project: project, name: "To Be Removed Issue Category") }
-
-    before { delete :destroy, params: { id: issue_category.id } }
-
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/categories') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "To Be Removed Issue Category") }
+    it "deletes a category and adds a new entry in the project journal" do
+      delete :destroy, params: { id: issue_category.id }
+      expect(response).to redirect_to('/projects/ecookbook/settings/categories')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "To Be Removed Issue Category")
+    end
   end
 end
