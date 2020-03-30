@@ -20,7 +20,6 @@ describe ProjectsController, type: :controller do
   end
 
   describe "POST modules" do
-
     it "logs any enabled module" do
       Project.find(1).enabled_module_names = ['issue_tracking', 'news']
       patch :update, params: {id: 1, project: {enabled_module_names: ['issue_tracking', 'repository', 'documents']}}
@@ -42,7 +41,6 @@ describe ProjectsController, type: :controller do
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:old_value => "issue_tracking,news", :value => "issue_tracking")
     end
-
   end
 
   describe "POST /" do

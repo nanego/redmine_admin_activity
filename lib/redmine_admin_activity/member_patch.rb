@@ -1,7 +1,6 @@
 require_dependency 'member'
 
 class Member < ActiveRecord::Base
-
   attr_reader :project_journal
 
   # after_create :update_project_journal
@@ -14,7 +13,6 @@ class Member < ActiveRecord::Base
   end
 
   def update_project_journal
-
     puts "\n\n001 - JOURNALIZED\n\n"
 
     @project_journal = self.project.init_journal(nil)
@@ -24,5 +22,4 @@ class Member < ActiveRecord::Base
       :value => self.principal
     )
   end
-
 end
