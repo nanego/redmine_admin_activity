@@ -18,6 +18,8 @@ module PluginAdminActivity
         show_trackers_details(detail, no_html, options)
       when 'custom_fields'
         show_custom_fields_details(detail, no_html, options)
+      when 'copy_project'
+        show_copy_project_details(detail, no_html, options)
       else
         # Process standard properties like 'attr', 'attachment' or 'cf'
         super
@@ -86,6 +88,10 @@ module PluginAdminActivity
       new_values = new_values.any? ? l(:text_journal_custom_fields_added, :value => new_values.join(', ')).html_safe : ""
 
       l(:text_journal_custom_fields_changed, :deleted => deleted_values, :new => new_values).html_safe
+    end
+
+    def show_copy_project_details(detail, no_html = false, options = {})
+      l(:text_journal_copy_project, :value => detail.value).html_safe
     end
 
     def string_list_to_array(value)

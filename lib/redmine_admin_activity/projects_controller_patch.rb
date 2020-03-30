@@ -3,12 +3,27 @@ require_dependency 'projects_controller'
 class ProjectsController
   before_action :init_journal, :only => [:update]
   after_action :update_journal, :only => [:update]
+  after_action :journalized_projects_duplication, :only => [:copy]
 
   def init_journal
     @project.init_journal(User.current)
     @previous_enabled_module_names = @project.enabled_module_names
     @previous_enabled_tracker_ids = @project.tracker_ids
     @previous_enabled_issue_custom_field_ids = @project.issue_custom_field_ids
+  end
+
+  def journalized_projects_duplication
+    return unless @project.persisted?
+
+    @project.init_journal(User.current)
+
+    @project.current_journal.details << JournalDetail.new(
+      :property => 'copy_project',
+      :prop_key => 'copy_project',
+      :value => "#{@source_project.name} (id: #{@source_project.id})"
+    )
+
+    @project.current_journal.save if @project.current_journal.details.any?
   end
 
   def update_journal
