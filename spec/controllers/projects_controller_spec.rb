@@ -45,4 +45,16 @@ describe ProjectsController, type: :controller do
 
   end
 
+  describe "POST /" do
+    before { @request.session[:user_id] = 1 }
+
+    it "creates a new project duplicate from a source project and a new entry in the project journal" do
+      post :copy, params: { id: 1, project: { name: "Test copy", identifier: "test-copy" } }
+
+      project = Project.last
+      expect(response).to redirect_to('/projects/test-copy/settings')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "eCookbook (id: 1)")
+    end
+  end
 end
