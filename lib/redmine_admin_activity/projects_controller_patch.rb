@@ -13,7 +13,7 @@ class ProjectsController
   end
 
   def journalized_projects_duplication
-    return unless @project.persisted?
+    return unless @project.present? && @project.persisted?
 
     @project.init_journal(User.current)
 
