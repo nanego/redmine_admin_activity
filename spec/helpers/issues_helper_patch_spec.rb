@@ -103,4 +103,18 @@ describe "IssuesHelperPatch" do
     end
   end
 
+  describe "copy project" do
+    it "should IssuesHelper#copy_project with no_html should show the source project" do
+      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
+      expect(show_detail(detail, true)).to eq "Project copy from Test (id: 4)"
+    end
+
+    it "should IssuesHelper#copy_project with html should show the source project with HTML highlights" do
+      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
+      result = show_detail(detail, false)
+      html = "Project copy from Test (id: 4)"
+      expect(result).to include(html)
+    end
+  end
+
 end
