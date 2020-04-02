@@ -17,3 +17,4 @@ fr:
   text_journal_custom_fields_added: "activation de [%{value}]"
   permission_see_project_activity: "Voir l'historique des projets"
   and: et
+  text_setting_journal_entry: "%{field} changé de <i>%{old_value}</i> à <i>%{value}</i>."

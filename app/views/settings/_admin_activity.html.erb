@@ -1,0 +1,12 @@
+<%
+  @journals = JournalSetting.all.to_a
+  @journals.each_with_index {|j,i| j.indice = i+1}
+  @journals.reverse! # Last changes first
+%>
+
+<% if @journals.present? %>
+  <div id="history">
+    <h3><%=l(:label_history)%></h3>
+    <%= render :partial => 'history', :locals => { :journals => @journals } %>
+  </div>
+<% end %>
