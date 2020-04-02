@@ -19,3 +19,4 @@ en:
   text_journal_copy_project: "Project copy from %{value}"
   permission_see_project_activity: "See projects activity"
   and: and
+  text_setting_journal_entry: "%{field} changed from <i>%{old_value}</i> to <i>%{value}</i>."

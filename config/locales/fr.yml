@@ -18,3 +18,4 @@ fr:
   text_journal_copy_project: "Projet copié de %{value}"
   permission_see_project_activity: "Voir l'historique des projets"
   and: et
+  text_setting_journal_entry: "%{field} changé de <i>%{old_value}</i> à <i>%{value}</i>."
