@@ -23,7 +23,6 @@ describe SettingsHelper, :type => :controller do
     @request.session[:user_id] = 2
 
     get :index
-
     assert_response 403
   end
 end

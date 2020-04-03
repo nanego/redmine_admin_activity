@@ -1,24 +1,24 @@
 <% journals.each do |journal| %>
   <div id="change-<%= journal.id %>" class="journal has-details">
     <div id="note-<%= journal.indice %>">
-      <h4><a href="#note-<%= journal.indice %>" class="journal-link">#<%= journal.indice %></a>
-      <%= avatar(journal.user, :size => "24") %>
-      <%= authoring journal.created_at, journal.user, :label => :label_updated_time_by %></h4>
-      <% if journal.value_changes.any? %>
-      <ul class="details">
-        <% journal.value_changes.each do |name, changes| %>
-          <%
-            field_name = l("setting_#{name}")
-            field_name = l("label_theme") if name == "ui_theme"
-          %>
-          <li>
-            <%= sanitize l(".text_setting_journal_entry", field:  field_name,
-                                                          old_value: changes[0],
-                                                          value: changes[1]) %>
-          </li>
-        <% end %>
-      </ul>
+    <h4><a href="#note-<%= journal.indice %>" class="journal-link">#<%= journal.indice %></a>
+    <%= avatar(journal.user, :size => "24") %>
+    <%= authoring journal.created_on, journal.user, :label => :label_updated_time_by %></h4>
+    <% if journal.value_changes.any? %>
+    <ul class="details">
+      <% journal.value_changes.each do |name, changes| %>
+        <%
+          field_name = l("setting_#{name}")
+          field_name = l("label_theme") if name == "ui_theme"
+        %>
+        <li>
+          <%= sanitize l(".text_setting_journal_entry", field:  field_name,
+                                                        old_value: changes[0],
+                                                        value: changes[1]) %>
+        </li>
       <% end %>
+    </ul>
+    <% end %>
     </div>
   </div>
 <% end %>
