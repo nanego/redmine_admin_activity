@@ -1,7 +1,7 @@
 <%
-  @journals = JournalSetting.all.to_a
-  @journals.each_with_index {|j,i| j.indice = i+1}
-  @journals.reverse! # Last changes first
+  @journals = JournalSetting.includes(:user).order(:created_at => :asc)
+                                            .each_with_index {|j, i| j.indice = i+1}
+                                            .reverse
 %>
 
 <% if @journals.present? %>
