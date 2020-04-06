@@ -7,7 +7,9 @@ class SettingsController
   private
 
   def intialize_settings_was
-    @settings_was = Setting.pluck(:name).map { |name| [name.to_sym, Setting[name]] }
+    @settings_was = Setting.pluck(:name)
+                        .select { |name| Setting.find_by_name(name).valid? }
+                        .map { |name| [name.to_sym, Setting[name]] }
   end
 
   def track_settings_was_changes
