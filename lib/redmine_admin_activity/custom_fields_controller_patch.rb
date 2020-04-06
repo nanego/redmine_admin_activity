@@ -1,7 +1,7 @@
 require_dependency 'custom_fields_controller'
 
 class CustomFieldsController
-  before_action :store_project_ids, :only => [:update]
+  append_before_action :store_project_ids, :only => [:update]
   after_action :custom_fields_creation, :only => [:create]
   after_action :custom_fields_upgrade, :only => [:update]
   before_action :custom_fields_deletion_preparation, :only => [:destroy]
@@ -10,12 +10,11 @@ class CustomFieldsController
   private
 
   def store_project_ids
-    custom_field = CustomField.find(params[:id])
-    @previous_project_ids = custom_field.project_ids
+    @previous_project_ids = @custom_field.project_ids if @custom_field.is_a?(IssueCustomField)
   end
 
   def custom_fields_creation
-    return unless @custom_field.persisted?
+    return unless @custom_field.persisted? && @custom_field.is_a?(IssueCustomField)
 
     @custom_field.projects.each do |project|
       add_journal_entry project, JournalDetail.new(
@@ -27,7 +26,7 @@ class CustomFieldsController
   end
 
   def custom_fields_upgrade
-    return if @previous_project_ids == @custom_field.project_ids
+    return unless @custom_field.is_a?(IssueCustomField) && @previous_project_ids != @custom_field.project_ids
 
     changed_project_ids = array_difference(@previous_project_ids, @custom_field.project_ids)
 
@@ -48,7 +47,9 @@ class CustomFieldsController
   end
 
   def custom_fields_deletion_preparation
-    @jouarnals_projects = []
+    return unless @custom_field.is_a?(IssueCustomField)
+
+    @journals_projects = []
     custom_field = CustomField.find(params[:id])
     custom_field.projects.each do |project|
       project.init_journal(User.current)
@@ -57,12 +58,13 @@ class CustomFieldsController
         :prop_key  => :custom_fields,
         :old_value => custom_field.name
       )
-      @jouarnals_projects << project
+      @journals_projects << project
     end
   end
 
   def custom_fields_deletion
-    @jouarnals_projects.each { |project| project.current_journal.save }
+    return unless @custom_field.is_a?(IssueCustomField)
+    @journals_projects.each { |project| project.current_journal.save }
   end
 
   def add_journal_entry(project, journal_detail)
