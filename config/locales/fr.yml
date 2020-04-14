@@ -19,3 +19,5 @@ fr:
   permission_see_project_activity: "Voir l'historique des projets"
   and: et
   text_setting_journal_entry: "%{field} changé de <i>%{old_value}</i> à <i>%{value}</i>."
+  text_setting_create_project_journal_entry: "Le projet <i>%{project}</i> a été créé."
+  text_setting_destroy_project_journal_entry: "Le projet <i>%{project_name}</i> a été supprimé."
