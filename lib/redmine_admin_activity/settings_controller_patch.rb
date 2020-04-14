@@ -25,7 +25,7 @@ class SettingsController
 
     return unless changes.any?
 
-    journal_entry = JournalSetting.create(
+    JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => changes
     )
