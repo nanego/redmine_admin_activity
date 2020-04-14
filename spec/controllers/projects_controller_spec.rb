@@ -57,4 +57,28 @@ describe ProjectsController, type: :controller do
       expect(project.journals.last.details.last).to have_attributes(:value => "eCookbook (id: 1)")
     end
   end
+
+  describe "POST create" do
+    it "logs change on module" do
+      post :create, :params => { :project => { "name" => "Test create", "identifier" => "test-create" } }
+
+      project = Project.last
+      expect(response).to redirect_to('/projects/test-create/settings')
+      expect(JournalSetting.all).to_not be_nil
+      expect(JournalSetting.all.last.value_changes).to include({"name" => ["", "Test create"]})
+      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+    end
+  end
+
+  describe "DELETE destroy" do
+    it "logs change on module" do
+      @request.session[:user_id] = 1
+      delete :destroy, :params => { :id => "ecookbook", :confirm => true }
+
+      expect(response).to redirect_to('/admin/projects')
+      expect(JournalSetting.all).to_not be_nil
+      expect(JournalSetting.all.last.value_changes).to include({"name" => ["eCookbook", nil]})
+      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+    end
+  end
 end
