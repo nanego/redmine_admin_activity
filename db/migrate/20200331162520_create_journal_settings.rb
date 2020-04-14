@@ -4,6 +4,6 @@ class CreateJournalSettings < ActiveRecord::Migration[5.2]
       t.json :value_changes, :null => false
       t.references :user, :foreign_key => true, :null => false
       t.datetime :created_on, :null => false
-    end
+    end unless ActiveRecord::Base.connection.table_exists? 'journal_settings'
   end
 end
