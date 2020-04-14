@@ -64,6 +64,8 @@ class ProjectsController
   end
 
   def journalized_projects_creation
+    return unless @project.present? && @project.persisted?
+
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => @project.previous_changes,
@@ -72,7 +74,7 @@ class ProjectsController
   end
 
   def journalized_projects_deletion
-    return unless api_request? || params[:confirm]
+    return unless @project_to_destroy.destroyed?
 
     changes = @project_to_destroy.attributes.to_a.map { |i| [i[0], [i[1], nil]] }.to_h
 
