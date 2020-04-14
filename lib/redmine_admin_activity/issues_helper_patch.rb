@@ -42,7 +42,9 @@ module PluginAdminActivity
     end
 
     def show_members_details(detail, no_html = false, options = {})
-      begin
+
+      if detail.prop_key == 'member_with_roles'
+
         value = JSON.parse(detail.value || "{}")
         old_value = JSON.parse(detail.old_value || "{}")
         name = value["name"] || old_value["name"]
@@ -56,7 +58,9 @@ module PluginAdminActivity
         else
           l(:text_journal_member_removed, :name => name, :old => old_roles).html_safe
         end
-      rescue JSON::ParserError => _e
+
+      else
+
         value = string_list_to_array(detail.value)
         old_value = string_list_to_array(detail.old_value)
         deleted_values = old_value - value
@@ -66,6 +70,7 @@ module PluginAdminActivity
         new_values = new_values.any? ? l(:text_journal_members_added, :value => new_values.join(', ')).html_safe : ""
 
         l(:text_journal_members_changed, :deleted => deleted_values, :new => new_values).html_safe
+
       end
     end
 

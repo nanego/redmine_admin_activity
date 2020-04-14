@@ -28,7 +28,7 @@ class MembersController
 
         entries << JournalDetail.new(
           :property => 'members',
-          :prop_key => 'members',
+          :prop_key => 'member_with_roles',
           :value    => { :name => member.principal.to_s, :roles => Role.where(id: role_ids).pluck(:name) }.to_json
         )
       end
@@ -45,7 +45,7 @@ class MembersController
 
     add_journal_entry @project, JournalDetail.new(
       :property  => :members,
-      :prop_key  => :members,
+      :prop_key  => 'member_with_roles',
       :old_value => { :name => @member.principal.to_s, :roles => previous_roles }.to_json,
       :value     => { :name => @member.principal.to_s, :roles => new_roles }.to_json
     )
@@ -56,7 +56,7 @@ class MembersController
     # key = (added_or_removed == :removed ? :old_value : :value)
     add_journal_entry @project, JournalDetail.new(
       :property  => 'members',
-      :prop_key  => 'members',
+      :prop_key  => 'member_with_roles',
       :old_value => { :name => @member.principal.to_s, :roles => Role.where(id: @member.roles.ids).pluck(:name) }.to_json
     )
   end
