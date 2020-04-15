@@ -61,6 +61,17 @@ class ProjectsController
     )
 
     @project.current_journal.save if @project.current_journal.details.any?
+
+    changes = @project.attributes.to_a.map { |i| [i[0], [nil, i[1]]] }.to_h
+    changes["source_project"] = @source_project.id
+    changes["source_project_name"] = @source_project.name
+
+    JournalSetting.create(
+      :user_id => User.current.id,
+      :value_changes => changes,
+      :journalized => @project,
+      :journalized_entry_type => "copy",
+    )
   end
 
   def journalized_projects_creation
@@ -70,6 +81,7 @@ class ProjectsController
       :user_id => User.current.id,
       :value_changes => @project.previous_changes,
       :journalized => @project,
+      :journalized_entry_type => "create",
     )
   end
 
@@ -82,6 +94,7 @@ class ProjectsController
       :user_id => User.current.id,
       :value_changes => changes,
       :journalized => @project_to_destroy,
+      :journalized_entry_type => "destroy",
     )
   end
 end

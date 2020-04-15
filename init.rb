@@ -11,6 +11,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/custom_fields_controller_patch'
   require_dependency 'redmine_admin_activity/settings_controller_patch'
   require_dependency 'redmine_admin_activity/settings_helper_patch'
+  require_dependency 'redmine_admin_activity/journal_settings_helper'
 end
 
 Redmine::Plugin.register :redmine_admin_activity do

@@ -7,26 +7,10 @@
     <% if journal.value_changes.any? %>
     <ul class="details">
       <% if journal.journalized_type == "Project" %>
-        <li>
-          <% if journal.creation? %>
-            <% project_text = journal.journalized.present? ? link_to(journal.journalized.name, project_path(journal.journalized))
-                                                             : journal.value_changes["name"][1] %>
-            <%= sanitize l(".text_setting_create_project_journal_entry", project: project_text) %>
-          <% elsif journal.deletion? %>
-            <%= sanitize l(".text_setting_destroy_project_journal_entry", project_name: journal.value_changes["name"][0]) %>
-          <% end %>
-        </li>
+        <li><%= project_update_text(journal) %></li>
       <% else %>
         <% journal.value_changes.each do |name, changes| %>
-            <%
-              field_name = l("setting_#{name}")
-              field_name = l("label_theme") if name == "ui_theme"
-            %>
-            <li>
-              <%= sanitize l(".text_setting_journal_entry", field:  field_name,
-                                                            old_value: changes[0],
-                                                            value: changes[1]) %>
-            </li>
+          <li><%= settings_update_text(name, changes) %></li>
         <% end %>
       <% end %>
     </ul>

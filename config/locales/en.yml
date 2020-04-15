@@ -22,3 +22,4 @@ en:
   text_setting_journal_entry: "%{field} changed from <i>%{old_value}</i> to <i>%{value}</i>."
   text_setting_create_project_journal_entry: "Project <i>%{project_name}</i> has been created."
   text_setting_destroy_project_journal_entry: "Project <i>%{project_name}</i> has been deleted."
+  text_setting_copy_project_journal_entry: "Projet <i>%{project}</i> has been copied from <i>%{source_project}</i>."
