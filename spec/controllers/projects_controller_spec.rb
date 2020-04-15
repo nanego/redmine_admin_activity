@@ -44,20 +44,29 @@ describe ProjectsController, type: :controller do
   end
 
   describe "POST /" do
-    before { @request.session[:user_id] = 1 }
+    before do
+      @request.session[:user_id] = 1
+      post :copy, params: { id: 1, project: { name: "Test copy", identifier: "test-copy" } }
+    end
 
     it "creates a new project duplicate from a source project and a new entry in the project journal" do
-      post :copy, params: { id: 1, project: { name: "Test copy", identifier: "test-copy" } }
-
       project = Project.last
       expect(response).to redirect_to('/projects/test-copy/settings')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "eCookbook (id: 1)")
     end
+
+    it "logs change on JournalSetting" do
+      expect(JournalSetting.all).to_not be_nil
+      expect(JournalSetting.all.last.value_changes).to include({"name" => [nil, "Test copy"]})
+      expect(JournalSetting.all.last.value_changes).to include({"source_project" => 1})
+      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "copy")
+    end
   end
 
   describe "POST create" do
-    it "logs change on module" do
+    it "logs change on JournalSetting" do
       post :create, :params => { :project => { "name" => "Test create", "identifier" => "test-create" } }
 
       project = Project.last
@@ -65,11 +74,12 @@ describe ProjectsController, type: :controller do
       expect(JournalSetting.all).to_not be_nil
       expect(JournalSetting.all.last.value_changes).to include({"name" => ["", "Test create"]})
       expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "create")
     end
   end
 
   describe "DELETE destroy" do
-    it "logs change on module" do
+    it "logs change on JournalSetting" do
       @request.session[:user_id] = 1
       delete :destroy, :params => { :id => "ecookbook", :confirm => true }
 
@@ -77,6 +87,7 @@ describe ProjectsController, type: :controller do
       expect(JournalSetting.all).to_not be_nil
       expect(JournalSetting.all.last.value_changes).to include({"name" => ["eCookbook", nil]})
       expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "destroy")
     end
   end
 end

@@ -7,10 +7,14 @@ class JournalSetting < ActiveRecord::Base
   validates :value_changes, :presence => true
 
   def creation?
-    value_changes["id"][0].nil? && !value_changes["id"][1].nil?
+    journalized_entry_type == "create"
   end
 
   def deletion?
-    !value_changes["id"][0].nil? && value_changes["id"][1].nil?
+    journalized_entry_type == "destroy"
+  end
+
+  def duplication?
+    journalized_entry_type == "copy"
   end
 end
