@@ -19,24 +19,24 @@ describe MembersController, type: :controller do
   end
 
   let(:project) { projects(:projects_001) }
-  let(:user)    { users(:users_009) }
-  let(:member)  { members(:members_001) }
-  let(:role)    { roles(:roles_002) }
+  let(:user)    { users(:users_009) } # User Misc
+  let(:member)  { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
+  let(:role)    { roles(:roles_002) } # Developer
 
   describe "POST /" do
-    before { post :create, params: { project_id: project.id, membership: { user_ids: [user.id], roles_ids: [role.id] } } }
+    before { post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } } }
 
     it { expect(response).to redirect_to('/projects/ecookbook/settings/members') }
     it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[]}", :old_value => nil) }
+    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"]}", :old_value => nil) }
   end
 
   describe "PATCH /:id" do
-    before { patch :update, params: { id: member.id, membership: { roles_ids: [role.id] } } }
+    before { patch :update, params: { id: member.id, membership: { role_ids: [role.id] } } }
 
     it { expect(response).to redirect_to('/projects/ecookbook/settings/members') }
     it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}") }
+    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}") }
   end
 
   describe "DELETE /:id" do
