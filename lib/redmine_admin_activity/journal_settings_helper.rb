@@ -27,7 +27,7 @@ module PluginAdminActivity
     private
 
     def link_to_project_if_exists(project)
-      link_to(project.name, project_path(project)) if project.present?
+      link_to(project.name, project_path(project)) if project.present? && project.persisted?
     end
 
     ActionView::Base.send :include, JournalSettingsHelper
