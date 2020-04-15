@@ -24,26 +24,36 @@ describe MembersController, type: :controller do
   let(:role)    { roles(:roles_002) } # Developer
 
   describe "POST /" do
-    before { post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } } }
-
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/members') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"]}", :old_value => nil) }
+    it "adds a new member" do
+      post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } }
+      expect(response).to redirect_to('/projects/ecookbook/settings/members')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"]}", :old_value => nil)
+    end
   end
 
   describe "PATCH /:id" do
-    before { patch :update, params: { id: member.id, membership: { role_ids: [role.id] } } }
+    it "replaces current role by another" do
+      patch :update, params: { id: member.id, membership: { role_ids: [role.id] } }
+      expect(response).to redirect_to('/projects/ecookbook/settings/members')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+    end
 
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/members') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}") }
+    pending "adds a role to a member" do
+      patch :update, params: { id: member.id, membership: { role_ids: member.roles.map(&:id)|[role.id] } }
+      expect(response).to redirect_to('/projects/ecookbook/settings/members')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\", \"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+    end
   end
 
   describe "DELETE /:id" do
-    before { delete :destroy, params: { id: member.id } }
-
-    it { expect(response).to redirect_to('/projects/ecookbook/settings/members') }
-    it { expect(project.journals).to_not be_nil }
-    it { expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}") }
+    it "removes a member" do
+      delete :destroy, params: { id: member.id }
+      expect(response).to redirect_to('/projects/ecookbook/settings/members')
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+    end
   end
 end
