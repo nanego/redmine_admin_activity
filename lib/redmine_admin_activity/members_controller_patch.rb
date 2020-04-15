@@ -40,8 +40,8 @@ class MembersController
   def journalized_members_upgrade
     return if @previous_role_ids == @member.roles.ids
 
-    previous_roles = Role.where(id: @previous_role_ids - @member.roles.ids).pluck(:name)
-    new_roles = Role.where(id: @member.roles.ids - @previous_role_ids).pluck(:name)
+    previous_roles = Role.where(id: @previous_role_ids).pluck(:name)
+    new_roles = Role.where(id: @member.roles.ids).pluck(:name)
 
     add_journal_entry @project, JournalDetail.new(
       :property  => :members,
