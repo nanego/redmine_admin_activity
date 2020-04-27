@@ -26,11 +26,25 @@ class MembersController
         member = Member.new(:project => @project, :user_id => user_id)
         member.set_editable_role_ids(role_ids)
 
-        entries << JournalDetail.new(
-          :property => 'members',
-          :prop_key => 'member_with_roles',
-          :value    => { :name => member.principal.to_s, :roles => Role.where(id: role_ids).pluck(:name) }.to_json
-        )
+        if installed_plugin?(:redmine_limited_visibility)
+          function_ids = params[:membership][:function_ids]
+
+          entries << JournalDetail.new(
+            :property => 'members',
+            :prop_key => 'member_roles_and_functions',
+            :value    => {
+              :name => member.principal.to_s,
+              :roles => Role.where(id: role_ids).pluck(:name),
+              :functions => Function.where(id: function_ids).pluck(:name)
+            }.to_json
+          )
+        else
+          entries << JournalDetail.new(
+            :property => 'members',
+            :prop_key => 'member_with_roles',
+            :value    => { :name => member.principal.to_s, :roles => Role.where(id: role_ids).pluck(:name) }.to_json
+          )
+        end
       end
     end
 
@@ -54,10 +68,22 @@ class MembersController
   # Called after a member is removed
   def journalized_member_deletion
     # key = (added_or_removed == :removed ? :old_value : :value)
-    add_journal_entry @project, JournalDetail.new(
-      :property  => 'members',
-      :prop_key  => 'member_with_roles',
-      :old_value => { :name => @member.principal.to_s, :roles => Role.where(id: @member.roles.ids).pluck(:name) }.to_json
-    )
+    if installed_plugin?(:redmine_limited_visibility)
+      add_journal_entry @project, JournalDetail.new(
+        :property  => 'members',
+        :prop_key  => 'member_roles_and_functions',
+        :old_value => {
+          :name => @member.principal.to_s,
+          :roles => Role.where(id: @member.roles.ids).pluck(:name),
+          :functions => Function.where(id: @member.functions.ids).pluck(:name)
+        }.to_json
+      )
+    else
+      add_journal_entry @project, JournalDetail.new(
+        :property  => 'members',
+        :prop_key  => 'member_with_roles',
+        :old_value => { :name => @member.principal.to_s, :roles => Role.where(id: @member.roles.ids).pluck(:name) }.to_json
+      )
+    end
   end
 end

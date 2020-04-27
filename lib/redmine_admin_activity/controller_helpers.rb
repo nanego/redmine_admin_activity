@@ -9,4 +9,8 @@ module RedmineAdminActivity::ControllerHelpers
 
     project.current_journal.save
   end
+
+  def installed_plugin?(name)
+    Redmine::Plugin.installed?(name)
+  end
 end
