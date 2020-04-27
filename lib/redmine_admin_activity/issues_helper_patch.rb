@@ -42,9 +42,8 @@ module PluginAdminActivity
     end
 
     def show_members_details(detail, no_html = false, options = {})
-
-      if detail.prop_key == 'member_with_roles'
-
+      case detail.prop_key
+      when 'member_with_roles'
         value = JSON.parse(detail.value || "{}")
         old_value = JSON.parse(detail.old_value || "{}")
         name = value["name"] || old_value["name"]
@@ -59,8 +58,24 @@ module PluginAdminActivity
           l(:text_journal_member_removed, :name => name, :old => old_roles).html_safe
         end
 
-      else
+      when 'member_roles_and_functions'
+        value = JSON.parse(detail.value || "{}")
+        old_value = JSON.parse(detail.old_value || "{}")
+        name = value["name"] || old_value["name"]
+        new_roles = value.fetch("roles", []).join(", ")
+        old_roles = old_value.fetch("roles", []).join(", ")
+        new_functions = value.fetch("functions", []).join(", ")
+        old_functions = old_value.fetch("functions", []).join(", ")
 
+        if new_roles.present? && old_roles.present?
+          l(:text_journal_member_with_roles_and_functions_changed, :name => name, :new_roles => new_roles, :old_roles => old_roles, :new_functions => new_functions, :old_functions => old_functions).html_safe
+        elsif new_roles.present? && old_roles.empty?
+          l(:text_journal_member_with_roles_and_functions_added, :name => name, :new_roles => new_roles, :new_functions => new_functions).html_safe
+        else
+          l(:text_journal_member_with_roles_and_functions_removed, :name => name, :old_roles => old_roles, :old_functions => old_functions).html_safe
+        end
+
+      else
         value = string_list_to_array(detail.value)
         old_value = string_list_to_array(detail.old_value)
         deleted_values = old_value - value

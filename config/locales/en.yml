@@ -10,6 +10,8 @@ en:
   text_journal_member_changed: "Roles of member %{name} have been changed from [%{old}] to [%{new}]"
   text_journal_member_added: "Member %{name} has been added with roles [%{new}]"
   text_journal_member_removed: "Member %{name}, with roles [%{old}], has been removed"
+  text_journal_member_with_roles_and_functions_added: "Member %{name} has been added with roles [%{new_roles}] and functions [%{new_functions}]"
+  text_journal_member_with_roles_and_functions_removed: "Member %{name}, with roles [%{old_roles}] and functions [%{old_functions}], has been removed"
   text_journal_issue_category_changed: "Category name changed from %{old_value} to %{value}"
   text_journal_issue_category_removed: "Category %{old_value} removed"
   text_journal_issue_category_added: "Category %{value} added"

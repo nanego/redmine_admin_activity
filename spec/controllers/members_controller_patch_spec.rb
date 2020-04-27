@@ -26,9 +26,15 @@ describe MembersController, type: :controller do
   describe "POST /" do
     it "adds a new member" do
       post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } }
+
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
-      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"]}", :old_value => nil)
+
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"],\"functions\":[]}", :old_value => nil)
+      else
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"User Misc\",\"roles\":[\"Developer\"]}", :old_value => nil)
+      end
     end
   end
 
@@ -53,7 +59,11 @@ describe MembersController, type: :controller do
       delete :destroy, params: { id: member.id }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
-      expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+      else
+        expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+      end
     end
   end
 end
