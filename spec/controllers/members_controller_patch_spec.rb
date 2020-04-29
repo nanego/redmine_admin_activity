@@ -43,14 +43,24 @@ describe MembersController, type: :controller do
       patch :update, params: { id: member.id, membership: { role_ids: [role.id] } }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
-      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+      else
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+      end
     end
 
     it "adds a role to a member" do
       patch :update, params: { id: member.id, membership: { role_ids: member.roles.map(&:id) + [role.id] } }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
-      expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+      else
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
+      end
     end
   end
 
@@ -59,6 +69,7 @@ describe MembersController, type: :controller do
       delete :destroy, params: { id: member.id }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
+
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
         expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
       else
