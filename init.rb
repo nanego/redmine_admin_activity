@@ -8,6 +8,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/issues_helper_patch'
   require_dependency 'redmine_admin_activity/member_patch'
   require_dependency 'redmine_admin_activity/members_controller_patch'
+  require_dependency 'redmine_admin_activity/principal_memberships_controller_patch'
   require_dependency 'redmine_admin_activity/journal_patch'
   require_dependency 'redmine_admin_activity/trackers_controller_patch'
   require_dependency 'redmine_admin_activity/custom_fields_controller_patch'
