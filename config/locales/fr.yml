@@ -9,6 +9,7 @@ fr:
   text_journal_member_changed: "Les rôles du membre %{name} ont été modifiés de [%{old}] à [%{new}]"
   text_journal_member_added: "Le membre %{name} a été ajouté avec les rôles [%{new}]"
   text_journal_member_removed: "Le membre %{name}, avec les rôles [%{old}], a été supprimé"
+  text_journal_member_with_roles_and_functions_changed: "Le membre %{name} a été modifiés avec les rôles de [%{old_roles}] à [%{new_roles}], les fonctions de [%{old_functions}] à [%{new_functions}]"
   text_journal_member_with_roles_and_functions_added: "Le membre %{name} a été ajouté avec les rôles [%{new_roles}] et les fonctions [%{new_functions}]"
   text_journal_member_with_roles_and_functions_removed: "Le membre %{name}, avec les rôles [%{old_roles}] et les fonctions [%{old_functions}], a été supprimé"
   text_journal_issue_category_changed: "La catégorie %{old_value} a été renommée %{value}"
