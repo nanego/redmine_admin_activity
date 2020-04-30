@@ -3,7 +3,7 @@ require_dependency 'members_controller'
 class MembersController
   include RedmineAdminActivity::ControllerHelpers
 
-  before_action :store_role_ids, :only => [:update]
+  before_action :store_role_ids, :only => [:update, :destroy]
   after_action :journalized_members_creation, :only => [:create]
   after_action :journalized_members_upgrade, :only => [:update]
   after_action :journalized_member_deletion, :only => [:destroy]
@@ -99,15 +99,15 @@ class MembersController
         :prop_key  => 'member_roles_and_functions',
         :old_value => {
           :name => @member.principal.to_s,
-          :roles => Role.where(id: @member.roles.ids).pluck(:name),
-          :functions => Function.where(id: @member.functions.ids).pluck(:name)
+          :roles => Role.where(id: @previous_role_ids).pluck(:name),
+          :functions => Function.where(id: @previous_function_ids).pluck(:name)
         }.to_json
       )
     else
       add_journal_entry @project, JournalDetail.new(
         :property  => 'members',
         :prop_key  => 'member_with_roles',
-        :old_value => { :name => @member.principal.to_s, :roles => Role.where(id: @member.roles.ids).pluck(:name) }.to_json
+        :old_value => { :name => @member.principal.to_s, :roles => Role.where(id: @previous_role_ids).pluck(:name) }.to_json
       )
     end
   end
