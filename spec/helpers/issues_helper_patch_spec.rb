@@ -155,6 +155,11 @@ describe "IssuesHelperPatch" do
         expect(show_detail(detail, true)).to eq "Member user1, with roles [Developer] and functions [function1], has been removed"
       end
 
+      it "should IssuesHelper#show_detail with no_html should show a deleted members without functions" do
+        detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer"],"functions":[]}', :value => nil, :prop_key => 'member_roles_and_functions')
+        expect(show_detail(detail, true)).to eq "Member user1, with roles [Developer], has been removed"
+      end
+
       it "should IssuesHelper#show_detail with html should show a new member with HTML highlights" do
         detail = JournalDetail.new(:property => 'members', :old_value => nil, :value => '{"name":"user1","roles":["Developer"],"functions":["function2"]}', :prop_key => 'member_roles_and_functions')
         detail.id = 1

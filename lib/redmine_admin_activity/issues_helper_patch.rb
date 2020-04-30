@@ -50,9 +50,9 @@ module PluginAdminActivity
         new_roles = value.fetch("roles", []).join(", ")
         old_roles = old_value.fetch("roles", []).join(", ")
 
-        if new_roles.present? && old_roles.present?
+        if value.present? && old_value.present?
           l(:text_journal_member_changed, :name => name, :new => new_roles, :old => old_roles).html_safe
-        elsif new_roles.present? && old_roles.empty?
+        elsif value.present? && old_value.empty?
           l(:text_journal_member_added, :name => name, :new => new_roles).html_safe
         else
           l(:text_journal_member_removed, :name => name, :old => old_roles).html_safe
@@ -67,12 +67,26 @@ module PluginAdminActivity
         new_functions = value.fetch("functions", []).join(", ")
         old_functions = old_value.fetch("functions", []).join(", ")
 
-        if new_roles.present? && old_roles.present?
-          l(:text_journal_member_with_roles_and_functions_changed, :name => name, :new_roles => new_roles, :old_roles => old_roles, :new_functions => new_functions, :old_functions => old_functions).html_safe
-        elsif new_roles.present? && old_roles.empty?
-          l(:text_journal_member_with_roles_and_functions_added, :name => name, :new_roles => new_roles, :new_functions => new_functions).html_safe
+        changes = []
+
+        if value.present? && old_value.present?
+          changes << l(:text_journal_member_roles_changed, :old => old_roles, :new => new_roles) if new_roles.present? || old_roles.present?
+          changes << l(:text_journal_member_functions_changed, :old => old_functions, :new => new_functions) if new_functions.present? || old_functions.present?
+          changes = changes.join(" #{l(:and)} ")
+
+          l(:text_journal_member_with_roles_and_functions_changed, :name => name, :changes => changes).html_safe
+        elsif value.present? && old_value.empty?
+          changes << l(:text_journal_member_roles, :roles => new_roles) if new_roles.present?
+          changes << l(:text_journal_member_functions, :functions => new_functions) if new_functions.present?
+          changes = changes.join(" #{l(:and)} ")
+
+          l(:text_journal_member_with_roles_and_functions_added, :name => name, :changes => changes).html_safe
         else
-          l(:text_journal_member_with_roles_and_functions_removed, :name => name, :old_roles => old_roles, :old_functions => old_functions).html_safe
+          changes << l(:text_journal_member_roles, :roles => old_roles) if old_roles.present?
+          changes << l(:text_journal_member_functions, :functions => old_functions) if old_functions.present?
+          changes = changes.join(" #{l(:and)} ")
+
+          l(:text_journal_member_with_roles_and_functions_removed, :name => name, :changes => changes).html_safe
         end
 
       else
