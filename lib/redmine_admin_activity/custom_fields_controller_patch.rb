@@ -1,6 +1,8 @@
 require_dependency 'custom_fields_controller'
 
 class CustomFieldsController
+  include RedmineAdminActivity::ControllerHelpers
+
   append_before_action :store_project_ids, :only => [:update]
   after_action :custom_fields_creation, :only => [:create]
   after_action :custom_fields_upgrade, :only => [:update]
@@ -10,11 +12,11 @@ class CustomFieldsController
   private
 
   def store_project_ids
-    @previous_project_ids = @custom_field.project_ids if @custom_field.is_a?(IssueCustomField)
+    @previous_project_ids = @custom_field.project_ids if trackable_custom_field?
   end
 
   def custom_fields_creation
-    return unless @custom_field.persisted? && @custom_field.is_a?(IssueCustomField)
+    return unless @custom_field.persisted? && trackable_custom_field?
 
     @custom_field.projects.each do |project|
       add_journal_entry project, JournalDetail.new(
@@ -26,7 +28,7 @@ class CustomFieldsController
   end
 
   def custom_fields_upgrade
-    return unless @custom_field.is_a?(IssueCustomField) && @previous_project_ids != @custom_field.project_ids
+    return unless trackable_custom_field? && @previous_project_ids != @custom_field.project_ids
 
     changed_project_ids = array_difference(@previous_project_ids, @custom_field.project_ids)
 
@@ -47,7 +49,7 @@ class CustomFieldsController
   end
 
   def custom_fields_deletion_preparation
-    return unless @custom_field.is_a?(IssueCustomField)
+    return unless trackable_custom_field?
 
     @journals_projects = []
     custom_field = CustomField.find(params[:id])
@@ -63,17 +65,16 @@ class CustomFieldsController
   end
 
   def custom_fields_deletion
-    return unless @custom_field.is_a?(IssueCustomField)
-    @journals_projects.each { |project| project.current_journal.save }
-  end
+    return unless trackable_custom_field?
 
-  def add_journal_entry(project, journal_detail)
-    project.init_journal(User.current)
-    project.current_journal.details << journal_detail
-    project.current_journal.save
+    @journals_projects.each { |project| project.current_journal.save }
   end
 
   def array_difference(arr1, arr2)
     arr1 - arr2 | arr2 - arr1
+  end
+
+  def trackable_custom_field?
+    @custom_field.is_a?(IssueCustomField)
   end
 end
