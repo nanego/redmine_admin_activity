@@ -28,7 +28,10 @@ describe PrincipalMembershipsController, type: :controller do
   let(:user)     { users(:users_009) } # User Misc
   let(:member)   { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
   let(:role)     { roles(:roles_002) } # Developer
-  let(:function) { functions(:functions_001) }
+
+  if Redmine::Plugin.installed?(:redmine_limited_visibility)
+    let(:function) { functions(:functions_001) }
+  end
 
   describe "POST /" do
     it "adds a member to projects" do
@@ -63,7 +66,7 @@ describe PrincipalMembershipsController, type: :controller do
 
   describe "DELETE /:id" do
     it "removes a member" do
-      project1.update(functions: [function])
+      project1.update(functions: [function]) if Redmine::Plugin.installed?(:redmine_limited_visibility)
       member = Member.new(:project => project1, :user => user)
       member.set_editable_role_ids([roles(:roles_001).id], admin)
       member.set_functional_roles([function.id]) if Redmine::Plugin.installed?(:redmine_limited_visibility)

@@ -8,6 +8,10 @@ describe MembersController, type: :controller do
            :workflows, :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
            :time_entries, :journals, :journal_details, :queries, :repositories, :changesets
 
+  if Redmine::Plugin.installed?(:redmine_limited_visibility)
+    fixtures :functions
+  end
+
   include Redmine::I18n
 
   before do
@@ -22,6 +26,10 @@ describe MembersController, type: :controller do
   let(:user)    { users(:users_009) } # User Misc
   let(:member)  { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
   let(:role)    { roles(:roles_002) } # Developer
+
+  if Redmine::Plugin.installed?(:redmine_limited_visibility)
+    let(:function) { functions(:functions_001) }
+  end
 
   describe "POST /" do
     it "adds a new member" do
