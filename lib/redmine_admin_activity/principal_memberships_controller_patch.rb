@@ -103,7 +103,7 @@ class PrincipalMembershipsController
       add_journal_entry project, JournalDetail.new(
         :property  => 'members',
         :prop_key  => 'member_with_roles',
-        :old_value => { :name => @membership.to_s, :roles => Role.where(id: @membership.roles.ids).pluck(:name) }.to_json
+        :old_value => { :name => @principal.to_s, :roles => Role.where(id: @membership.roles.ids).pluck(:name) }.to_json
       )
     end
   end
