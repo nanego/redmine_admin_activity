@@ -20,6 +20,10 @@ describe MembersController, type: :controller do
     @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 1 #permissions are hard
+    if Redmine::Plugin.installed?(:redmine_limited_visibility)
+      member.function_ids = [Function.first.id]
+      member.save!
+    end
   end
 
   let(:project) { projects(:projects_001) }
@@ -33,7 +37,7 @@ describe MembersController, type: :controller do
 
   describe "POST /" do
     it "adds a new member" do
-      post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } }
+      post :create, params: {project_id: project.id, membership: {user_ids: [user.id], role_ids: [role.id]}}
 
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
@@ -47,25 +51,34 @@ describe MembersController, type: :controller do
   end
 
   describe "PATCH /:id" do
+
+    before do
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        @functions_params = {function_ids: [Function.first.id]}
+      else
+        @functions_params = {}
+      end
+    end
+
     it "replaces current role by another" do
-      patch :update, params: { id: member.id, membership: { role_ids: [role.id] } }
+      patch :update, params: {id: member.id, membership: {role_ids: [role.id]}.merge(@functions_params)}
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
-        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[\"function1\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function1\"]}")
       else
         expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
       end
     end
 
     it "adds a role to a member" do
-      patch :update, params: { id: member.id, membership: { role_ids: member.roles.map(&:id) + [role.id] } }
+      patch :update, params: {id: member.id, membership: {role_ids: member.roles.map(&:id) + [role.id]}.merge(@functions_params)}
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
-        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+        expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[\"function1\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function1\"]}")
       else
         expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
       end
@@ -74,12 +87,12 @@ describe MembersController, type: :controller do
 
   describe "DELETE /:id" do
     it "removes a member" do
-      delete :destroy, params: { id: member.id }
+      delete :destroy, params: {id: member.id}
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
-        expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
+        expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function1\"]}")
       else
         expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
       end
