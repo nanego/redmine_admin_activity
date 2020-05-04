@@ -150,6 +150,16 @@ describe "IssuesHelperPatch" do
         expect(show_detail(detail, true)).to eq "Member user1 has been changed with roles from [Developer] to [Developer, Manager] and functions from [] to [function1]"
       end
 
+      it "should IssuesHelper#show_detail with no_html should show a changing roles only" do
+        detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer"],"functions":["function1"]}', :value => '{"name":"user1","roles":["Developer", "Manager"],"functions":["function1"]}', :prop_key => 'member_roles_and_functions')
+        expect(show_detail(detail, true)).to eq "Member user1 has been changed with roles from [Developer] to [Developer, Manager]"
+      end
+
+      it "should IssuesHelper#show_detail with no_html should show a changing functions onlu" do
+        detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer"],"functions":[]}', :value => '{"name":"user1","roles":["Developer"],"functions":["function1"]}', :prop_key => 'member_roles_and_functions')
+        expect(show_detail(detail, true)).to eq "Member user1 has been changed with functions from [] to [function1]"
+      end
+
       it "should IssuesHelper#show_detail with no_html should show a deleted members" do
         detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer"],"functions":["function1"]}', :value => nil, :prop_key => 'member_roles_and_functions')
         expect(show_detail(detail, true)).to eq "Member user1, with roles [Developer] and functions [function1], has been removed"

@@ -70,8 +70,8 @@ module PluginAdminActivity
         changes = []
 
         if value.present? && old_value.present?
-          changes << l(:text_journal_member_roles_changed, :old => old_roles, :new => new_roles) if new_roles.present? || old_roles.present?
-          changes << l(:text_journal_member_functions_changed, :old => old_functions, :new => new_functions) if new_functions.present? || old_functions.present?
+          changes << l(:text_journal_member_roles_changed, :old => old_roles, :new => new_roles) if (new_roles.present? || old_roles.present?) && old_roles != new_roles
+          changes << l(:text_journal_member_functions_changed, :old => old_functions, :new => new_functions) if (new_functions.present? || old_functions.present?) && old_functions != new_functions
           changes = changes.join(" #{l(:and)} ")
 
           l(:text_journal_member_with_roles_and_functions_changed, :name => name, :changes => changes).html_safe
