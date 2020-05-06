@@ -1,7 +1,7 @@
 require_dependency 'principal_memberships_controller'
 
 class PrincipalMembershipsController
-  include RedmineAdminActivity::ControllerHelpers
+  include RedmineAdminActivity::Journalizable
 
   before_action :store_role_ids, :only => [:update, :destroy]
   after_action :journalized_memberships_creation, :only => [:create]

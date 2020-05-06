@@ -1,7 +1,7 @@
 require_dependency 'members_controller'
 
 class MembersController
-  include RedmineAdminActivity::ControllerHelpers
+  include RedmineAdminActivity::Journalizable
 
   before_action :store_role_ids, :only => [:update, :destroy]
   after_action :journalized_members_creation, :only => [:create]
