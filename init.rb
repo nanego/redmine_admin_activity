@@ -1,20 +1,22 @@
 ActiveSupport::Reloader.to_prepare do
-  require_dependency 'redmine_admin_activity/controller_helpers'
+  require_dependency 'redmine_admin_activity/controllers/concerns/journalizable'
 
-  require_dependency 'redmine_admin_activity/projects_controller_patch' # unless Rails.env.test?
-  require_dependency 'redmine_admin_activity/project_patch'
-  require_dependency 'redmine_admin_activity/projects_helper_patch'
-  require_dependency 'redmine_admin_activity/issue_categories_controller_patch'
-  require_dependency 'redmine_admin_activity/issues_helper_patch'
-  require_dependency 'redmine_admin_activity/member_patch'
-  require_dependency 'redmine_admin_activity/members_controller_patch'
-  require_dependency 'redmine_admin_activity/principal_memberships_controller_patch'
-  require_dependency 'redmine_admin_activity/journal_patch'
-  require_dependency 'redmine_admin_activity/trackers_controller_patch'
-  require_dependency 'redmine_admin_activity/custom_fields_controller_patch'
-  require_dependency 'redmine_admin_activity/settings_controller_patch'
-  require_dependency 'redmine_admin_activity/settings_helper_patch'
-  require_dependency 'redmine_admin_activity/journal_settings_helper'
+  require_dependency 'redmine_admin_activity/controllers/projects_controller' # unless Rails.env.test?
+  require_dependency 'redmine_admin_activity/controllers/issue_categories_controller'
+  require_dependency 'redmine_admin_activity/controllers/members_controller'
+  require_dependency 'redmine_admin_activity/controllers/principal_memberships_controller'
+  require_dependency 'redmine_admin_activity/controllers/trackers_controller'
+  require_dependency 'redmine_admin_activity/controllers/custom_fields_controller'
+  require_dependency 'redmine_admin_activity/controllers/settings_controller'
+
+  require_dependency 'redmine_admin_activity/models/project'
+  require_dependency 'redmine_admin_activity/models/member'
+  require_dependency 'redmine_admin_activity/models/journal'
+
+  require_dependency 'redmine_admin_activity/helpers/projects_helper'
+  require_dependency 'redmine_admin_activity/helpers/issues_helper'
+  require_dependency 'redmine_admin_activity/helpers/settings_helper'
+  require_dependency 'redmine_admin_activity/helpers/journal_settings_helper'
 end
 
 Redmine::Plugin.register :redmine_admin_activity do

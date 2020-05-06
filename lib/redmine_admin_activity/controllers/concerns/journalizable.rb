@@ -1,4 +1,4 @@
-module RedmineAdminActivity::ControllerHelpers
+module RedmineAdminActivity::Journalizable
   # Store a [JournalDetail] or an array of [JournalDetail]s in a new
   # journal entry for current User.
   def add_journal_entry(project, journal_details)

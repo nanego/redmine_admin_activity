@@ -1,7 +1,7 @@
 require_dependency 'custom_fields_controller'
 
 class CustomFieldsController
-  include RedmineAdminActivity::ControllerHelpers
+  include RedmineAdminActivity::Journalizable
 
   append_before_action :store_project_ids, :only => [:update]
   after_action :custom_fields_creation, :only => [:create]
