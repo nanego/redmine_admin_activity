@@ -5,7 +5,9 @@ module RedmineAdminActivity::Journalizable
     project.init_journal(User.current)
 
     journal_details = [journal_details] unless journal_details.is_a?(Array)
-    project.current_journal.details = journal_details
+    journal_details.each do |journal_detail|
+      project.current_journal.details << journal_detail
+    end
 
     project.current_journal.save
   end
