@@ -18,41 +18,79 @@ class Organizations::MembershipsController
     to_be_deleted_members = Member.where(user: to_be_deleted_users, project: @project)
     @deletable_members = to_be_deleted_members.select{|m| (m.roles & User.current.managed_roles(@project)) == m.roles}
 
-    @updated_members = @previous_current_users.map{|u| Member.includes(:roles).find_by(user: u, project: @project)}
-      .reject{|m| @deletable_members.include?(m)}
+    @updated_members = @previous_current_users.map do |u|
+      query = Member.includes(:roles)
+      query = query.includes(:functions) if installed_plugin?(:redmine_limited_visibility)
+      query.find_by(user: u, project: @project)
+    end.reject{|m| @deletable_members.include?(m)}
+
+    if installed_plugin?(:redmine_limited_visibility)
+      # @requested_functions_ids = Function.where(id: params[:membership][:function_ids].reject(&:empty?)).ids || []
+      @previous_organization_functions_ids = @organization.default_functions_by_project(@project).map{|f| f.id}
+    end
   end
 
   def journalized_memberships_edition
+    if installed_plugin?(:redmine_limited_visibility)
+      organization_functions = @organization.organization_functions.where(project_id: @project.id).map(&:function).reject(&:blank?)
+      previous_organization_functions = @organization.default_functions_by_project(@project)
+    end
+
     @new_users.each do |user|
       member = Member.where(user: user, project: @project).first_or_initialize
 
-      add_member_creation_to_journal(@project, member, @requested_roles.ids, previous_function_ids = nil)
+      personal_functions = member.functions - previous_organization_functions
+      function_ids = (organization_functions | personal_functions).ids
+
+      add_member_creation_to_journal(@project, member, @requested_roles.ids, function_ids)
     end
 
     @updated_members.each do |member|
+      function_ids = nil
+      previous_function_ids = nil
+
       previous_role_ids = member.roles.ids
+      if installed_plugin?(:redmine_limited_visibility)
+        previous_function_ids = member.functions.ids
+      end
+
       member.reload
       role_ids = Member.includes(:roles).find_by(user: member.user, project: @project).roles.ids
 
-      next if previous_role_ids == role_ids
+      if installed_plugin?(:redmine_limited_visibility)
+        personal_functions = member.functions - previous_organization_functions
+        function_ids = (organization_functions | personal_functions).map{|f| f.id}
 
-      add_member_edition_to_journal(@project, member, previous_role_ids, role_ids, previous_function_ids = nil, function_ids = nil)
+        binding.pry
+
+        next if previous_role_ids == role_ids && previous_function_ids == function_ids
+      else
+        next if previous_role_ids == role_ids
+      end
+
+      add_member_edition_to_journal(@project, member, previous_role_ids, role_ids, previous_function_ids, function_ids)
     end
 
     @deletable_members.each do |member|
-       add_member_deletion_to_journal(@project, member, member.role_ids, previous_function_ids = nil)
+      previous_function_ids = nil
+
+      if installed_plugin?(:redmine_limited_visibility)
+        previous_function_ids = member.functions.ids
+      end
+
+      add_member_deletion_to_journal(@project, member, member.role_ids, previous_function_ids)
     end
   end
 
   def add_member_creation_to_journal(project, member, role_ids, function_ids = nil)
-    if function_ids.nil?
+    if function_ids.present?
       add_journal_entry project, JournalDetail.new(
         :property  => 'members',
         :prop_key  => 'member_roles_and_functions',
         :value => {
           :name => member.principal.to_s,
           :roles => Role.where(id: role_ids).pluck(:name),
-          # :functions => .pluck(:name)
+          :functions => Function.where(id: function_ids).pluck(:name)
         }.to_json
       )
     else
@@ -65,19 +103,19 @@ class Organizations::MembershipsController
   end
 
   def add_member_edition_to_journal(project, member, previous_role_ids, role_ids, previous_function_ids = nil, function_ids = nil)
-    if previous_function_ids.nil?
+    if previous_function_ids.present?
       add_journal_entry project, JournalDetail.new(
         :property  => 'members',
         :prop_key  => 'member_roles_and_functions',
         :value => {
           :name => member.principal.to_s,
           :roles => Role.where(id: role_ids).pluck(:name),
-          # :functions => .pluck(:name)
+          :functions => Function.where(id: function_ids).pluck(:name)
         }.to_json,
         :old_value => {
           :name => member.principal.to_s,
           :roles => Role.where(id: previous_role_ids).pluck(:name),
-          # :functions => .pluck(:name)
+          :functions => Function.where(id: previous_function_ids).pluck(:name)
         }.to_json
       )
     else
@@ -91,14 +129,14 @@ class Organizations::MembershipsController
   end
 
   def add_member_deletion_to_journal(project, member, previous_role_ids, previous_function_ids = nil)
-    if previous_function_ids.nil?
+    if previous_function_ids.present?
       add_journal_entry project, JournalDetail.new(
         :property  => 'members',
         :prop_key  => 'member_roles_and_functions',
         :old_value => {
           :name => member.principal.to_s,
           :roles => Role.where(id: previous_role_ids).pluck(:name),
-          # :functions => .pluck(:name)
+          :functions => Function.where(id: previous_function_ids).pluck(:name)
         }.to_json
       )
     else
