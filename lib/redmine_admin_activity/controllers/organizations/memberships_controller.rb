@@ -25,7 +25,6 @@ class Organizations::MembershipsController
     end.reject{|m| @deletable_members.include?(m)}
 
     if installed_plugin?(:redmine_limited_visibility)
-      # @requested_functions_ids = Function.where(id: params[:membership][:function_ids].reject(&:empty?)).ids || []
       @previous_organization_functions_ids = @organization.default_functions_by_project(@project).map{|f| f.id}
     end
   end
@@ -40,7 +39,7 @@ class Organizations::MembershipsController
       member = Member.where(user: user, project: @project).first_or_initialize
 
       personal_functions = member.functions - previous_organization_functions
-      function_ids = (organization_functions | personal_functions).ids
+      function_ids = (organization_functions | personal_functions).map{|f| f.id}
 
       add_member_creation_to_journal(@project, member, @requested_roles.ids, function_ids)
     end
@@ -60,8 +59,6 @@ class Organizations::MembershipsController
       if installed_plugin?(:redmine_limited_visibility)
         personal_functions = member.functions - previous_organization_functions
         function_ids = (organization_functions | personal_functions).map{|f| f.id}
-
-        binding.pry
 
         next if previous_role_ids == role_ids && previous_function_ids == function_ids
       else
