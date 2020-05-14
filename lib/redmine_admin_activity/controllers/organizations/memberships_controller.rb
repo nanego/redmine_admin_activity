@@ -60,9 +60,9 @@ class Organizations::MembershipsController
         personal_functions = member.functions - previous_organization_functions
         function_ids = (organization_functions | personal_functions).map{|f| f.id}
 
-        next if previous_role_ids == role_ids && previous_function_ids == function_ids
+        next if previous_role_id.difference(role_ids).empty? && previous_function_ids.difference(function_ids).empty?
       else
-        next if previous_role_ids == role_ids
+        next if previous_role_id.difference(role_ids).empty?
       end
 
       add_member_edition_to_journal(@project, member, previous_role_ids, role_ids, previous_function_ids, function_ids)
