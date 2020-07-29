@@ -33,10 +33,11 @@ class MembersController
   def journalized_members_upgrade
     if limited_visibility_plugin_installed?
       return if @previous_role_ids == @member.roles.ids && @previous_function_ids == @member.functions.ids
+      current_functions = @member.functions.ids
     else
       return if @previous_role_ids == @member.roles.ids
     end
-    add_member_edition_to_journal(@member, @previous_role_ids, @member.roles.ids, @previous_function_ids, @member.functions.ids)
+    add_member_edition_to_journal(@member, @previous_role_ids, @member.roles.ids, @previous_function_ids, current_functions)
   end
 
   def journalized_member_deletion

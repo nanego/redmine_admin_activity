@@ -43,9 +43,11 @@ class Organizations::MembershipsController
     @new_users.each do |user|
       member = Member.where(user: user, project: @project).first_or_initialize
 
-      personal_functions = member.functions - previous_organization_functions
-      function_ids = (organization_functions | personal_functions).map { |f| f.id }
-
+      if limited_visibility_plugin_installed?
+        personal_functions = member.functions - previous_organization_functions
+        function_ids = (organization_functions | personal_functions).map { |f| f.id }
+      end
+      
       add_member_creation_to_journal(member, @requested_roles.ids, function_ids)
     end
   end
