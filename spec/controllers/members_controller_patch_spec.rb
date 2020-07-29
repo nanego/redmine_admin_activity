@@ -15,10 +15,6 @@ describe MembersController, type: :controller do
   include Redmine::I18n
 
   before do
-    @controller = described_class.new
-    @request = ActionDispatch::TestRequest.create
-    @response = ActionDispatch::TestResponse.new
-    User.current = nil
     @request.session[:user_id] = 1 #permissions are hard
     if Redmine::Plugin.installed?(:redmine_limited_visibility)
       member.function_ids = [Function.first.id]

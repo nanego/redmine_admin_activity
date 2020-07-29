@@ -34,7 +34,11 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to("/projects/ecookbook/settings/members")
           expect(project.journals).to_not be_nil
-          expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}")
+          if Redmine::Plugin.installed?(:redmine_limited_visibility)
+            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[]}")
+          else
+            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}")
+          end
           expect(project.journals.last.details.last).to have_attributes(old_value: nil)
         end
       end

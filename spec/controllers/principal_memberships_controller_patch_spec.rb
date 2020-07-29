@@ -15,10 +15,6 @@ describe PrincipalMembershipsController, type: :controller do
   include Redmine::I18n
 
   before do
-    @controller = described_class.new
-    @request = ActionDispatch::TestRequest.create
-    @response = ActionDispatch::TestResponse.new
-    User.current = nil
     @request.session[:user_id] = 1 #permissions are hard
   end
 
@@ -50,19 +46,6 @@ describe PrincipalMembershipsController, type: :controller do
       end
     end
   end
-
-  #   it "adds a role to a member" do
-  #     patch :update, params: { id: member.id, membership: { role_ids: member.roles.map(&:id) + [role.id] } }
-  #     expect(response).to redirect_to('/projects/ecookbook/settings/members')
-  #     expect(project.journals).to_not be_nil
-
-  #     if Redmine::Plugin.installed?(:redmine_limited_visibility)
-  #       expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
-  #     else
-  #       expect(project.journals.last.details.last).to have_attributes(:value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}", :old_value => "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
-  #     end
-  #   end
-  # end
 
   describe "DELETE /:id" do
     it "removes a member" do
