@@ -17,6 +17,7 @@ class PrincipalMembershipsController
 
   def journalized_memberships_creation
     @members.each do |member|
+      next unless member.persisted?
       role_ids = params[:membership][:role_ids]
       function_ids = params[:membership][:function_ids] if limited_visibility_plugin_installed?
       add_member_creation_to_journal(member, role_ids, function_ids)

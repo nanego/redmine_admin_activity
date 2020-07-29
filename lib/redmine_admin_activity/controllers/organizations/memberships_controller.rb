@@ -47,7 +47,7 @@ class Organizations::MembershipsController
         personal_functions = member.functions - previous_organization_functions
         function_ids = (organization_functions | personal_functions).map { |f| f.id }
       end
-      
+
       add_member_creation_to_journal(member, @requested_roles.ids, function_ids)
     end
   end
