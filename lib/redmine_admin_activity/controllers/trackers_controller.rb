@@ -10,7 +10,6 @@ class TrackersController
   private
 
   def store_project_ids
-    # binding.irb
     tracker = Tracker.find(params[:id])
     @previous_project_ids = tracker.project_ids
   end
@@ -29,7 +28,6 @@ class TrackersController
   end
 
   def journalized_trackers_upgrade
-    # binding.irb
     return if @previous_project_ids == @tracker.project_ids
 
     changed_project_ids = array_difference(@previous_project_ids, @tracker.project_ids)

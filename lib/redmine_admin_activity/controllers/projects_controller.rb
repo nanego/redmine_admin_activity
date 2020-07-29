@@ -14,36 +14,34 @@ class ProjectsController
     @previous_enabled_issue_custom_field_ids = @project.issue_custom_field_ids
   end
 
+  def add_journal_entry(property:, value: nil, old_value: nil)
+    @project.current_journal.details << JournalDetail.new(
+        :property => property,
+        :prop_key => property,
+        :value => value,
+        :old_value => old_value
+    )
+  end
+
   def update_journal
     if @previous_enabled_tracker_ids != @project.tracker_ids
       previous_tracker_names = Tracker.where(:id => @previous_enabled_tracker_ids.map(&:to_i)).sorted.pluck(:name)
-
-      @project.current_journal.details << JournalDetail.new(
-        :property => 'trackers',
-        :prop_key => 'trackers',
-        :value => @project.trackers.map(&:name).join(','),
-        :old_value => previous_tracker_names.join(',')
-      )
+      add_journal_entry(property: 'trackers',
+                        value: @project.trackers.map(&:name).join(','),
+                        old_value: previous_tracker_names.join(','))
     end
 
     if @previous_enabled_issue_custom_field_ids != @project.issue_custom_field_ids
       previous_custom_field_names = CustomField.where(:id => @previous_enabled_issue_custom_field_ids.map(&:to_i)).sorted.pluck(:name)
-
-      @project.current_journal.details << JournalDetail.new(
-        :property => 'custom_fields',
-        :prop_key => 'custom_fields',
-        :value => @project.issue_custom_fields.map(&:name).join(','),
-        :old_value => previous_custom_field_names.join(',')
-      )
+      add_journal_entry(property: 'custom_fields',
+                        value: @project.issue_custom_fields.map(&:name).join(','),
+                        old_value: previous_custom_field_names.join(','))
     end
 
     if @previous_enabled_module_names != @project.enabled_module_names
-      @project.current_journal.details << JournalDetail.new(
-        :property => 'modules',
-        :prop_key => 'modules',
-        :value => @project.enabled_module_names.join(','),
-        :old_value => @previous_enabled_module_names.join(',')
-      )
+      add_journal_entry(property: 'modules',
+                        value: @project.enabled_module_names.join(','),
+                        old_value: @previous_enabled_module_names.join(','))
     end
 
     @project.current_journal.save if @project.current_journal.details.any?
