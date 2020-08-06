@@ -13,52 +13,103 @@ if Redmine::Plugin.installed?(:redmine_organizations)
       fixtures :functions
     end
 
+    let(:organization) { organizations(:organization_001) }
+    let(:project) { projects(:projects_001) }
+    let(:role) { roles(:roles_001) }
+    let(:new_role) { roles(:roles_002) }
+    let(:user) { users(:users_002) } # member of project
+    let(:new_user) { users(:users_004) } # not member of project
+
     before do
-      @controller = described_class.new
-      @request = ActionDispatch::TestRequest.create
-      @response = ActionDispatch::TestResponse.new
       User.current = nil
       @request.session[:user_id] = 1 #permissions are hard
+      user.update_attribute(:organization, organization)
+      new_user.update_attribute(:organization, organization)
     end
 
     describe "PATCH /:id" do
       context "simple roles update" do
-        let(:organization) { organizations(:organization_001) }
-        let(:project)      { projects(:projects_001) }
-        let(:role)         { roles(:roles_002) }
-        let(:user)         { users(:users_002) }
 
-        it "updates a custom_field and adds a new entry in the project journal" do
-          patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [role.id], user_ids: [user.id] } }
+        it "updates a membership through an organization and adds a new entry in the project journal" do
+          expect(project.users).to include user
+
+          expect {
+            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [new_role.id], user_ids: [user.id]}}
+          }.to change(project.journals, :count)
 
           expect(response).to have_http_status(:redirect)
           expect(response).to redirect_to("/projects/ecookbook/settings/members")
           expect(project.journals).to_not be_nil
           if Redmine::Plugin.installed?(:redmine_limited_visibility)
-            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[]}")
+            expect(project.journals.last.details.last).to have_attributes(
+                                                              value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[]}",
+                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}"
+                                                          )
           else
-            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"]}")
+            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}",
+                                                                          old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}")
           end
-          expect(project.journals.last.details.last).to have_attributes(old_value: nil)
         end
+
+        it "creates a membership through an organization and adds a new entry in the project journal" do
+          expect(project.users).to include user
+          expect(project.users).to_not include new_user
+
+          expect {
+            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [role.id], user_ids: [user.id, new_user.id]}}
+          }.to change(project.journals, :count).by(1)
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to("/projects/ecookbook/settings/members")
+          expect(project.journals).to_not be_nil
+          if Redmine::Plugin.installed?(:redmine_limited_visibility)
+            expect(project.journals.last.details.last).to have_attributes(
+                                                              value: "{\"name\":\"Robert Hill\",\"roles\":[\"Manager\"],\"functions\":[]}",
+                                                              old_value: nil
+                                                          )
+          else
+            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"Robert Hill\",\"roles\":[\"Manager\"]}",
+                                                                          old_value: nil)
+          end
+        end
+
+        it "deletes a membership through an organization and adds a new entry in the project journal" do
+          expect(project.users).to include user
+
+          expect {
+            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [role.id], user_ids: ['']}}
+          }.to change(project.journals, :count).by(1)
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to redirect_to("/projects/ecookbook/settings/members")
+          expect(project.journals).to_not be_nil
+          if Redmine::Plugin.installed?(:redmine_limited_visibility)
+            expect(project.journals.last.details.last).to have_attributes(
+                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}",
+                                                              value: nil
+                                                          )
+          else
+            expect(project.journals.last.details.last).to have_attributes(old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}",
+                                                                          value: nil)
+          end
+        end
+
       end
 
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
         context "update roles and functions" do
-          let(:organization) { organizations(:organization_001) }
-          let(:project)      { projects(:projects_001) }
-          let(:role)         { roles(:roles_002) }
-          let(:function)     { functions(:functions_003) }
-          let(:user)         { users(:users_002) }
+          let(:function) { functions(:functions_003) }
 
-          it "updates a custom_field and adds a new entry in the project journal" do
-            patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [role.id], user_ids: [user.id], function_ids: [function.id] } }
+          it "updates a membership through an organization and adds a new entry in the project journal" do
+            expect {
+              patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [new_role.id], user_ids: [user.id], function_ids: [function.id]}}
+            }.to change(project.journals, :count)
 
             expect(response).to have_http_status(:redirect)
             expect(response).to redirect_to("/projects/ecookbook/settings/members")
             expect(project.journals).to_not be_nil
-            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Developer\"],\"functions\":[\"function3\"]}")
-            expect(project.journals.last.details.last).to have_attributes(old_value: nil)
+            expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[\"function3\"]}")
+            expect(project.journals.last.details.last).to have_attributes(old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}")
           end
         end
       end
