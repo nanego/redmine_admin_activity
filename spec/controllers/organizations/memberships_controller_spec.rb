@@ -11,6 +11,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
     if Redmine::Plugin.installed?(:redmine_limited_visibility)
       fixtures :functions
+      let(:function) { functions(:functions_003) }
     end
 
     let(:organization) { organizations(:organization_001) }
@@ -75,6 +76,10 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
         it "deletes a membership through an organization and adds a new entry in the project journal" do
           expect(project.users).to include user
+          member = Member.find_by(user: user, project: project)
+          if Redmine::Plugin.installed?(:redmine_limited_visibility)
+            member.functions = [function]
+          end
 
           expect {
             patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [role.id], user_ids: ['']}}
@@ -85,7 +90,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.journals).to_not be_nil
           if Redmine::Plugin.installed?(:redmine_limited_visibility)
             expect(project.journals.last.details.last).to have_attributes(
-                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}",
+                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function3\"]}",
                                                               value: nil
                                                           )
           else
@@ -98,7 +103,6 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
         context "update roles and functions" do
-          let(:function) { functions(:functions_003) }
 
           it "updates a membership through an organization and adds a new entry in the project journal" do
             expect {

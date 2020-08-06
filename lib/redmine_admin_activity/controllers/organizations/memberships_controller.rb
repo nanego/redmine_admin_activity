@@ -16,6 +16,7 @@ class Organizations::MembershipsController
     @new_users = @requested_users - @previous_current_users
     to_be_deleted_users = @previous_current_users - @requested_users
     to_be_deleted_members = Member.where(user: to_be_deleted_users, project: @project)
+    to_be_deleted_members = to_be_deleted_members.includes(:functions) if limited_visibility_plugin_installed?
     @deletable_members = to_be_deleted_members.select { |m| (m.roles & User.current.managed_roles(@project)) == m.roles }
 
     @updated_members = @previous_current_users.map do |u|
@@ -36,7 +37,7 @@ class Organizations::MembershipsController
     end
     journalize_new_users(organization_functions, previous_organization_functions)
     journalize_updated_users(organization_functions, previous_organization_functions)
-    journalize_deleted_users(organization_functions, previous_organization_functions)
+    journalize_deleted_users
   end
 
   def journalize_new_users(organization_functions, previous_organization_functions)
@@ -78,14 +79,9 @@ class Organizations::MembershipsController
     end
   end
 
-  def journalize_deleted_users(organization_functions, previous_organization_functions)
+  def journalize_deleted_users
     @deletable_members.each do |member|
-      previous_function_ids = nil
-
-      if limited_visibility_plugin_installed?
-        previous_function_ids = member.functions.ids
-      end
-
+      previous_function_ids = member.function_ids if limited_visibility_plugin_installed?
       add_member_deletion_to_journal(member, member.role_ids, previous_function_ids)
     end
   end
