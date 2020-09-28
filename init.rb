@@ -13,6 +13,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/models/project'
   require_dependency 'redmine_admin_activity/models/member'
   require_dependency 'redmine_admin_activity/models/journal'
+  require_dependency 'redmine_admin_activity/models/version'
 
   require_dependency 'redmine_admin_activity/helpers/projects_helper'
   require_dependency 'redmine_admin_activity/helpers/issues_helper'

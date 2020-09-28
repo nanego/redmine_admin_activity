@@ -14,6 +14,16 @@ class Project < ActiveRecord::Base
     @current_journal ||= Journal.new(:journalized => self, :user => user)
   end
 
+  def add_journal_entry(property:, value:, old_value: nil)
+    init_journal(User.current)
+    current_journal.details << JournalDetail.new(
+        property: property,
+        prop_key: property,
+        value: value,
+        old_value: old_value)
+    current_journal.save
+  end
+
   # Returns the current journal or nil if it's not initialized
   def current_journal
     @current_journal

@@ -15,6 +15,8 @@ module PluginAdminActivity
         show_members_details(detail, no_html, options)
       when 'issue_category'
         show_issue_category_details(detail, no_html, options)
+      when 'versions'
+        show_versions_details(detail, no_html, options)
       when 'trackers'
         show_trackers_details(detail, no_html, options)
       when 'custom_fields'
@@ -114,6 +116,20 @@ module PluginAdminActivity
         l(:text_journal_issue_category_added, data)
       elsif value.blank? && old_value.present?
         l(:text_journal_issue_category_removed, data)
+      end.html_safe
+    end
+
+    def show_versions_details(detail, no_html = false, options = {})
+      value = detail.value
+      old_value = detail.old_value
+      data = {:old_value => old_value, :value => value}
+
+      if value.present? && old_value.present?
+        l(:text_journal_version_changed, data)
+      elsif value.present? && old_value.blank?
+        l(:text_journal_version_added, data)
+      elsif value.blank? && old_value.present?
+        l(:text_journal_version_removed, data)
       end.html_safe
     end
 
