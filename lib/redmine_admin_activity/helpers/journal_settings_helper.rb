@@ -9,10 +9,13 @@ module PluginAdminActivity
     end
 
     def project_update_text(journal)
-      if journal.creation? || journal.duplication?
+      if journal.creation? || journal.duplication? || journal.activation? || journal.closing? || journal.archivation?
         project_text = link_to_project_if_exists(journal.journalized) || journal.value_changes["name"][1]
 
         return sanitize l(".text_setting_create_project_journal_entry", project: project_text) if journal.creation?
+        return sanitize l(".text_setting_active_project_journal_entry", project: project_text) if journal.activation?
+        return sanitize l(".text_setting_close_project_journal_entry", project: project_text) if journal.closing?
+        return sanitize l(".text_setting_archive_project_journal_entry", project: project_text) if journal.archivation?
 
         source_project = Project.find_by(id: journal.value_changes["source_project"])
         source_project_text = link_to_project_if_exists(source_project) || journal.value_changes["source_project_name"]

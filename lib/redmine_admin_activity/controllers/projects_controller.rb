@@ -1,13 +1,20 @@
 require_dependency 'projects_controller'
 
 class ProjectsController
-  before_action :init_journal, :only => [:update]
+  include RedmineAdminActivity::Journalizable
+
+  before_action :init_journal, :only => [:update, :close, :unarchive]
+  before_action :last_updated_on, :only => [:close, :unarchive, :reopen]
   after_action :update_journal, :only => [:update]
   after_action :journalized_projects_duplication, :only => [:copy]
   after_action :journalized_projects_creation, :only => [:create]
   after_action :journalized_projects_deletion, :only => [:destroy]
+  after_action :journalized_projects_activation, :only => [:unarchive]
+  after_action :journalized_projects_closing, :only => [:close]
+  after_action :journalized_projects_archivation, :only => [:archive]
+  after_action :journalized_projects_reopen, :only => [:reopen]
 
-  def init_journal
+  def init_journal    
     @project.init_journal(User.current)
     @previous_enabled_module_names = @project.enabled_module_names
     @previous_enabled_tracker_ids = @project.tracker_ids
@@ -94,5 +101,70 @@ class ProjectsController
       :journalized => @project_to_destroy,
       :journalized_entry_type => "destroy",
     )
+  end  
+
+  def journalized_projects_activation
+    # change modification time because the action unarchive use function update_all which does not change the column updated_at
+    @project.update_column :updated_on, Time.now
+
+    return unless @project.present? && @project.persisted?
+
+    #build hash of previous_changes manually
+    previous_changes = { 
+      "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE],
+      "updated_on" => [@project_last_updatee_on, @project.updated_on] 
+    }
+    
+    JournalSetting.create(
+      :user_id => User.current.id,
+      :value_changes => previous_changes,
+      :journalized => @project,
+      :journalized_entry_type => "active",
+    )
+    
   end
+
+  def journalized_projects_closing
+    # change modification time because the action close use function update_all which does not change the column updated_at
+    @project.update_column :updated_on, Time.now
+
+    return unless @project.present? && @project.persisted?
+
+    #build hash of previous_changes manually
+    previous_changes = { 
+      "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],
+      "updated_on" => [@project_last_updatee_on, @project.updated_on] 
+    }
+
+    JournalSetting.create(
+      :user_id => User.current.id,
+      :value_changes => previous_changes,
+      :journalized => @project,
+      :journalized_entry_type => "close",
+    )
+  end
+
+  def journalized_projects_archivation
+    return unless @project.present? && @project.persisted?
+
+    JournalSetting.create(
+      :user_id => User.current.id,
+      :value_changes => @project.previous_changes,
+      :journalized => @project,
+      :journalized_entry_type => "archive",
+    )
+  end
+
+  def journalized_projects_reopen
+    # change modification time because the action reopen use function update_all which does not change the column updated_at
+    @project.update_column :updated_on, Time.now
+
+    return unless @project.present? && @project.persisted?
+
+  end
+
+  def last_updated_on
+    @project_last_updatee_on = @project.updated_on
+  end
+
 end

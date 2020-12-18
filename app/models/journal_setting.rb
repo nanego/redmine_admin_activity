@@ -17,4 +17,16 @@ class JournalSetting < ActiveRecord::Base
   def duplication?
     journalized_entry_type == "copy"
   end
+
+  def activation? 
+    journalized_entry_type == "active"
+  end
+
+  def closing?    
+    journalized_entry_type == "close"
+  end 
+
+  def archivation?    
+    journalized_entry_type == "archive"
+  end 
 end
