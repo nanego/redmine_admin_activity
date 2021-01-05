@@ -1,15 +1,15 @@
 require_dependency 'projects_controller'
 
 class ProjectsController
-  include RedmineAdminActivity::Journalizable
 
-  before_action :init_journal, :only => [:update, :close, :unarchive]
-  before_action :last_updated_on, :only => [:close, :unarchive, :reopen]
+  before_action :init_journal, :only => [:update]  
+  before_action :project_last_updatee_on, :only => [:close, :archive, :unarchive, :reopen]
   after_action :update_journal, :only => [:update]
   after_action :journalized_projects_duplication, :only => [:copy]
   after_action :journalized_projects_creation, :only => [:create]
   after_action :journalized_projects_deletion, :only => [:destroy]
-  after_action :journalized_projects_activation, :only => [:unarchive]
+  before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen]
+  after_action :journalized_projects_activation, :only => [:unarchive] 
   after_action :journalized_projects_closing, :only => [:close]
   after_action :journalized_projects_archivation, :only => [:archive]
   after_action :journalized_projects_reopen, :only => [:reopen]
@@ -101,70 +101,153 @@ class ProjectsController
       :journalized => @project_to_destroy,
       :journalized_entry_type => "destroy",
     )
-  end  
+  end
 
   def journalized_projects_activation
-    # change modification time because the action unarchive use function update_all which does not change the column updated_at
-    @project.update_column :updated_on, Time.now
-
     return unless @project.present? && @project.persisted?
 
-    #build hash of previous_changes manually
-    previous_changes = { 
-      "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE],
-      "updated_on" => [@project_last_updatee_on, @project.updated_on] 
-    }
-    
-    JournalSetting.create(
-      :user_id => User.current.id,
-      :value_changes => previous_changes,
-      :journalized => @project,
-      :journalized_entry_type => "active",
-    )
-    
+    new_status = @project.ancestors.any?(&:closed?) ? Project::STATUS_CLOSED : Project::STATUS_ACTIVE
+    entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"
+    @self_and_descendants_or_ancestors.each do |ancestor|
+      if ancestor.status == Project::STATUS_ARCHIVED
+        # change modification time because the action reopen use function update_all which does not change the column updated_at
+        ancestor.update_column :updated_on, Time.now
+
+        # build hash of previous_changes manually
+        # l'appel update_all() rails ne conserve pas @project.previous_changes
+        previous_changes = { 
+          "status" => [Project::STATUS_ARCHIVED, new_status],
+          "updated_on" => [@project_last_updatee_on, ancestor.updated_on]
+        }
+
+        # Saves the changes in a JournalDetail
+        ancestor.add_journal_entry(property: 'status',
+                                value: new_status,
+                                old_value: Project::STATUS_ARCHIVED)
+
+        # Saves the changes in a JournalSetting 
+        JournalSetting.create(
+          :user_id => User.current.id,
+          :value_changes => previous_changes,
+          :journalized => ancestor,
+          :journalized_entry_type => entry_type,
+        )
+      end  
+    end
   end
 
   def journalized_projects_closing
-    # change modification time because the action close use function update_all which does not change the column updated_at
-    @project.update_column :updated_on, Time.now
-
     return unless @project.present? && @project.persisted?
 
-    #build hash of previous_changes manually
-    previous_changes = { 
-      "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],
-      "updated_on" => [@project_last_updatee_on, @project.updated_on] 
-    }
+    @self_and_descendants_or_ancestors.each do |child|
+      # change modification time because the action reopen use function update_all which does not change the column updated_at
+      child.update_column :updated_on, Time.now
 
-    JournalSetting.create(
-      :user_id => User.current.id,
-      :value_changes => previous_changes,
-      :journalized => @project,
-      :journalized_entry_type => "close",
-    )
+      # build hash of previous_changes manually
+      # l'appel update_all() rails ne conserve pas @project.previous_changes
+      previous_changes = { 
+        "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],
+        "updated_on" => [@project_last_updatee_on, child.updated_on]
+      }
+
+      # Saves the changes in a JournalDetail
+      child.add_journal_entry(property: 'status',
+                              value: Project::STATUS_CLOSED,
+                              old_value: Project::STATUS_ACTIVE)
+
+      # Saves the changes in a JournalSetting 
+      JournalSetting.create(
+        :user_id => User.current.id,
+        :value_changes => previous_changes,
+        :journalized => child,
+        :journalized_entry_type => "close",
+      )
+    end
   end
 
   def journalized_projects_archivation
     return unless @project.present? && @project.persisted?
 
-    JournalSetting.create(
-      :user_id => User.current.id,
-      :value_changes => @project.previous_changes,
-      :journalized => @project,
-      :journalized_entry_type => "archive",
-    )
+    @self_and_descendants_or_ancestors.each do |child|
+      if child.status != Project::STATUS_ARCHIVED
+        # change modification time because the action reopen use function update_all which does not change the column updated_at
+        child.update_column :updated_on, Time.now
+
+        # build hash of previous_changes manually
+        # l'appel update_all() rails ne conserve pas @project.previous_changes
+        previous_changes = { 
+          "status" => [child.status, Project::STATUS_ARCHIVED],
+          "updated_on" => [@project_last_updatee_on, child.updated_on]
+        }
+
+        # Saves the changes in a JournalDetail
+        child.add_journal_entry(property: 'status',
+                                value: Project::STATUS_ARCHIVED,
+                                old_value: child.status)
+
+        # Saves the changes in a JournalSetting 
+        JournalSetting.create(
+          :user_id => User.current.id,
+          :value_changes => previous_changes,
+          :journalized => child,
+          :journalized_entry_type => "archive",
+        )
+      end  
+    end
   end
 
-  def journalized_projects_reopen
-    # change modification time because the action reopen use function update_all which does not change the column updated_at
-    @project.update_column :updated_on, Time.now
-
+  def journalized_projects_reopen     
     return unless @project.present? && @project.persisted?
 
+    @self_and_descendants_or_ancestors.each do |child|
+      # change modification time because the action reopen use function update_all which does not change the column updated_at
+      child.update_column :updated_on, Time.now
+
+      # build hash of previous_changes manually
+      # l'appel update_all() rails ne conserve pas @project.previous_changes
+      previous_changes = { 
+        "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE],
+        "updated_on" => [@project_last_updatee_on, child.updated_on]
+      }
+
+      # Saves the changes in a JournalDetail
+      child.add_journal_entry(property: 'status',
+                              value: Project::STATUS_ACTIVE,
+                              old_value: Project::STATUS_CLOSED)
+
+      # Saves the changes in a JournalSetting 
+      JournalSetting.create(
+        :user_id => User.current.id,
+        :value_changes => previous_changes,
+        :journalized => child,
+        :journalized_entry_type => "reopen",
+      )
+    end
   end
 
-  def last_updated_on
+  def project_last_updatee_on
     @project_last_updatee_on = @project.updated_on
   end
 
+  def self_and_descendants_or_ancestors
+    @self_and_descendants_or_ancestors = Array.new
+    case action_name
+    when "close"     
+      @project.self_and_descendants.status(Project::STATUS_ACTIVE).each do |child|
+        @self_and_descendants_or_ancestors.push(child)
+      end
+    when "reopen"
+      @project.self_and_descendants.status(Project::STATUS_CLOSED).each do |child|
+        @self_and_descendants_or_ancestors.push(child)
+      end  
+    when "unarchive"
+      @project.self_and_ancestors.status(Project::STATUS_ARCHIVED).each do |ancestor|
+        @self_and_descendants_or_ancestors.push(ancestor)
+      end
+    when "archive"
+      @project.self_and_descendants.each do |child|
+        @self_and_descendants_or_ancestors.push(child) 
+      end
+    end   
+  end
 end
