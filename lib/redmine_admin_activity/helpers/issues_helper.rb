@@ -23,6 +23,8 @@ module PluginAdminActivity
         show_custom_fields_details(detail, no_html, options)
       when 'copy_project'
         show_copy_project_details(detail, no_html, options)
+      when 'status'
+        show_project_status_details(detail, no_html, options)  
       else
         # Process standard properties like 'attr', 'attachment' or 'cf'
         super
@@ -159,6 +161,21 @@ module PluginAdminActivity
 
     def show_copy_project_details(detail, no_html = false, options = {})
       l(:text_journal_copy_project, :value => detail.value).html_safe
+    end
+
+    def show_project_status_details(detail, no_html = false, options = {})
+      label = content_tag('strong', l(:text_label_status))         
+      value = get_project_status_label_for_history[detail.value]
+      old_value = get_project_status_label_for_history[detail.old_value]      
+      l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
+    end
+
+    def get_project_status_label_for_history
+      {
+        "1" => l(:project_status_active),
+        "5" => l(:project_status_closed),
+        "9" => l(:project_status_archived),
+      }
     end
 
     def string_list_to_array(value)
