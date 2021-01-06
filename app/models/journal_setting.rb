@@ -28,5 +28,9 @@ class JournalSetting < ActiveRecord::Base
 
   def archivation?    
     journalized_entry_type == "archive"
+  end
+
+  def reopening?    
+    journalized_entry_type == "reopen"
   end 
 end
