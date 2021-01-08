@@ -14,7 +14,10 @@ module PluginAdminActivity
 
         return sanitize l(".text_setting_create_project_journal_entry", project: project_text) if journal.creation?
         return sanitize l(".text_setting_active_project_journal_entry", project: project_text) if journal.activation?
-        return sanitize l(".text_setting_close_project_journal_entry", project: project_text) if journal.closing?
+        if journal.closing?
+          return sanitize l(".text_setting_change_from_archive_to_close_project_journal_entry", project: project_text) if journal.value_changes["status"][0] == Project::STATUS_ARCHIVED
+          return sanitize l(".text_setting_close_project_journal_entry", project: project_text)
+        end        
         return sanitize l(".text_setting_archive_project_journal_entry", project: project_text) if journal.archivation?
         return sanitize l(".text_setting_reopen_project_journal_entry", project: project_text) if journal.reopening?
 

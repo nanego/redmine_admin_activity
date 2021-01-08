@@ -41,3 +41,4 @@ en:
   text_setting_close_project_journal_entry: "Project <i>%{project}</i> has been closed."
   text_setting_archive_project_journal_entry: "Project <i>%{project}</i> has been archived."
   text_setting_reopen_project_journal_entry: "Project <i>%{project}</i> has been reopened."
+  text_setting_change_from_archive_to_close_project_journal_entry: "Project <i>%{project}</i> has been changed from archived to Closed." 
