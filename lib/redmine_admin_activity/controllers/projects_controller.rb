@@ -106,28 +106,25 @@ class ProjectsController
     return unless @project.present? && @project.persisted?
 
     new_status = @project.ancestors.any?(&:closed?) ? Project::STATUS_CLOSED : Project::STATUS_ACTIVE
-    entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"
-    @self_and_descendants_or_ancestors.each do |ancestor|
+    entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"    
+    @self_and_descendants_or_ancestors.each do |ancestor|      
+      # build hash of previous_changes manually        
+      previous_changes = { 
+        "status" => [Project::STATUS_ARCHIVED, new_status],          
+      }
 
-      if ancestor.status == Project::STATUS_ARCHIVED
-        # build hash of previous_changes manually        
-        previous_changes = { 
-          "status" => [Project::STATUS_ARCHIVED, new_status],          
-        }
+      # Saves the changes in a JournalDetail
+      ancestor.add_journal_entry(property: 'status',
+                              value: new_status,
+                              old_value: Project::STATUS_ARCHIVED)
 
-        # Saves the changes in a JournalDetail
-        ancestor.add_journal_entry(property: 'status',
-                                value: new_status,
-                                old_value: Project::STATUS_ARCHIVED)
-
-        # Saves the changes in a JournalSetting 
-        JournalSetting.create(
-          :user_id => User.current.id,
-          :value_changes => previous_changes,
-          :journalized => ancestor,
-          :journalized_entry_type => entry_type,
-        )
-      end  
+      # Saves the changes in a JournalSetting 
+      JournalSetting.create(
+        :user_id => User.current.id,
+        :value_changes => previous_changes,
+        :journalized => ancestor,
+        :journalized_entry_type => entry_type,
+      )      
     end
   end
 
