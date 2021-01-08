@@ -88,4 +88,57 @@ describe "JournalSettingsHelper" do
       expect(project_update_text(journal)).to eq "Projet <i>eCookbook</i> has been copied from <i>Source project</i>."
     end
   end
+
+  describe "Change the project status" do
+    it "should generate the right translated sentence for a project reopening" do
+      project = Project.find(1)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [5,1] },
+                                  :journalized => project,
+                                  :journalized_entry_type => "reopen")
+      
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been reopened."
+    end
+
+    it "should generate the right translated sentence for a project closing" do
+      project = Project.find(1)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [1,5] },
+                                  :journalized => project,
+                                  :journalized_entry_type => "close")
+      
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been closed."
+    end
+
+    it "should generate the right translated sentence for a project changing from archiving to closing " do
+      project = Project.find(1)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [9,5] },
+                                  :journalized => project,
+                                  :journalized_entry_type => "close")
+      
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been changed from archived to Closed."
+    end
+
+    it "should generate the right translated sentence for a project archiving" do
+      project = Project.find(1)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [1,9] },
+                                  :journalized => project,
+                                  :journalized_entry_type => "archive")
+      
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been archived."
+    end
+
+    it "should generate the right translated sentence for a project activation" do
+      project = Project.find(1)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [9,1] },
+                                  :journalized => project,
+                                  :journalized_entry_type => "active")
+      
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been activated."
+    end
+
+  end
 end
