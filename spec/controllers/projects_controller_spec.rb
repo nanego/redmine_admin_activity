@@ -90,4 +90,121 @@ describe ProjectsController, type: :controller do
       expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "destroy")
     end
   end
+
+  describe "POST archive" do
+    it "add logs on JournalSetting and on the project journal for the project_root and its five children" do
+      @request.session[:user_id] = 1
+      post :archive, :params => { :id => "ecookbook" }
+      
+      expect(response).to redirect_to('/admin/projects')
+      expect(JournalSetting.count).to eq(5)
+
+      JournalSetting.last(5) do |jorrnalsetting|
+        expect(jorrnalsetting.value_changes).to include({"status" => [1, 9]})
+        expect(jorrnalsetting).to have_attributes(:journalized_type => "Project")
+        expect(jorrnalsetting).to have_attributes(:journalized_entry_type => "archive")
+      end
+
+      Journal.last(5) do |jorrnal|
+        expect(jorrnal.details.last).to have_attributes(:old_value => "1", :value => "9")
+      end     
+      
+    end
+  end
+
+  describe "POST unarchive" do
+    before do
+      @request.session[:user_id] = 1
+    end
+    
+    it "add logs on JournalSetting and on the project journal only for the project_root but not for its children" do      
+      project = Project.find(1)
+      project.status = 9
+      project.save
+      post :unarchive, :params => { :id => "ecookbook" }
+      
+      expect(response).to redirect_to('/admin/projects')
+      expect(JournalSetting.count).to eq(1)        
+      expect(JournalSetting.all.last.value_changes).to include({"status" => [9, 1]})
+      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "active")
+      expect(project.journals.last.details.last).to have_attributes(:old_value => "9", :value => "1")
+    end
+
+    it "add logs on JournalSetting and on the project journal for the project_child and three ancestors" do      
+      Project.all.update_all :status => 9
+      post :unarchive, :params => { :id => "project6" }
+
+      expect(response).to redirect_to('/admin/projects')
+      expect(JournalSetting.count).to eq(3)
+
+      JournalSetting.last(3) do |jorrnalsetting|
+        expect(jorrnalsetting.value_changes).to include({"status" => [9, 1]})
+        expect(jorrnalsetting).to have_attributes(:journalized_type => "Project")
+        expect(jorrnalsetting).to have_attributes(:journalized_entry_type => "active")
+      end
+
+      Journal.last(3) do |jorrnal|
+        expect(jorrnal.details.last).to have_attributes(:old_value => "9", :value => "1")
+      end      
+    end
+
+    it "add logs on JournalSetting and on the project journal only for the project_child when its ancestors are closed" do      
+      Project.all.update_all :status => 5
+      project = Project.find(6)
+      project.update_attribute :status, 9
+      post :unarchive, :params => { :id => "project6" }
+
+      expect(response).to redirect_to('/admin/projects')
+      expect(JournalSetting.count).to eq(1)        
+      expect(JournalSetting.all.last.value_changes).to include({"status" => [9, 5]})
+      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
+      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "close")
+      expect(project.journals.last.details.last).to have_attributes(:old_value => "9", :value => "5")
+
+    end
+  end
+
+  describe "POST close" do
+    it "add logs on JournalSetting and on the project journal for the project_root and its five children" do
+      @request.session[:user_id] = 1
+      post :close, :params => { :id => "ecookbook" }
+
+      expect(response).to redirect_to('/projects/ecookbook')      
+      expect(JournalSetting.count).to eq(5)
+
+      JournalSetting.last(5) do |jorrnalsetting|
+        expect(jorrnalsetting.value_changes).to include({"status" => [1, 5]})
+        expect(jorrnalsetting).to have_attributes(:journalized_type => "Project")
+        expect(jorrnalsetting).to have_attributes(:journalized_entry_type => "close")
+      end
+            
+      Journal.last(5) do |jorrnal|
+        expect(jorrnal.details.last).to have_attributes(:old_value => "1", :value => "5")
+      end
+     
+    end
+  end
+
+  describe "POST reopen" do
+    it "add logs on JournalSetting and on the project journal for the project_root and its five children" do
+      @request.session[:user_id] = 1
+      Project.all.update_all :status => 5
+      post :reopen, :params => { :id => "ecookbook" }
+
+      expect(response).to redirect_to('/projects/ecookbook')      
+      expect(JournalSetting.count).to eq(5)
+
+      JournalSetting.last(5) do |jorrnalsetting|
+        expect(jorrnalsetting.value_changes).to include({"status" => [5, 1]})
+        expect(jorrnalsetting).to have_attributes(:journalized_type => "Project")
+        expect(jorrnalsetting).to have_attributes(:journalized_entry_type => "reopen")
+      end
+            
+      Journal.last(5) do |jorrnal|
+        expect(jorrnal.details.last).to have_attributes(:old_value => "5", :value => "1")
+      end
+     
+    end
+  end
 end

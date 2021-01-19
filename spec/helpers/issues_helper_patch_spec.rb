@@ -202,15 +202,78 @@ describe "IssuesHelperPatch" do
 
   describe "copy project" do
     it "should IssuesHelper#copy_project with no_html should show the source project" do
-      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
+      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project') 
       expect(show_detail(detail, true)).to eq "Project copy from Test (id: 4)"
     end
 
     it "should IssuesHelper#copy_project with html should show the source project with HTML highlights" do
       detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
-      result = show_detail(detail, false)
+      result = show_detail(detail, false)      
       html = "Project copy from Test (id: 4)"
       expect(result).to include(html)
+    end
+  end
+
+  describe "status project" do
+
+    it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from closed to active" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "5", :value => "1", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from closed to active"
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from closed to active" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "5", :value => "1", :prop_key => 'status')      
+      result = show_detail(detail, false)
+      html = "changed from closed to active"
+      expect(result).to include(html)      
+    end
+
+    it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from active to closed" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "5", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from active to closed" 
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from active to closed" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "5", :prop_key => 'status')
+      result = show_detail(detail, false)
+      html = "changed from active to closed"
+      expect(result).to include(html)
+    end
+
+    it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from active to archived" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "9", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from active to archived" 
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from active to archived" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "9", :prop_key => 'status')
+      result = show_detail(detail, false)
+      html = "changed from active to archived"
+      expect(result).to include(html)      
+    end
+
+    it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from archived to active" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "1", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from archived to active"
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from archived to active" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "1", :prop_key => 'status')
+      result = show_detail(detail, false)
+      html = "changed from archived to active"
+      expect(result).to include(html)
+    end
+
+    it "should IssuesHelper#show_detail with no_html should show the property status of project archived when one of it ancestor is closed followed by changing it from archived to closed" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "5", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from archived to closed"    
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status (with HTML highlights) of project archived when one of it ancestor is closed followed by changing it from archived to closed" do
+      detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "5", :prop_key => 'status')
+      result = show_detail(detail, false)
+      html = "changed from archived to closed"
+      expect(result).to include(html)      
     end
   end
 
