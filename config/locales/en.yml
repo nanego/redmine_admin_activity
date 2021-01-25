@@ -42,3 +42,8 @@ en:
   text_setting_archive_project_journal_entry: "Project <i>%{project}</i> has been archived."
   text_setting_reopen_project_journal_entry: "Project <i>%{project}</i> has been reopened."
   text_setting_change_from_archive_to_close_project_journal_entry: "Project <i>%{project}</i> has been changed from archived to Closed." 
+  text_setting_create_user_journal_entry: "User <i>%{user}</i> has been created."
+  text_setting_active_user_journal_entry: "User <i>%{user}</i> has been activated."
+  text_setting_lock_user_journal_entry: "User <i>%{user}</i> has been locked."
+  text_setting_unlock_user_journal_entry: "User <i>%{user}</i> has been unlocked."
+  text_setting_destroy_user_journal_entry: "User <i>%{user_name}</i> has been deleted."
