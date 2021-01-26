@@ -4,7 +4,7 @@ describe "JournalSettingsHelper" do
   include ApplicationHelper
   include PluginAdminActivity::JournalSettingsHelper
 
-  fixtures :projects
+  fixtures :projects, :users
 
   before do
     set_language_if_valid('en')
@@ -147,4 +147,91 @@ describe "JournalSettingsHelper" do
     end
 
   end
+
+  describe "User creation" do
+    it "should generate the right translated sentence for a user creation" do
+      user = User.new(:login => 'newuser',
+                      :firstname => 'new',
+                      :lastname => 'user',
+                      :mail => 'newuser@example.net'
+                      )
+      user.save      
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "login" => ["","newuser"], "firstname" => ["","new"],"lastname" => ["","user"] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "create")
+      expect(user_update_text(journal)).to eq "User <i><a href=\"/users/15\">new user</a></i> has been created."
+    end
+  end
+
+  describe "Change the user status" do
+    it "should generate the right translated sentence for a user activation" do
+      user = User.find(7)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [2,1] },
+                                  :journalized => user,
+                                  :journalized_entry_type => "active")
+      expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been activated."
+    end
+
+    it "should generate the right translated sentence for a user locking" do
+      user = User.find(7)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [1,3] },
+                                  :journalized => user,
+                                  :journalized_entry_type => "lock")
+      
+      expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been locked."
+    end  
+
+    it "should generate the right translated sentence for a user unlocking" do
+      user = User.find(7)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                  :value_changes => { "status" => [3,1] },
+                                  :journalized => user,
+                                  :journalized_entry_type => "unlock")
+      
+      expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been unlocked."
+    end   
+
+  end
+
+  describe "User deletion" do
+    it "should generate the right translated sentence for a user deletion" do
+      user = users(:users_007)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil],"lastname" => ["One", nil] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "destroy")
+      expect(user_update_text(journal)).to eq "User <i>Some One</i> has been deleted."
+    end
+
+    it "should show logs of users without link(html), when we delete it" do
+      user = users(:users_007)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "status" => [1,3] },
+                                  :journalized => user,
+                                  :journalized_entry_type => "lock")
+      journal.save
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "status" => [3,1] },
+                                  :journalized => user,
+                                  :journalized_entry_type => "unlock")
+      journal.save
+
+      user.destroy
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil],"lastname" => ["One", nil] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "destroy")      
+      journal.save
+      expect(JournalSetting.count).to eq(3)
+      expect(user_update_text(JournalSetting.all.first)).to eq "User <i>Some One</i> has been locked."
+      expect(user_update_text(JournalSetting.all.second)).to eq "User <i>Some One</i> has been unlocked."
+      expect(user_update_text(JournalSetting.all.last)).to eq "User <i>Some One</i> has been deleted."
+    end
+
+  end
+
+
 end
