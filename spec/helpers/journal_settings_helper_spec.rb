@@ -54,12 +54,12 @@ describe "JournalSettingsHelper" do
     it "should show logs of projects without link(html), when we delete it" do
       project = projects(:projects_002)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "status" => [1,9] },
+                                   :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
                                   :journalized => project,
                                   :journalized_entry_type => "archive")
       journal.save
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "status" => [9,1] },
+                                   :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
                                   :journalized => project,
                                   :journalized_entry_type => "active")
       journal.save
@@ -99,7 +99,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project reopening" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [5,1] },
+                                  :value_changes => { "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE] },
                                   :journalized => project,
                                   :journalized_entry_type => "reopen")
       
@@ -109,7 +109,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project closing" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [1,5] },
+                                  :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED] },
                                   :journalized => project,
                                   :journalized_entry_type => "close")
       
@@ -119,7 +119,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project changing from archiving to closing " do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [9,5] },
+                                  :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_CLOSED] },
                                   :journalized => project,
                                   :journalized_entry_type => "close")
       
@@ -129,7 +129,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project archiving" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [1,9] },
+                                  :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
                                   :journalized => project,
                                   :journalized_entry_type => "archive")
       
@@ -139,10 +139,9 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project activation" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [9,1] },
+                                  :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
                                   :journalized => project,
-                                  :journalized_entry_type => "active")
-      
+                                  :journalized_entry_type => "active")      
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been activated."
     end
 
@@ -168,7 +167,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a user activation" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [2,1] },
+                                  :value_changes => { "status" => [Principal::STATUS_REGISTERED, Principal::STATUS_ACTIVE] },
                                   :journalized => user,
                                   :journalized_entry_type => "active")
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been activated."
@@ -177,7 +176,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a user locking" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [1,3] },
+                                  :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
                                   :journalized => user,
                                   :journalized_entry_type => "lock")
       
@@ -187,7 +186,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a user unlocking" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [3,1] },
+                                  :value_changes => { "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] },
                                   :journalized => user,
                                   :journalized_entry_type => "unlock")
       
@@ -209,12 +208,12 @@ describe "JournalSettingsHelper" do
     it "should show logs of users without link(html), when we delete it" do
       user = users(:users_007)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "status" => [1,3] },
+                                   :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
                                   :journalized => user,
                                   :journalized_entry_type => "lock")
       journal.save
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "status" => [3,1] },
+                                   :value_changes => { "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] },
                                   :journalized => user,
                                   :journalized_entry_type => "unlock")
       journal.save
