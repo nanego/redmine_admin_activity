@@ -1,8 +1,6 @@
 Redmine Admin Activity
 ======================
 
-[![Build Status](https://travis-ci.com/nanego/redmine_admin_activity.svg?branch=master)](https://travis-ci.com/nanego/redmine_admin_activity)
-
 This Redmine plugin keeps a log of all admin actions:
 - Changes in project settings
 - Modules activations
