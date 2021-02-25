@@ -8,6 +8,8 @@
     <ul class="details">
       <% if journal.journalized_type == "Project" %>
         <li><%= project_update_text(journal) %></li>
+      <% elsif journal.journalized_type == "Principal" %>
+        <li><%= user_update_text(journal) %></li>  
       <% else %>
         <% journal.value_changes.each do |name, changes| %>
           <li><%= settings_update_text(name, changes) %></li>
