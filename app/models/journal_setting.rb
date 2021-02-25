@@ -33,4 +33,13 @@ class JournalSetting < ActiveRecord::Base
   def reopening?    
     journalized_entry_type == "reopen"
   end
+
+  def locking?
+    journalized_entry_type == "lock"
+  end
+
+  def unlocking?
+    journalized_entry_type == "unlock"
+  end
+  
 end
