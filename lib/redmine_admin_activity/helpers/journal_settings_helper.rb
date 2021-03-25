@@ -31,6 +31,20 @@ module PluginAdminActivity
       end
     end
 
+    def user_update_text(journal)
+      if journal.creation? || journal.activation? || journal.locking? || journal.unlocking?
+        user_text = link_to_user_if_exists(journal.journalized) || name_user_if_not_exists(journal)
+
+        return sanitize l(".text_setting_create_user_journal_entry", user: user_text) if journal.creation?
+        return sanitize l(".text_setting_active_user_journal_entry", user: user_text) if journal.activation?
+        return sanitize l(".text_setting_lock_user_journal_entry", user: user_text) if journal.locking?
+        return sanitize l(".text_setting_unlock_user_journal_entry", user: user_text) if journal.unlocking?
+
+      elsif journal.deletion?
+        sanitize l(".text_setting_destroy_user_journal_entry", user_name: journal.value_changes["firstname"][0] + " " + journal.value_changes["lastname"][0])
+      end
+    end
+
     private
 
     def link_to_project_if_exists(project)
@@ -40,6 +54,16 @@ module PluginAdminActivity
     def name_project_if_not_exists(journal)
       journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_entry_type: 'destroy'
       journal_row_destroy.value_changes["name"][0]      
+    end
+
+    def link_to_user_if_exists(user)
+      link_to(user.name, user_path(user)) if user.present? && user.persisted?
+    end
+
+    def name_user_if_not_exists(journal)
+        
+      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_entry_type: 'destroy'
+      journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
     end
 
     ActionView::Base.send :include, JournalSettingsHelper
