@@ -22,7 +22,7 @@ class CustomFieldsController
       add_journal_entry project, JournalDetail.new(
         :property => :custom_fields,
         :prop_key => :custom_fields,
-        :value => @custom_field.name
+        :value => helpers.sanitize(@custom_field.name)
       )
     end
   end
@@ -39,9 +39,9 @@ class CustomFieldsController
       )
 
       if @previous_project_ids.include?(project.id) && !@custom_field.project_ids.include?(project.id)
-        journal_detail.old_value = @custom_field.name
+        journal_detail.old_value = helpers.sanitize(@custom_field.name)
       elsif !@previous_project_ids.include?(project.id) && @custom_field.project_ids.include?(project.id)
-        journal_detail.value = @custom_field.name
+        journal_detail.value = helpers.sanitize(@custom_field.name)
       end
 
       add_journal_entry project, journal_detail
@@ -58,7 +58,7 @@ class CustomFieldsController
       project.current_journal.details << JournalDetail.new(
         :property  => :custom_fields,
         :prop_key  => :custom_fields,
-        :old_value => custom_field.name
+        :old_value => helpers.sanitize(custom_field.name)
       )
       @journals_projects << project
     end

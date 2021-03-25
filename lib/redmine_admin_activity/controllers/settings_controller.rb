@@ -27,7 +27,7 @@ class SettingsController
 
     JournalSetting.create(
       :user_id => User.current.id,
-      :value_changes => changes
+      :value_changes => helpers.sanitize(changes)
     )
   end
 end

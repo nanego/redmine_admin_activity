@@ -14,17 +14,17 @@ class IssueCategoriesController
 
   def journalized_issue_categories_creation
     return unless @category.persisted?
-    add_journal_entry value: helpers.sanitize(@category.name)
+    add_journal_entry value: @category.name
   end
 
   def journalized_issue_categories_upgrade
     return unless @category.name_previously_changed?
-    add_journal_entry old_value: helpers.sanitize(@category.name_previous_change[0]),
-                      value: helpers.sanitize(@category.name)
+    add_journal_entry old_value: @category.name_previous_change[0],
+                      value: @category.name
   end
 
   def journalized_issue_categories_deletion
-    add_journal_entry old_value: helpers.sanitize(@category.name)
+    add_journal_entry old_value: @category.name
   end
 
   def add_journal_entry(value: nil, old_value: nil)
