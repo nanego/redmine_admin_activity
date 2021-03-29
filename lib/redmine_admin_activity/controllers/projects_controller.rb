@@ -24,8 +24,8 @@ class ProjectsController
     @project.current_journal.details << JournalDetail.new(
         :property => property,
         :prop_key => property,
-        :value => helpers.sanitize(value),
-        :old_value => helpers.sanitize(old_value)
+        :value => value,
+        :old_value => old_value
     )
   end
 
