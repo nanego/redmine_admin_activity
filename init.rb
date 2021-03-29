@@ -9,11 +9,13 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/controllers/custom_fields_controller'
   require_dependency 'redmine_admin_activity/controllers/settings_controller'
   require_dependency 'redmine_admin_activity/controllers/organizations/memberships_controller' if Redmine::Plugin.installed?(:redmine_organizations)
-
+  require_dependency 'redmine_admin_activity/controllers/users_controller'
+  
   require_dependency 'redmine_admin_activity/models/project'
   require_dependency 'redmine_admin_activity/models/member'
   require_dependency 'redmine_admin_activity/models/journal'
   require_dependency 'redmine_admin_activity/models/version'
+  require_dependency 'redmine_admin_activity/models/user'
 
   require_dependency 'redmine_admin_activity/helpers/projects_helper'
   require_dependency 'redmine_admin_activity/helpers/issues_helper'
