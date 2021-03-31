@@ -28,6 +28,12 @@ describe IssueCategoriesController, type: :controller do
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "Issue Category", :old_value => nil)
     end
+
+    it "sanitizes category name in project journal to prevent cross-site scripting" do
+      post :create, params: { project_id: project.id, issue_category: { name: "<script>alert('xss')</script>" } }
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "alert('xss')")
+    end
   end
 
   describe "PATCH /:id" do
@@ -36,6 +42,14 @@ describe IssueCategoriesController, type: :controller do
       expect(response).to redirect_to('/projects/ecookbook/settings/categories')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "New name", :old_value => "Printing")
+    end
+
+    it "sanitizes category name in project journal to prevent cross-site scripting" do
+      issue_category.update!(name: "<script>alert('old_xss')</script>")
+      patch :update, params: { project_id: project.id, id: issue_category.id, issue_category: { name: "<script>alert('xss')</script>" } }
+
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => "alert('xss')", :old_value => "alert('old_xss')")
     end
   end
 
@@ -46,6 +60,13 @@ describe IssueCategoriesController, type: :controller do
       expect(response).to redirect_to('/projects/ecookbook/settings/categories')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "To Be Removed Issue Category")
+    end
+
+    it "sanitizes category name in project journal to prevent cross-site scripting" do
+      issue_category.update!(name: "<script>alert('old_value')</script>")
+      delete :destroy, params: { id: issue_category.id }
+      expect(project.journals).to_not be_nil
+      expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "alert('old_value')")
     end
   end
 end

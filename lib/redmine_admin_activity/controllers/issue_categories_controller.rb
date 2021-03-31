@@ -31,8 +31,8 @@ class IssueCategoriesController
     journal_detail = JournalDetail.new(
         property: :issue_category,
         prop_key: :issue_category,
-        value: value,
-        old_value: old_value
+        value: helpers.sanitize(value),
+        old_value: helpers.sanitize(old_value)
     )
     @project.current_journal.details << journal_detail
     @project.current_journal.save
