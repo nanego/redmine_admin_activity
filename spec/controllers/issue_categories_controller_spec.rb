@@ -11,9 +11,6 @@ describe IssueCategoriesController, type: :controller do
   include Redmine::I18n
 
   before do
-    @controller = IssueCategoriesController.new
-    @request = ActionDispatch::TestRequest.create
-    @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 2 #permissions are hard
   end
