@@ -10,9 +10,22 @@ RSpec.describe "activities", type: :system do
   end
 
   describe "issue category journal" do
-    it "is correclty javascript escaped on 'create event' (XSS proof)" do
+    it "is correctly javascript escaped on 'create event' (XSS proof)" do
       visit "/projects/ecookbook/issue_categories/new"
       fill_in "Name", with: "</script>alert('xss')<script>"
+
+      # expect no javascript alert is rendered
+      expect do
+        accept_alert wait: 2 do
+          click_on "Create"
+        end
+      end.to raise_error(Capybara::ModalNotFound)
+      expect(page).to have_content('Successful creation.')
+    end
+
+    it "does not show JS alert when adding a category (XSS proof)" do
+      visit "/projects/ecookbook/issue_categories/new"
+      fill_in "Name", with: "<script>alert('xss')</script>"
 
       # expect no javascript alert is rendered
       expect do
