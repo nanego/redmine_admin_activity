@@ -10,19 +10,6 @@ RSpec.describe "activities", type: :system do
   end
 
   describe "issue category journal" do
-    it "is correctly javascript escaped on 'create event' (XSS proof)" do
-      visit "/projects/ecookbook/issue_categories/new"
-      fill_in "Name", with: "</script>alert('xss')<script>"
-
-      # expect no javascript alert is rendered
-      expect do
-        accept_alert wait: 2 do
-          click_on "Create"
-        end
-      end.to raise_error(Capybara::ModalNotFound)
-      expect(page).to have_content('Successful creation.')
-    end
-
     it "does not show JS alert when adding a category (XSS proof)" do
       visit "/projects/ecookbook/issue_categories/new"
       fill_in "Name", with: "<script>alert('xss')</script>"
@@ -40,7 +27,7 @@ RSpec.describe "activities", type: :system do
       category = IssueCategory.create!(project: Project.find('ecookbook'), name: 'myIssue')
 
       visit "/issue_categories/#{category.id}/edit"
-      fill_in "Name", with: "</script>alert('xss')<script>"
+      fill_in "Name", with: "<script>alert('xss')</script>"
 
       # expect no javascript alert is rendered
       expect do
@@ -52,7 +39,7 @@ RSpec.describe "activities", type: :system do
     end
 
     it "is correctly javascript escaped on 'destroy event' (XSS proof)" do
-      category = IssueCategory.create!(project: Project.find('ecookbook'), name: "</script>alert('xss')<script>")
+      category = IssueCategory.create!(project: Project.find('ecookbook'), name: "<script>alert('xss')</script>")
 
       visit "/projects/ecookbook/settings/categories"
       delete_button = page.find("a[data-method='delete'][href='/issue_categories/#{category.id}']")
@@ -65,7 +52,7 @@ RSpec.describe "activities", type: :system do
           end
         end
       end.to raise_error(Capybara::ModalNotFound)
-      expect(IssueCategory.where(name: "</script>alert('xss')<script>")).to be_empty
+      expect(IssueCategory.where(name: "<script>alert('xss')</script>")).to be_empty
     end
   end
 end
