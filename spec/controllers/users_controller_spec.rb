@@ -76,7 +76,7 @@ describe UsersController, type: :controller do
 
   describe "DELETE destroy" do
     it "logs change on JournalSetting" do
-      delete :destroy, :params => { :id => 7, :confirm => true }
+      delete :destroy, :params => { :id => 7, :confirm => "someone" }
       
       expect(response).to redirect_to('/users')
       expect(JournalSetting.all).to_not be_nil

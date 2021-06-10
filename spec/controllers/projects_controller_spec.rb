@@ -81,7 +81,7 @@ describe ProjectsController, type: :controller do
   describe "DELETE destroy" do
     it "logs change on JournalSetting" do
       @request.session[:user_id] = 1
-      delete :destroy, :params => { :id => "ecookbook", :confirm => true }
+      delete :destroy, :params => { :id => "ecookbook", :confirm => 'ecookbook' }
 
       expect(response).to redirect_to('/admin/projects')
       expect(JournalSetting.all).to_not be_nil

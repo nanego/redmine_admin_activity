@@ -6,6 +6,8 @@ describe "JournalSettingsHelper" do
 
   fixtures :projects, :users
 
+  let!(:project_2) { Project.find(2) }
+
   before do
     set_language_if_valid('en')
     User.current = nil
@@ -14,7 +16,7 @@ describe "JournalSettingsHelper" do
   describe "settings update" do
     it "should generate the right translated sentence for a Settings update" do
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "app_title" => ["Redmine test", "New redmine name"] })
+                                   :value_changes => { "app_title" => ["Redmine test", "New redmine name"] })
       name = journal.value_changes.first[0]
       changes = journal.value_changes.first[1]
       expect(settings_update_text(name, changes)).to eq "Application title changed from <i>Redmine test</i> to <i>New redmine name</i>."
@@ -22,7 +24,7 @@ describe "JournalSettingsHelper" do
 
     it "should generate the right translated sentence when ui theme is updated" do
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "ui_theme" => ["classic", "alternate"] })
+                                   :value_changes => { "ui_theme" => ["classic", "alternate"] })
       name = journal.value_changes.first[0]
       changes = journal.value_changes.first[1]
       expect(settings_update_text(name, changes)).to eq "Theme changed from <i>classic</i> to <i>alternate</i>."
@@ -36,7 +38,7 @@ describe "JournalSettingsHelper" do
       journal = JournalSetting.new(:user_id => User.current.id,
                                    :value_changes => { "name" => [nil, "Test create"] },
                                    :journalized => project,
-                                   :journalized_entry_type => "create")      
+                                   :journalized_entry_type => "create")
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/test-create\">Test create</a></i> has been created."
     end
   end
@@ -53,23 +55,23 @@ describe "JournalSettingsHelper" do
     end
 
     it "should show logs of projects without link(html), when we delete it" do
-      project = projects(:projects_002)
+      project = project_2
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "archive")
+                                   :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "archive")
       journal.save
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "active")
+                                   :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "active")
       journal.save
 
       project.destroy
       journal = JournalSetting.new(:user_id => User.current.id,
                                    :value_changes => { "name" => ["OnlineStore", nil] },
                                    :journalized => project,
-                                   :journalized_entry_type => "destroy")      
+                                   :journalized_entry_type => "destroy")
       journal.save
       expect(JournalSetting.count).to eq(3)
       expect(project_update_text(JournalSetting.all.first)).to eq "Project <i>OnlineStore</i> has been archived."
@@ -88,8 +90,8 @@ describe "JournalSettingsHelper" do
                                                        "source_project" => 1000,
                                                        "source_project_name" => source_project.name },
                                    :journalized => project,
-                                   :journalized_entry_type => "copy")      
-      
+                                   :journalized_entry_type => "copy")
+
       source_project.save
       expect(project_update_text(journal)).to eq "Projet <i><a href=\"/projects/test-create\">Test create</a></i> has been copied from <i>Source project</i>."
     end
@@ -99,20 +101,20 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a project reopening" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "reopen")
-      
+                                   :value_changes => { "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "reopen")
+
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been reopened."
     end
 
     it "should generate the right translated sentence for a project closing" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "close")
-      
+                                   :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "close")
+
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been closed."
     end
 
@@ -120,29 +122,29 @@ describe "JournalSettingsHelper" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
                                    :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_CLOSED] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "close")
-      
+                                   :journalized => project,
+                                   :journalized_entry_type => "close")
+
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been changed from archived to Closed."
     end
 
     it "should generate the right translated sentence for a project archiving" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "archive")
-      
+                                   :value_changes => { "status" => [Project::STATUS_ACTIVE, Project::STATUS_ARCHIVED] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "archive")
+
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been archived."
     end
 
     it "should generate the right translated sentence for a project activation" do
       project = Project.find(1)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
-                                  :journalized => project,
-                                  :journalized_entry_type => "active")
-      
+                                   :value_changes => { "status" => [Project::STATUS_ARCHIVED, Project::STATUS_ACTIVE] },
+                                   :journalized => project,
+                                   :journalized_entry_type => "active")
+
       expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/ecookbook\">eCookbook</a></i> has been activated."
     end
 
@@ -154,10 +156,10 @@ describe "JournalSettingsHelper" do
                       :firstname => 'new',
                       :lastname => 'user',
                       :mail => 'newuser@example.net'
-                      )
-      user.save      
+      )
+      user.save
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "login" => ["","newuser"], "firstname" => ["","new"],"lastname" => ["","user"] },
+                                   :value_changes => { "login" => ["", "newuser"], "firstname" => ["", "new"], "lastname" => ["", "user"] },
                                    :journalized => user,
                                    :journalized_entry_type => "create")
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/15\">new user</a></i> has been created."
@@ -168,31 +170,31 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a user activation" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Principal::STATUS_REGISTERED, Principal::STATUS_ACTIVE] },
-                                  :journalized => user,
-                                  :journalized_entry_type => "active")
+                                   :value_changes => { "status" => [Principal::STATUS_REGISTERED, Principal::STATUS_ACTIVE] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "active")
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been activated."
     end
 
     it "should generate the right translated sentence for a user locking" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
-                                  :journalized => user,
-                                  :journalized_entry_type => "lock")
-      
+                                   :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "lock")
+
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been locked."
-    end  
+    end
 
     it "should generate the right translated sentence for a user unlocking" do
       user = User.find(7)
       journal = JournalSetting.new(:user_id => User.current.id,
                                    :value_changes => { "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] },
-                                  :journalized => user,
-                                  :journalized_entry_type => "unlock")
-      
+                                   :journalized => user,
+                                   :journalized_entry_type => "unlock")
+
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/7\">Some One</a></i> has been unlocked."
-    end   
+    end
 
   end
 
@@ -200,7 +202,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a user deletion" do
       user = users(:users_007)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil],"lastname" => ["One", nil] },
+                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil], "lastname" => ["One", nil] },
                                    :journalized => user,
                                    :journalized_entry_type => "destroy")
       expect(user_update_text(journal)).to eq "User <i>Some One</i> has been deleted."
@@ -209,19 +211,19 @@ describe "JournalSettingsHelper" do
     it "should show logs of users without link(html), when we delete it" do
       user = users(:users_007)
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
-                                  :journalized => user,
-                                  :journalized_entry_type => "lock")
+                                   :value_changes => { "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "lock")
       journal.save
       journal = JournalSetting.new(:user_id => User.current.id,
-                                  :value_changes => { "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] },
-                                  :journalized => user,
-                                  :journalized_entry_type => "unlock")
+                                   :value_changes => { "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "unlock")
       journal.save
 
       user.destroy
       journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil],"lastname" => ["One", nil] },
+                                   :value_changes => { "login" => ["someone", nil], "firstname" => ["Some", nil], "lastname" => ["One", nil] },
                                    :journalized => user,
                                    :journalized_entry_type => "destroy")
       journal.save

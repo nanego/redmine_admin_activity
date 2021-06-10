@@ -90,7 +90,7 @@ class ProjectsController
   end
 
   def journalized_projects_deletion
-    return unless @project_to_destroy.destroyed?
+    return unless @project_to_destroy.present? && @project_to_destroy.destroyed?
 
     changes = @project_to_destroy.attributes.to_a.map { |i| [i[0], [i[1], nil]] }.to_h
 
