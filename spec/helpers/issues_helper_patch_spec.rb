@@ -63,6 +63,13 @@ describe "IssuesHelperPatch" do
     end
   end
 
+  describe "functions property" do
+    it "shows a new enabled function with HTML highlights" do
+      detail = JournalDetail.new(:property => 'functions', :old_value => 'function_1', :value => 'function_1,function_2', :prop_key => 'functions')
+      expect(show_detail(detail, false)).to eq "Enabled functions changed: added [function_2]"
+    end
+  end
+
   describe "members property" do
     describe "members property with legacy Array format" do
       it "should IssuesHelper#show_detail with no_html should show a changing enabled members" do

@@ -24,7 +24,9 @@ module PluginAdminActivity
       when 'copy_project'
         show_copy_project_details(detail, options)
       when 'status'
-        show_project_status_details(detail, no_html, options)  
+        show_project_status_details(detail, no_html, options)
+      when 'functions'
+        show_functions_details(detail, options)
       else
         # Process standard properties like 'attr', 'attachment' or 'cf'
         super
@@ -43,6 +45,18 @@ module PluginAdminActivity
       new_values = new_values.any? ? l(:text_journal_modules_added, :value => new_values.join(', ')) : ""
 
       l(:text_journal_modules_changed, :deleted => deleted_values, :new => new_values)
+    end
+
+    def show_functions_details(detail, options = {})
+      value = string_list_to_array(detail.value)
+      old_value = string_list_to_array(detail.old_value)
+      deleted_values = old_value - value
+      new_values = value - old_value
+
+      deleted_values = deleted_values.any? ? l(:text_journal_functions_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
+      new_values = new_values.any? ? l(:text_journal_functions_added, :value => new_values.join(', ')) : ""
+
+      l(:text_journal_functions_changed, :deleted => deleted_values, :new => new_values)
     end
 
     def show_members_details(detail, options = {})
