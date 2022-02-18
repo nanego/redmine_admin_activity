@@ -239,35 +239,37 @@ describe "JournalSettingsHelper" do
 
   end
 
-  describe "organization creation / deletion" do
-    it "should generate the right translated sentence for a organization creation (parent or child)" do
+  if Redmine::Plugin.installed?(:redmine_organizations)
+    describe "organization creation / deletion" do
+      it "should generate the right translated sentence for a organization creation (parent or child)" do
+        # ex: Org A/Team B/Org child0/Org child1/Org child2
+        3.times do |i|
+          org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id )
+          org.save
+
+          journal = JournalSetting.new(:user_id => User.current.id,
+                                       :value_changes => { "name" => [nil, org.name], "name_with_parents" => [nil, org.fullname] },
+                                       :journalized => org,
+                                       :journalized_entry_type => "create")
+
+          expect(organization_update_text(journal)).to eq "Organization <i><a href=\"/organizations/#{org.id.to_s}\">#{org.fullname}</a></i> has been created."
+        end
+      end
+    end
+
+    it "should generate the right translated sentence for a organization deletion (parent or child)" do
       # ex: Org A/Team B/Org child0/Org child1/Org child2
       3.times do |i|
         org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id )
         org.save
 
         journal = JournalSetting.new(:user_id => User.current.id,
-                                     :value_changes => { "name" => [nil, org.name], "name_with_parents" => [nil, org.fullname] },
+                                     :value_changes => { "name" => [org.name, nil], "name_with_parents" => [org.fullname, nil] },
                                      :journalized => org,
-                                     :journalized_entry_type => "create")
+                                     :journalized_entry_type => "destroy")
 
-        expect(organization_update_text(journal)).to eq "Organization <i><a href=\"/organizations/#{org.id.to_s}\">#{org.fullname}</a></i> has been created."
+        expect(organization_update_text(journal)).to eq "Organization <i>#{org.fullname}</i> has been deleted."
       end
-    end
-  end
-
-  it "should generate the right translated sentence for a organization deletion (parent or child)" do
-    # ex: Org A/Team B/Org child0/Org child1/Org child2
-    3.times do |i|
-      org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id )
-      org.save
-
-      journal = JournalSetting.new(:user_id => User.current.id,
-                                   :value_changes => { "name" => [org.name, nil], "name_with_parents" => [org.fullname, nil] },
-                                   :journalized => org,
-                                   :journalized_entry_type => "destroy")
-
-      expect(organization_update_text(journal)).to eq "Organization <i>#{org.fullname}</i> has been deleted."
     end
   end
 end
