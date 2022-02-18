@@ -49,3 +49,5 @@ fr:
   text_setting_lock_user_journal_entry: "L'utilisateur <i>%{user}</i> a été verrouillé."
   text_setting_unlock_user_journal_entry: "L'utilisateur <i>%{user}</i> a été déverrouillé."
   text_setting_destroy_user_journal_entry: "L'utilisateur <i>%{user_name}</i>  a été supprimé."
+  text_setting_create_organization_journal_entry: "La organisation <i>%{organization}</i> a été créée."
+  text_setting_destroy_organization_journal_entry: "La organisation <i>%{organization_name}</i> a été supprimée."
