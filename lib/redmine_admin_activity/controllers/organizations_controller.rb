@@ -4,7 +4,7 @@ class OrganizationsController < ApplicationController
 
   after_action :journalized_organizations_creation, :only => [:create]
   after_action :journalized_organizations_deletion, :only => [:destroy]
-  before_action :self_and_descendants, :only => [:destroy]
+  before_action :memorize_deleted_organizations, :only => [:destroy]
 
   private
 
@@ -26,7 +26,7 @@ class OrganizationsController < ApplicationController
   def journalized_organizations_deletion
     return unless @organization.destroyed?
 
-    @self_and_descendants.each do |org|
+    @deleted_organizations.each do |org|
       changes = org.attributes.to_a.map { |i| [i[0], [i[1], nil]] }.to_h
 
       JournalSetting.create(
@@ -39,13 +39,7 @@ class OrganizationsController < ApplicationController
 
   end
 
-  def self_and_descendants
-    @self_and_descendants = Array.new
-    @self_and_descendants.push(@organization)
-
-    @organization.descendants.each do |child|
-      @self_and_descendants.push(child)
-    end
-
+  def memorize_deleted_organizations
+    @deleted_organizations = @organization.self_and_descendants.to_a
   end
 end
