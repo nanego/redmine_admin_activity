@@ -51,3 +51,5 @@ en:
   text_setting_lock_user_journal_entry: "User <i>%{user}</i> has been locked."
   text_setting_unlock_user_journal_entry: "User <i>%{user}</i> has been unlocked."
   text_setting_destroy_user_journal_entry: "User <i>%{user_name}</i> has been deleted."
+  text_setting_create_organization_journal_entry: "Organization <i>%{organization}</i> has been created."
+  text_setting_destroy_organization_journal_entry: "Organization <i>%{organization_name}</i> has been deleted."

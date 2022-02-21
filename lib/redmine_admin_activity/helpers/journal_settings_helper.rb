@@ -45,6 +45,18 @@ module PluginAdminActivity
       end
     end
 
+    def organization_update_text(journal)
+      if journal.creation?
+        organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
+
+        return sanitize l(".text_setting_create_organization_journal_entry", organization: organization_text) if journal.creation?
+
+      else journal.deletion?
+
+        return sanitize l(".text_setting_destroy_organization_journal_entry", organization_name: journal.value_changes["name_with_parents"][0])
+      end
+    end
+
     private
 
     def link_to_project_if_exists(project)
@@ -64,6 +76,15 @@ module PluginAdminActivity
         
       journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_entry_type: 'destroy'
       journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
+    end
+
+    def link_to_organization_if_exists(organization)
+      link_to(organization.fullname, organization_path(organization)) if organization.present? && organization.persisted?
+    end
+
+    def name_organization_if_not_exists(journal)
+      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
+      journal_row_destroy.value_changes["name_with_parents"][0]
     end
 
     ActionView::Base.send :include, JournalSettingsHelper
