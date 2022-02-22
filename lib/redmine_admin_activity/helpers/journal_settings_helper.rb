@@ -52,7 +52,7 @@ module PluginAdminActivity
     end
 
     def name_project_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_entry_type: 'destroy'
+      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
       journal_row_destroy.value_changes["name"][0]      
     end
 
@@ -62,7 +62,7 @@ module PluginAdminActivity
 
     def name_user_if_not_exists(journal)
         
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_entry_type: 'destroy'
+      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
       journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
     end
 
