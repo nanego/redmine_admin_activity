@@ -70,6 +70,13 @@ describe "IssuesHelperPatch" do
     end
   end
 
+  describe "templates property" do
+    it "shows a new enabled template with HTML highlights" do
+      detail = JournalDetail.new(:property => 'templates', :old_value => nil, :value => 'template-name', :prop_key => 'enabled_template')
+      expect(show_detail(detail, false)).to eq 'New template enabled: ["template-name"]'
+    end
+  end
+
   describe "members property" do
     describe "members property with legacy Array format" do
       it "should IssuesHelper#show_detail with no_html should show a changing enabled members" do

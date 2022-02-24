@@ -19,6 +19,8 @@ module PluginAdminActivity
         show_versions_details(detail, options)
       when 'trackers'
         show_trackers_details(detail, options)
+      when 'templates'
+        show_templates_details(detail, options)
       when 'custom_fields'
         show_custom_fields_details(detail, options)
       when 'copy_project'
@@ -124,7 +126,7 @@ module PluginAdminActivity
     def show_issue_category_details(detail, options = {})
       value = detail.value
       old_value = detail.old_value
-      data = {:old_value => old_value, :value => value}
+      data = { :old_value => old_value, :value => value }
 
       if value.present? && old_value.present?
         l(:text_journal_issue_category_changed, data)
@@ -138,7 +140,7 @@ module PluginAdminActivity
     def show_versions_details(detail, options = {})
       value = detail.value
       old_value = detail.old_value
-      data = {:old_value => old_value, :value => value}
+      data = { :old_value => old_value, :value => value }
 
       if value.present? && old_value.present?
         l(:text_journal_version_changed, data)
@@ -161,6 +163,14 @@ module PluginAdminActivity
       l(:text_journal_trackers_changed, :deleted => deleted_values, :new => new_values)
     end
 
+    def show_templates_details(detail, options = {})
+      value = string_list_to_array(detail.value)
+      case detail.prop_key
+      when 'enabled_template'
+        return l(:text_journal_templates_enabled, :value => value)
+      end
+    end
+
     def show_custom_fields_details(detail, options = {})
       value = string_list_to_array(detail.value)
       old_value = string_list_to_array(detail.old_value)
@@ -177,10 +187,10 @@ module PluginAdminActivity
       l(:text_journal_copy_project, :value => detail.value)
     end
 
-    def show_project_status_details(detail, no_html , options = {})
-      label = no_html ? l(:text_label_status) : content_tag('strong', l(:text_label_status))              
+    def show_project_status_details(detail, no_html, options = {})
+      label = no_html ? l(:text_label_status) : content_tag('strong', l(:text_label_status))
       value = get_project_status_label_for_history[detail.value]
-      old_value = get_project_status_label_for_history[detail.old_value]      
+      old_value = get_project_status_label_for_history[detail.old_value]
       l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
     end
 
