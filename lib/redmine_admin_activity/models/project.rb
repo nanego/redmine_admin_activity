@@ -29,7 +29,7 @@ class Project < ActiveRecord::Base
     @current_journal
   end
 
-  # Returns the names of attributes that are journalized when updating the issue
+  # Returns the names of attributes that are journalized when updating the project
   def journalized_attribute_names
     names = Project.column_names - %w(id root_id lft rgt lock_version created_on updated_on closed_on)
     names

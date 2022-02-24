@@ -44,7 +44,7 @@ module RedmineAdminActivity::Journalizable
 
   def add_member_creation_to_journal(member, role_ids, function_ids = nil)
     add_member_journal_entry(project: member.project, value: value_hash(member, role_ids, function_ids))
-    add_journal_entry_for_user(user: member.user, property: 'projects', prop_key: 'id', value: member.project.id)
+    add_journal_entry_for_user(user: member.user, property: 'associations', prop_key: 'projects', value: member.project.id)
   end
 
   def add_member_edition_to_journal(member, previous_role_ids, role_ids, previous_function_ids = nil, function_ids = nil)
@@ -55,7 +55,7 @@ module RedmineAdminActivity::Journalizable
 
   def add_member_deletion_to_journal(member, previous_role_ids, previous_function_ids = nil)
     add_member_journal_entry(project: member.project, old_value: value_hash(member, previous_role_ids, previous_function_ids))
-    add_journal_entry_for_user(user: member.user, property: 'projects', prop_key: 'id', old_value: member.project.id)
+    add_journal_entry_for_user(user: member.user, property: 'associations', prop_key: 'projects', old_value: member.project.id)
   end
 
   def value_hash(member, role_ids, function_ids)

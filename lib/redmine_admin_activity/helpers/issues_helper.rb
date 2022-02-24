@@ -28,8 +28,28 @@ module PluginAdminActivity
       when 'functions'
         show_functions_details(detail, options)
       else
-        # Process standard properties like 'attr', 'attachment' or 'cf'
-        super
+        if detail.journal.journalized_type == 'Principal'
+          if detail.prop_key == 'status'
+            show_user_status_details(detail, no_html, options)
+          elsif detail.property == 'associations'
+            if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
+              show_associations_details(detail, no_html, options)
+            else
+              super
+            end
+          elsif detail.property == 'attr'
+            if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
+              show_belongs_to_details(detail, no_html, options)
+            else
+              super
+            end
+          else
+            super
+          end
+        else
+          # Process standard properties like 'attr', 'attachment' or 'cf'
+           super
+        end
       end
     end
 
@@ -184,6 +204,13 @@ module PluginAdminActivity
       l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
     end
 
+    def show_user_status_details(detail, no_html , options = {})
+      label = no_html ? l(:text_label_status) : content_tag('strong', l(:text_label_status))
+      value = get_user_status_label_for_history[detail.value]
+      old_value = get_user_status_label_for_history[detail.old_value]
+      l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
+    end
+
     def get_project_status_label_for_history
       {
         "1" => l(:project_status_active),
@@ -192,10 +219,58 @@ module PluginAdminActivity
       }
     end
 
+    def get_user_status_label_for_history
+      {
+        "0" => l(:label_user_anonymous),
+        "1" => l(:status_active),
+        "2" => l(:status_registered),
+        "3" => l(:status_locked),
+      }
+    end
+
     def string_list_to_array(value)
       return [] if value.blank?
 
       value.split(",")
+    end
+
+    def show_associations_details(detail, no_html , options = {})
+      association_class = User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.first.klass
+      label_class_name = "label_#{association_class.class_name.downcase}"
+      val = association_class.find_by(:id => detail.value)
+      old_val = association_class.find_by(:id => detail.old_value)
+
+      if detail.value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
+
+        return l(:text_journal_association_added, :class_name => l(label_class_name), :new => label_new).html_safe
+      elsif detail.old_value.present?
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+
+        return l(:text_journal_association_deleted, :class_name => l(label_class_name), :old => label_old).html_safe
+      end
+    end
+
+    def show_belongs_to_details(detail, no_html , options = {})
+      belongs_to_class = User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.first.klass
+      label_class_name = "label_#{belongs_to_class.class_name.downcase}"
+      val = belongs_to_class.find_by(:id => detail.value)
+      old_val = belongs_to_class.find_by(:id => detail.old_value)
+
+      if detail.value.present? && detail.old_value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+
+        return l(:text_journal_belongs_to_changed, :class_name => l(label_class_name), :new => label_new, :old => label_old)
+      elsif detail.value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
+
+        return l(:text_journal_belongs_to_added, :class_name => l(label_class_name), :new => label_new).html_safe
+      elsif detail.old_value.present?
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+
+        return l(:text_journal_belongs_to_deleted, :class_name => l(label_class_name), :old => label_old).html_safe
+      end
     end
   end
 end

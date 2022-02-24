@@ -21,7 +21,7 @@ class User < Principal
 
   # Returns the names of attributes that are journalized when updating the user
   def journalized_attribute_names
-    names = User.column_names - %w(id hashed_password language salt staff beta_tester trusted_api_user created_on updated_on) + ["mails"]
+    names = User.column_names - %w(id hashed_password must_change_passwd language salt staff beta_tester trusted_api_user created_on updated_on) + ["mails"]
   end
 
 	def create_journal
