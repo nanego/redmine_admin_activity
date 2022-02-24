@@ -5,6 +5,12 @@ class UsersController
   after_action :journalized_users_creation, :only => [:create]
   after_action :journalized_users_update_status, :only => [:update]
   after_action :journalized_users_deletion, :only => [:destroy]
+  before_action :init_journal, :only => [:update]
+  before_action lambda {find_user(false)}, :only => :history
+
+  def history
+
+  end
 
   def journalized_users_creation
     
@@ -63,4 +69,7 @@ class UsersController
       )  
   end
 
+  def init_journal
+    @user.init_journal(User.current)
+  end
 end
