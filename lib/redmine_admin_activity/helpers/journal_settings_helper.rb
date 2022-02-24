@@ -1,6 +1,16 @@
 module PluginAdminActivity
   module JournalSettingsHelper
 
+    def prepare_journal_for_history(journals)
+      journals = journals.includes(:user, :details).
+        references(:user, :details).
+        reorder(:created_on, :id).to_a
+      journals.each_with_index {|j,i| j.indice = i+1}
+      Journal.preload_journals_details_custom_fields(journals)
+      journals.select! {|journal| journal.notes? || journal.visible_details.any?}
+      journals.reverse! # Last changes first
+    end
+
     def settings_update_text(name, changes)
       field_name = l("setting_#{name}")
       field_name = l("label_theme") if name == "ui_theme"
