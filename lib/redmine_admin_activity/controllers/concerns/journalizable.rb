@@ -9,16 +9,18 @@ module RedmineAdminActivity::Journalizable
   end
 
   # Store a [JournalDetail] or an array of [JournalDetail]s in a new
-  # journal entry for current User.
-  def add_journal_entry(project, journal_details)
-    project.init_journal(User.current)
+  # journal entry (project , user) for current User.
+  def add_journal_entry(journalized, journal_details)
+    return unless (journalized.respond_to?(:init_journal) && journalized.respond_to?(:current_journal))
+
+    journalized.init_journal(User.current)
 
     journal_details = [journal_details] unless journal_details.is_a?(Array)
     journal_details.each do |journal_detail|
-      project.current_journal.details << journal_detail
+      journalized.current_journal.details << journal_detail
     end
 
-    project.current_journal.save
+    journalized.current_journal.save
   end
 
   def add_member_journal_entry(project:, value: nil, old_value: nil)
@@ -32,8 +34,17 @@ module RedmineAdminActivity::Journalizable
         old_value: old_value)
   end
 
+  def add_journal_entry_for_user(user:, property:, prop_key:, value: nil, old_value: nil)
+    add_journal_entry user, JournalDetail.new(
+        property: property,
+        prop_key: prop_key,
+        value: value,
+        old_value: old_value)
+  end
+
   def add_member_creation_to_journal(member, role_ids, function_ids = nil)
     add_member_journal_entry(project: member.project, value: value_hash(member, role_ids, function_ids))
+    add_journal_entry_for_user(user: member.user, property: 'projects', prop_key: 'id', value: member.project.id)
   end
 
   def add_member_edition_to_journal(member, previous_role_ids, role_ids, previous_function_ids = nil, function_ids = nil)
@@ -44,6 +55,7 @@ module RedmineAdminActivity::Journalizable
 
   def add_member_deletion_to_journal(member, previous_role_ids, previous_function_ids = nil)
     add_member_journal_entry(project: member.project, old_value: value_hash(member, previous_role_ids, previous_function_ids))
+    add_journal_entry_for_user(user: member.user, property: 'projects', prop_key: 'id', old_value: member.project.id)
   end
 
   def value_hash(member, role_ids, function_ids)
