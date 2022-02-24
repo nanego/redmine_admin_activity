@@ -42,6 +42,8 @@ module PluginAdminActivity
           elsif detail.property == 'attr'
             if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
               show_belongs_to_details(detail, no_html, options)
+            elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean
+              show_boolean_details(detail, no_html, options)
             else
               super
             end
@@ -281,6 +283,12 @@ module PluginAdminActivity
 
         return l(:text_journal_belongs_to_deleted, :class_name => l(label_class_name), :old => label_old).html_safe
       end
+    end
+
+    def show_boolean_details(detail, no_html , options = {})
+      field = detail.prop_key.to_s.gsub(/\_id$/, "")
+      label = l(("field_" + field).to_sym)
+      l(:text_journal_changed, :label => label, :old => detail.old_value.to_bool ? l(:label_1) : l(:label_0), :new => detail.value.to_bool ? l(:label_1) : l(:label_0)).html_safe
     end
   end
 end

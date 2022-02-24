@@ -64,3 +64,5 @@ en:
   text_journal_belongs_to_added: "%{class_name} %{new} added."
   text_journal_belongs_to_deleted: "%{class_name} %{old} deleted."
   label_id_deleted: "(#%{id})"
+  label_0: "No"
+  label_1: "Yes"

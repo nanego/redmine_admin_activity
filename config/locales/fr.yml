@@ -63,3 +63,5 @@ fr:
   text_journal_belongs_to_added: "%{class_name} %{new} a été ajouté."
   text_journal_belongs_to_deleted: "%{class_name} %{old} a été supprimé."
   label_id_deleted: "(#%{id})"
+  label_0: "Non"
+  label_1: "Oui"
