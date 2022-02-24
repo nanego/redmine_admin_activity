@@ -225,18 +225,18 @@ module PluginAdminActivity
 
     def get_project_status_label_for_history
       {
-        "1" => l(:project_status_active),
-        "5" => l(:project_status_closed),
-        "9" => l(:project_status_archived),
+        Project::STATUS_ACTIVE.to_s => l(:project_status_active),
+        Project::STATUS_CLOSED.to_s => l(:project_status_closed),
+        Project::STATUS_ARCHIVED.to_s => l(:project_status_archived),
       }
     end
 
     def get_user_status_label_for_history
       {
-        "0" => l(:label_user_anonymous),
-        "1" => l(:status_active),
-        "2" => l(:status_registered),
-        "3" => l(:status_locked),
+        User::STATUS_ANONYMOUS.to_s => l(:label_user_anonymous),
+        User::STATUS_ACTIVE.to_s => l(:status_active),
+        User::STATUS_REGISTERED.to_s => l(:status_registered),
+        User::STATUS_LOCKED.to_s => l(:status_locked),
       }
     end
 
