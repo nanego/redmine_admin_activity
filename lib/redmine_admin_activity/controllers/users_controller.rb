@@ -8,6 +8,18 @@ class UsersController
   before_action :init_journal, :only => [:update]
   before_action lambda {find_user(false)}, :only => :history
 
+  # override require_admin because of redmine_organizations and ,redmine_scn override before_action
+  def require_admin
+    return unless require_login
+
+    return true if  params[:action] == 'history' && User.current.allowed_to?(:see_user_changes_history, nil, :global => true)
+    if !User.current.admin?
+      render_403
+      return false
+    end
+    true
+  end
+
   def history
 
   end
