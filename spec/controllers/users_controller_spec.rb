@@ -72,6 +72,61 @@ describe UsersController, type: :controller do
       expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
       expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "active")
     end
+
+    it "add logs on JournalDetail when changing his attributes" do
+      user = User.find(5)
+      user.update_attribute :status, Principal::STATUS_LOCKED
+      user.update_attribute :mail, "old_mail@example.net"
+      # set requested attribute
+      if Redmine::Plugin.installed?(:redmine_scn)
+        user.update_attribute :issue_display_mode, "by_priority"
+      end
+
+      expect do
+        patch :update, :params => { :id => user.id,
+                                    :user => {:login => 'test',
+                                    :status => Principal::STATUS_ACTIVE,
+                                    :mail => 'new_mail@example.net'} }
+
+      end.to change(Journal, :count).by(1)
+         .and change(JournalDetail, :count).by(3)
+
+      expect(Journal.last.journalized_type).to eq("Principal")
+      expect(Journal.last.journalized_id).to eq(user.id)
+      expect(JournalDetail.last.property).to eq("attr")
+      expect(JournalDetail.last(3)[0].prop_key).to eq("login")
+      expect(JournalDetail.last.prop_key).to eq("mails")
+      expect(JournalDetail.last.old_value).to eq(["old_mail@example.net"].to_s)
+      expect(JournalDetail.last.value).to eq(user.mails.to_s)
+    end
+
+    if Redmine::Plugin.installed?(:redmine_organizations)
+      it "add logs on JournalDetail when changing his organization" do
+        user = User.find(5)
+        org_id = Organization.find(1).id
+        # set requested attribute
+        user.update_attribute :mail, "old_mail@example.net"
+        if Redmine::Plugin.installed?(:redmine_scn)
+          user.update_attribute :issue_display_mode, "by_priority"
+        end
+
+        expect do
+          patch :update,
+                :params => { :id => user.id, :user => { :organization_id => org_id } }
+
+        end.to change { Journal.count }.by(1)
+           .and change(JournalDetail, :count).by(1)
+
+        expect(Journal.last.journalized_type).to eq("Principal")
+        expect(Journal.last.journalized_id).to eq(user.id)
+        expect(JournalDetail.last.property).to eq("attr")
+        expect(JournalDetail.last.prop_key).to eq("organization_id")
+        expect(JournalDetail.last.old_value).to be_nil
+        expect(JournalDetail.last.value).to eq(org_id.to_s)
+
+      end
+    end
+
   end
 
   describe "DELETE destroy" do
@@ -87,5 +142,16 @@ describe UsersController, type: :controller do
       expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "destroy")
     end  
   end
+  describe "permission of user's history" do
+    it "Should not allow access to history when user with incorrect permission" do
+      @request.session[:user_id] = 5
+      get :history, params: { id: 1 }
+      expect(response).not_to have_http_status(:success)
 
+    end
+    it "Should allow access to history when user with correct permission" do
+      get :history, :params => { id: 7 }
+      expect(response).to have_http_status(:success)
+    end
+  end
 end
