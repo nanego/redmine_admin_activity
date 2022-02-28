@@ -30,7 +30,7 @@ module PluginAdminActivity
       when 'functions'
         show_functions_details(detail, options)
       else
-        if detail.journal.present? && detail.journal.journalized_type == 'Principal'
+        if detail.property != 'cf' && detail.journal.present? && detail.journal.journalized_type == 'Principal'
           if detail.prop_key == 'status'
             show_user_status_details(detail, no_html, options)
           elsif detail.property == 'associations'
