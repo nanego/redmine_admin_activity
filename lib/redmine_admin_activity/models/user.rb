@@ -30,4 +30,12 @@ class User < Principal
 		end
 	end
 
+  def notified_users
+    []
+  end
+
+  def notified_watchers
+    []
+  end
+
 end
