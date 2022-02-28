@@ -237,8 +237,9 @@ module PluginAdminActivity
     end
 
     def show_associations_details(detail, no_html , options = {})
+
       association_class = User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.first.klass
-      label_class_name = "label_#{association_class.class_name.downcase}"
+      label_class_name = "label_#{association_class.name.downcase}"
       val = association_class.find_by(:id => detail.value)
       old_val = association_class.find_by(:id => detail.old_value)
 
@@ -255,7 +256,7 @@ module PluginAdminActivity
 
     def show_belongs_to_details(detail, no_html , options = {})
       belongs_to_class = User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.first.klass
-      label_class_name = "label_#{belongs_to_class.class_name.downcase}"
+      label_class_name = "label_#{belongs_to_class.name.downcase}"
       val = belongs_to_class.find_by(:id => detail.value)
       old_val = belongs_to_class.find_by(:id => detail.old_value)
 
