@@ -53,7 +53,6 @@ fr:
   text_setting_create_organization_journal_entry: "L'organisation <i>%{organization}</i> a été créée."
   text_setting_destroy_organization_journal_entry: "L'organisation <i>%{organization_name}</i> a été supprimée."
   project_module_user_changes_history: "Historique d'utilisateur"
-  permission_see_user_changes_history: "Voir l'historique d'utilisateur"
   field_mails: "Mail"
   field_organization: "Organisation"
   field_sudoer: "Sudoer"

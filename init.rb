@@ -36,8 +36,5 @@ Redmine::Plugin.register :redmine_admin_activity do
   url 'https://github.com/nanego/redmine_admin_activity'
   permission :see_project_activity, {  }
 
-  project_module :user_changes_history  do
-    permission :see_user_changes_history, {}
-  end
   # requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?
 end
