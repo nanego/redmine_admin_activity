@@ -12,7 +12,9 @@ class UsersController
   def require_admin
     return unless require_login
 
-    return true if  params[:action] == 'history' && User.current.allowed_to?(:see_user_changes_history, nil, :global => true)
+    user_instance_manager = Redmine::Plugin.installed?(:redmine_scn) ? User.current.instance_manager? : false
+
+    return true if  params[:action] == 'history' && User.current.admin?  || user_instance_manager
     if !User.current.admin?
       render_403
       return false

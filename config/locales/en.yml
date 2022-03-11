@@ -51,7 +51,6 @@ en:
   text_setting_unlock_user_journal_entry: "User <i>%{user}</i> has been unlocked."
   text_setting_destroy_user_journal_entry: "User <i>%{user_name}</i> has been deleted."
   project_module_user_changes_history: "User history"
-  permission_see_user_changes_history: "See user history"
   field_mails: "Mail"
   field_organization: "Organization"
   field_sudoer: "Sudoer"

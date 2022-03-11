@@ -50,7 +50,6 @@ fr:
   text_setting_unlock_user_journal_entry: "L'utilisateur <i>%{user}</i> a été déverrouillé."
   text_setting_destroy_user_journal_entry: "L'utilisateur <i>%{user_name}</i>  a été supprimé."
   project_module_user_changes_history: "Historique d'utilisateur"
-  permission_see_user_changes_history: "Voir l'historique d'utilisateur"
   field_mails: "Mail"
   field_organization: "Organisation"
   field_sudoer: "Sudoer"
