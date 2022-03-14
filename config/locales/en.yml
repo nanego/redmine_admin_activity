@@ -53,7 +53,6 @@ en:
   text_setting_destroy_user_journal_entry: "User <i>%{user_name}</i> has been deleted."
   text_setting_create_organization_journal_entry: "Organization <i>%{organization}</i> has been created."
   text_setting_destroy_organization_journal_entry: "Organization <i>%{organization_name}</i> has been deleted."
-  project_module_user_changes_history: "User history"
   field_mails: "Mail"
   field_organization: "Organization"
   field_sudoer: "Sudoer"
