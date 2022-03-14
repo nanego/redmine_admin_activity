@@ -29,25 +29,8 @@ module PluginAdminActivity
         show_functions_details(detail, options)
       else
         if detail.property != 'cf' && detail.journal.present? && detail.journal.journalized_type == 'Principal'
-          if detail.prop_key == 'status'
-            show_user_status_details(detail, no_html, options)
-          elsif detail.property == 'associations'
-            if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
-              show_associations_details(detail, no_html, options)
-            else
-              super
-            end
-          elsif detail.property == 'attr'
-            if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
-              show_belongs_to_details(detail, no_html, options)
-            elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean
-              show_boolean_details(detail, no_html, options)
-            else
-              super
-            end
-          else
-            super
-          end
+          details = show_principal_detail(detail, no_html, options)
+          details ? details : super
         else
           # Process standard properties like 'attr', 'attachment' or 'cf'
            super
@@ -280,6 +263,22 @@ module PluginAdminActivity
       field = detail.prop_key.to_s.gsub(/\_id$/, "")
       label = l(("field_" + field).to_sym)
       l(:text_journal_changed, :label => label, :old => detail.old_value.to_bool ? l(:label_1) : l(:label_0), :new => detail.value.to_bool ? l(:label_1) : l(:label_0)).html_safe
+    end
+
+    def show_principal_detail(detail, no_html , options = {})
+      if detail.prop_key == 'status'
+        show_user_status_details(detail, no_html, options)
+      elsif detail.property == 'associations'
+        if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
+          show_associations_details(detail, no_html, options)
+        end
+      elsif detail.property == 'attr'
+        if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
+          show_belongs_to_details(detail, no_html, options)
+        elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean
+          show_boolean_details(detail, no_html, options)
+        end
+      end
     end
   end
 end
