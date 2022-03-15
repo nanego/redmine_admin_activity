@@ -8,20 +8,6 @@ class UsersController
   before_action :init_journal, :only => [:update]
   before_action lambda {find_user(false)}, :only => :history
 
-  # override require_admin because of redmine_organizations and ,redmine_scn override before_action
-  def require_admin
-    return unless require_login
-
-    user_instance_manager = Redmine::Plugin.installed?(:redmine_scn) ? User.current.instance_manager? : false
-
-    return true if  params[:action] == 'history' && User.current.admin?  || user_instance_manager
-    if !User.current.admin?
-      render_403
-      return false
-    end
-    true
-  end
-
   def history
 
   end
