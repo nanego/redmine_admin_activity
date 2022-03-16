@@ -107,10 +107,10 @@ class ProjectsController
 
     new_status = @project.ancestors.any?(&:closed?) ? Project::STATUS_CLOSED : Project::STATUS_ACTIVE
     entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"    
-    @self_and_descendants_or_ancestors.each do |ancestor|      
-      # build hash of previous_changes manually        
+    @self_and_descendants_or_ancestors.each do |ancestor|
+      # build hash of previous_changes manually
       previous_changes = { 
-        "status" => [Project::STATUS_ARCHIVED, new_status],          
+        "status" => [Project::STATUS_ARCHIVED, new_status],
       }
 
       # Saves the changes in a JournalDetail
@@ -134,7 +134,7 @@ class ProjectsController
     @self_and_descendants_or_ancestors.each do |child|
       # build hash of previous_changes manually      
       previous_changes = { 
-        "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],        
+        "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],
       }
 
       # Saves the changes in a JournalDetail
@@ -157,10 +157,10 @@ class ProjectsController
 
     @self_and_descendants_or_ancestors.each do |child|
 
-      if child.status != Project::STATUS_ARCHIVED       
-        # build hash of previous_changes manually        
+      if child.status != Project::STATUS_ARCHIVED
+        # build hash of previous_changes manually
         previous_changes = { 
-          "status" => [child.status, Project::STATUS_ARCHIVED],          
+          "status" => [child.status, Project::STATUS_ARCHIVED],
         }
 
         # Saves the changes in a JournalDetail
@@ -183,9 +183,9 @@ class ProjectsController
     return unless @project.present? && @project.persisted?
 
     @self_and_descendants_or_ancestors.each do |child|
-      # build hash of previous_changes manually      
+      # build hash of previous_changes manually
       previous_changes = { 
-        "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE],        
+        "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE],
       }
 
       # Saves the changes in a JournalDetail

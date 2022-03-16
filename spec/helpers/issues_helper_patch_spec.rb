@@ -23,6 +23,7 @@ describe "IssuesHelperPatch" do
     User.current = nil
   end
 
+  let(:journal) { Journal.new(:journalized => User.find(5), :user_id => 1) }
   describe "modules property" do
     it "should IssuesHelper#show_detail with no_html should show a changing enabled modules" do
       detail = JournalDetail.new(:property => 'modules', :old_value => ['module1'], :value => ['module1', 'module2'], :prop_key => 'modules')
@@ -236,7 +237,7 @@ describe "IssuesHelperPatch" do
     end
 
     it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from closed to active" do
-      detail = JournalDetail.new(:property => 'status', :old_value => "5", :value => "1", :prop_key => 'status')      
+      detail = JournalDetail.new(:property => 'status', :old_value => "5", :value => "1", :prop_key => 'status')
       result = show_detail(detail, false)
       html = "changed from closed to active"
       expect(result).to include(html)      
@@ -263,7 +264,7 @@ describe "IssuesHelperPatch" do
       detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "9", :prop_key => 'status')
       result = show_detail(detail, false)
       html = "changed from active to archived"
-      expect(result).to include(html)      
+      expect(result).to include(html)
     end
 
     it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from archived to active" do
@@ -287,8 +288,64 @@ describe "IssuesHelperPatch" do
       detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "5", :prop_key => 'status')
       result = show_detail(detail, false)
       html = "changed from archived to closed"
-      expect(result).to include(html)      
+      expect(result).to include(html)
     end
   end
 
+  describe "user's changes" do
+    it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from active to locked" do
+      detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => "1", :value => "3", :prop_key => 'status')
+      expect(show_detail(detail, true)).to eq "Status changed from active to locked"
+    end
+
+    it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from active to locked" do
+      detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => "1", :value => "3", :prop_key => 'status')
+      result = show_detail(detail, false)
+      html = "changed from active to locked"
+      expect(result).to include(html)
+    end
+  end
+
+  it 'should IssuesHelper#show_detail should show Project followed by (its name) added when a project is added to him' do
+    p = Project.find(1)
+    detail = JournalDetail.new(:journal => journal, :property => 'associations', :old_value => nil, :value => "#{p.id}", :prop_key => 'projects')
+    expect(show_detail(detail, true)).to eq "Project #{p.name} added"
+  end
+
+  it 'should IssuesHelper#show_detail should show Project followed by (its name) deleted when a project is no longer added to him ' do
+    p = Project.find(1)
+    detail = JournalDetail.new(:journal => journal, :property => 'associations', :old_value => "#{p.id}", :value => nil, :prop_key => 'projects')
+    expect(show_detail(detail, true)).to eq "Project #{p.name} deleted"
+  end
+
+  if Redmine::Plugin.installed?(:redmine_organizations)
+    it 'should IssuesHelper#show_detail should show organization followed by (its name) added when a Organization is added to him' do
+      org = Organization.find(1)
+      detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => nil, :value => "#{org.id}", :prop_key => 'organization_id')
+      expect(show_detail(detail, true)).to eq "Organization #{org.name} added."
+    end
+
+    it 'should IssuesHelper#show_detail should show organization followed by (its name) deleted when a Organization is no longer added to him ' do
+      org = Organization.find(1)
+      detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => "#{org.id}", :value => nil, :prop_key => 'organization_id')
+      expect(show_detail(detail, true)).to eq "Organization #{org.name} deleted."
+    end
+
+    it 'should IssuesHelper#show_detail should show organization changes on a user' do
+      org_old = Organization.find(1)
+      org_new = Organization.find(2)
+      detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => "#{org_old.id}", :value => "#{org_new.id}", :prop_key => 'organization_id')
+      expect(show_detail(detail, true)).to eq "Organization has been changed from #{org_old.fullname} to #{org_new.fullname}"
+    end
+  end
+
+  it 'should IssuesHelper#show_detail should show attributes changes on a user' do
+    user = journal.journalized
+
+    detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => user.login, :value => "new_login", :prop_key => 'login')
+    expect(show_detail(detail, true)).to eq "Login changed from #{user.login} to new_login"
+
+    detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => user.mails, :value => "newmails@example.com", :prop_key => 'mails')
+    expect(show_detail(detail, true)).to eq "Mail changed from #{user.mails} to newmails@example.com"
+  end
 end
