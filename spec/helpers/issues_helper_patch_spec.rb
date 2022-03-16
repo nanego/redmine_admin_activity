@@ -144,7 +144,7 @@ describe "IssuesHelperPatch" do
       end
 
       it "should IssuesHelper#show_detail with html should show all new members with HTML highlights" do
-        detail = JournalDetail.new(:property => 'members', :old_value => nil, :value =>  '{"name":"user1","roles":["Developer", "Manager"]}', :prop_key => 'member_with_roles')
+        detail = JournalDetail.new(:property => 'members', :old_value => nil, :value => '{"name":"user1","roles":["Developer", "Manager"]}', :prop_key => 'member_with_roles')
         detail.id = 1
         result = show_detail(detail, false)
         html = "Member user1 has been added with roles [Developer, Manager]"
@@ -152,7 +152,7 @@ describe "IssuesHelperPatch" do
       end
 
       it "should IssuesHelper#show_detail with html should show all deleted members with HTML highlights" do
-        detail = JournalDetail.new(:property => 'members', :old_value =>  '{"name":"user1","roles":["Developer", "Manager"]}', :value => nil, :prop_key => 'member_with_roles')
+        detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer", "Manager"]}', :value => nil, :prop_key => 'member_with_roles')
         result = show_detail(detail, false)
         html = "Member user1, with roles [Developer, Manager], has been removed"
         expect(result).to include(html)
@@ -199,7 +199,7 @@ describe "IssuesHelperPatch" do
       end
 
       it "should IssuesHelper#show_detail with html should show all new members with HTML highlights" do
-        detail = JournalDetail.new(:property => 'members', :old_value => nil, :value =>  '{"name":"user1","roles":["Developer", "Manager"],"functions":["function3"]}', :prop_key => 'member_roles_and_functions')
+        detail = JournalDetail.new(:property => 'members', :old_value => nil, :value => '{"name":"user1","roles":["Developer", "Manager"],"functions":["function3"]}', :prop_key => 'member_roles_and_functions')
         detail.id = 1
         result = show_detail(detail, false)
         html = "Member user1 has been added with roles [Developer, Manager] and functions [function3]"
@@ -207,7 +207,7 @@ describe "IssuesHelperPatch" do
       end
 
       it "should IssuesHelper#show_detail with html should show all deleted members with HTML highlights" do
-        detail = JournalDetail.new(:property => 'members', :old_value =>  '{"name":"user1","roles":["Developer", "Manager"],"functions":["function1","function2"]}', :value => nil, :prop_key => 'member_roles_and_functions')
+        detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer", "Manager"],"functions":["function1","function2"]}', :value => nil, :prop_key => 'member_roles_and_functions')
         result = show_detail(detail, false)
         html = "Member user1, with roles [Developer, Manager] and functions [function1, function2], has been removed"
         expect(result).to eq(html)
@@ -217,13 +217,13 @@ describe "IssuesHelperPatch" do
 
   describe "copy project" do
     it "should IssuesHelper#copy_project with no_html should show the source project" do
-      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project') 
+      detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
       expect(show_detail(detail, true)).to eq "Project copy from Test (id: 4)"
     end
 
     it "should IssuesHelper#copy_project with html should show the source project with HTML highlights" do
       detail = JournalDetail.new(:property => 'copy_project', :value => "Test (id: 4)", :prop_key => 'copy_project')
-      result = show_detail(detail, false)      
+      result = show_detail(detail, false)
       html = "Project copy from Test (id: 4)"
       expect(result).to include(html)
     end
@@ -240,12 +240,12 @@ describe "IssuesHelperPatch" do
       detail = JournalDetail.new(:property => 'status', :old_value => "5", :value => "1", :prop_key => 'status')
       result = show_detail(detail, false)
       html = "changed from closed to active"
-      expect(result).to include(html)      
+      expect(result).to include(html)
     end
 
     it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from active to closed" do
       detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "5", :prop_key => 'status')
-      expect(show_detail(detail, true)).to eq "Status changed from active to closed" 
+      expect(show_detail(detail, true)).to eq "Status changed from active to closed"
     end
 
     it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from active to closed" do
@@ -257,7 +257,7 @@ describe "IssuesHelperPatch" do
 
     it "should IssuesHelper#show_detail with no_html should show the property status followed by changing it from active to archived" do
       detail = JournalDetail.new(:property => 'status', :old_value => "1", :value => "9", :prop_key => 'status')
-      expect(show_detail(detail, true)).to eq "Status changed from active to archived" 
+      expect(show_detail(detail, true)).to eq "Status changed from active to archived"
     end
 
     it "should IssuesHelper#show_detail with html should show the property status with HTML highlights followed by changing it from active to archived" do
@@ -281,7 +281,7 @@ describe "IssuesHelperPatch" do
 
     it "should IssuesHelper#show_detail with no_html should show the property status of project archived when one of it ancestor is closed followed by changing it from archived to closed" do
       detail = JournalDetail.new(:property => 'status', :old_value => "9", :value => "5", :prop_key => 'status')
-      expect(show_detail(detail, true)).to eq "Status changed from archived to closed"    
+      expect(show_detail(detail, true)).to eq "Status changed from archived to closed"
     end
 
     it "should IssuesHelper#show_detail with html should show the property status (with HTML highlights) of project archived when one of it ancestor is closed followed by changing it from archived to closed" do

@@ -5,9 +5,9 @@ module PluginAdminActivity
       journals = journals.includes(:user, :details).
         references(:user, :details).
         reorder(:created_on, :id).to_a
-      journals.each_with_index {|j,i| j.indice = i+1}
+      journals.each_with_index { |j, i| j.indice = i + 1 }
       Journal.preload_journals_details_custom_fields(journals)
-      journals.select! {|journal| journal.notes? || journal.visible_details.any?}
+      journals.select! { |journal| journal.notes? || journal.visible_details.any? }
       journals.reverse! # Last changes first
     end
 
@@ -15,7 +15,7 @@ module PluginAdminActivity
       field_name = l("setting_#{name}")
       field_name = l("label_theme") if name == "ui_theme"
 
-      sanitize l(".text_setting_journal_entry", field:  field_name, old_value: changes[0], value: changes[1])
+      sanitize l(".text_setting_journal_entry", field: field_name, old_value: changes[0], value: changes[1])
     end
 
     def project_update_text(journal)
@@ -27,7 +27,7 @@ module PluginAdminActivity
         if journal.closing?
           return sanitize l(".text_setting_change_from_archive_to_close_project_journal_entry", project: project_text) if journal.value_changes["status"][0] == Project::STATUS_ARCHIVED
           return sanitize l(".text_setting_close_project_journal_entry", project: project_text)
-        end        
+        end
         return sanitize l(".text_setting_archive_project_journal_entry", project: project_text) if journal.archivation?
         return sanitize l(".text_setting_reopen_project_journal_entry", project: project_text) if journal.reopening?
 
@@ -35,7 +35,7 @@ module PluginAdminActivity
         source_project_text = link_to_project_if_exists(source_project) || journal.value_changes["source_project_name"]
 
         sanitize l(".text_setting_copy_project_journal_entry", project: project_text,
-                                                               source_project: source_project_text)
+                   source_project: source_project_text)
       elsif journal.deletion?
         sanitize l(".text_setting_destroy_project_journal_entry", project_name: journal.value_changes["name"][0])
       end
@@ -58,11 +58,8 @@ module PluginAdminActivity
     def organization_update_text(journal)
       if journal.creation?
         organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
-
         return sanitize l(".text_setting_create_organization_journal_entry", organization: organization_text) if journal.creation?
-
-      else journal.deletion?
-
+      elsif journal.deletion?
         return sanitize l(".text_setting_destroy_organization_journal_entry", organization_name: journal.value_changes["name_with_parents"][0])
       end
     end

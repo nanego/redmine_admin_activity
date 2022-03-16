@@ -2,7 +2,7 @@
 
 <% if @journals.present? %>
   <div id="history">
-    <h3><%=l(:label_history)%></h3>
+    <h3><%= l(:label_history) %></h3>
     <%= render :partial => 'projects/history', :locals => { :journals => @journals } %>
   </div>
 <% end %>

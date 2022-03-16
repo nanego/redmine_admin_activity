@@ -20,10 +20,10 @@ describe PrincipalMembershipsController, type: :controller do
 
   let(:project1) { projects(:projects_001) }
   let(:project2) { projects(:projects_002) }
-  let(:admin)    { users(:users_001) }
-  let(:user)     { users(:users_009) } # User Misc
-  let(:member)   { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
-  let(:role)     { roles(:roles_002) } # Developer
+  let(:admin) { users(:users_001) }
+  let(:user) { users(:users_009) } # User Misc
+  let(:member) { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
+  let(:role) { roles(:roles_002) } # Developer
 
   if Redmine::Plugin.installed?(:redmine_limited_visibility)
     let(:function) { functions(:functions_001) }
@@ -50,9 +50,8 @@ describe PrincipalMembershipsController, type: :controller do
 
       expect do
         post :create, params: { user_id: user.id, membership: { project_ids: [project1.id, project2.id], role_ids: [role.id] } }
-
       end.to change { Journal.count }.by(4)
-        .and change { JournalDetail.count }.by(4)
+                                     .and change { JournalDetail.count }.by(4)
 
       expect(Journal.last(4)[1].journalized_type).to eq("Principal")
       expect(Journal.last(4)[1].journalized_id).to eq(user.id)
