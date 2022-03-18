@@ -64,5 +64,33 @@ if Redmine::Plugin.installed?(:redmine_organizations)
       end
 
     end
+
+    describe "patch Update" do
+      it "logs change on JournalSetting when we update a organization" do
+        org = Organization.last
+        expect do
+          patch :update, :params => {
+            :id => org.id,
+            :organization => {
+              :name => "new_name",
+              :description => "new_des",
+              :parent_id => Organization.find(2).id,
+              :mail => "test@test.com",
+              :direction => true,
+            }
+          }
+        end.to change { JournalSetting.count }.by(1)
+
+        expect(JournalSetting.last.value_changes).to include({ "name" => [org.name, "new_name"] })
+        expect(JournalSetting.last.value_changes).to include({ "description" => [org.description, "new_des"] })
+        expect(JournalSetting.last.value_changes).to include({ "parent_id" => [org.parent.id, Organization.find(2).id] })
+        expect(JournalSetting.last.value_changes).to include({ "direction" => [nil, true] })
+        expect(JournalSetting.last.value_changes).to include({ "mail" => [org.mail, "test@test.com"] })
+        expect(JournalSetting.last).to have_attributes(:journalized_type => "Organization")
+        expect(JournalSetting.last).to have_attributes(:journalized_id => org.id)
+        expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "update")
+
+      end
+    end
   end
 end
