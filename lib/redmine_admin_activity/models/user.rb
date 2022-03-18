@@ -21,7 +21,7 @@ class User < Principal
 
   # Returns the names of attributes that are journalized when updating the user
   def journalized_attribute_names
-    %w(login firstname lastname admin status organization sudoer staff beta_tester instance_manager issue_display_mode trusted_api_user mails)
+    %w(login firstname lastname admin status organization_id sudoer staff beta_tester instance_manager issue_display_mode trusted_api_user mails)
   end
 
 	def create_journal
