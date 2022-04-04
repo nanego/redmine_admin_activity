@@ -2,13 +2,13 @@ require_dependency 'projects_controller'
 
 class ProjectsController
 
-  before_action :init_journal, :only => [:update]  
+  before_action :init_journal, :only => [:update]
   after_action :update_journal, :only => [:update]
   after_action :journalized_projects_duplication, :only => [:copy]
   after_action :journalized_projects_creation, :only => [:create]
   after_action :journalized_projects_deletion, :only => [:destroy]
   before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen]
-  after_action :journalized_projects_activation, :only => [:unarchive] 
+  after_action :journalized_projects_activation, :only => [:unarchive]
   after_action :journalized_projects_closing, :only => [:close]
   after_action :journalized_projects_archivation, :only => [:archive]
   after_action :journalized_projects_reopen, :only => [:reopen]
@@ -22,10 +22,10 @@ class ProjectsController
 
   def add_journal_entry(property:, value: nil, old_value: nil)
     @project.current_journal.details << JournalDetail.new(
-        :property => property,
-        :prop_key => property,
-        :value => value,
-        :old_value => old_value
+      :property => property,
+      :prop_key => property,
+      :value => value,
+      :old_value => old_value
     )
   end
 
@@ -106,17 +106,17 @@ class ProjectsController
     return unless @project.present? && @project.persisted?
 
     new_status = @project.ancestors.any?(&:closed?) ? Project::STATUS_CLOSED : Project::STATUS_ACTIVE
-    entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"    
-    @self_and_descendants_or_ancestors.each do |ancestor|      
+    entry_type = @project.ancestors.any?(&:closed?) ? "close" : "active"
+    @self_and_descendants_or_ancestors.each do |ancestor|
       # build hash of previous_changes manually        
-      previous_changes = { 
-        "status" => [Project::STATUS_ARCHIVED, new_status],          
+      previous_changes = {
+        "status" => [Project::STATUS_ARCHIVED, new_status],
       }
 
       # Saves the changes in a JournalDetail
       ancestor.add_journal_entry(property: 'status',
-                              value: new_status,
-                              old_value: Project::STATUS_ARCHIVED)
+                                 value: new_status,
+                                 old_value: Project::STATUS_ARCHIVED)
 
       # Saves the changes in a JournalSetting 
       JournalSetting.create(
@@ -124,7 +124,7 @@ class ProjectsController
         :value_changes => previous_changes,
         :journalized => ancestor,
         :journalized_entry_type => entry_type,
-      )      
+      )
     end
   end
 
@@ -133,8 +133,8 @@ class ProjectsController
 
     @self_and_descendants_or_ancestors.each do |child|
       # build hash of previous_changes manually      
-      previous_changes = { 
-        "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],        
+      previous_changes = {
+        "status" => [Project::STATUS_ACTIVE, Project::STATUS_CLOSED],
       }
 
       # Saves the changes in a JournalDetail
@@ -157,10 +157,10 @@ class ProjectsController
 
     @self_and_descendants_or_ancestors.each do |child|
 
-      if child.status != Project::STATUS_ARCHIVED       
+      if child.status != Project::STATUS_ARCHIVED
         # build hash of previous_changes manually        
-        previous_changes = { 
-          "status" => [child.status, Project::STATUS_ARCHIVED],          
+        previous_changes = {
+          "status" => [child.status, Project::STATUS_ARCHIVED],
         }
 
         # Saves the changes in a JournalDetail
@@ -175,17 +175,17 @@ class ProjectsController
           :journalized => child,
           :journalized_entry_type => "archive",
         )
-      end  
+      end
     end
   end
 
-  def journalized_projects_reopen     
+  def journalized_projects_reopen
     return unless @project.present? && @project.persisted?
 
     @self_and_descendants_or_ancestors.each do |child|
       # build hash of previous_changes manually      
-      previous_changes = { 
-        "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE],        
+      previous_changes = {
+        "status" => [Project::STATUS_CLOSED, Project::STATUS_ACTIVE],
       }
 
       # Saves the changes in a JournalDetail
@@ -204,24 +204,15 @@ class ProjectsController
   end
 
   def self_and_descendants_or_ancestors
-    @self_and_descendants_or_ancestors = Array.new
-    case action_name
-    when "close"
-      @project.self_and_descendants.status(Project::STATUS_ACTIVE).each do |child|
-        @self_and_descendants_or_ancestors.push(child)
-      end
-    when "reopen"
-      @project.self_and_descendants.status(Project::STATUS_CLOSED).each do |child|
-        @self_and_descendants_or_ancestors.push(child)
-      end
-    when "unarchive"
-      @project.self_and_ancestors.status(Project::STATUS_ARCHIVED).each do |ancestor|
-        @self_and_descendants_or_ancestors.push(ancestor)
-      end
-    when "archive"
-      @project.self_and_descendants.each do |child|
-        @self_and_descendants_or_ancestors.push(child) 
-      end
-    end
+    @self_and_descendants_or_ancestors = case action_name
+                                         when "close"
+                                           @project.self_and_descendants.status(Project::STATUS_ACTIVE).to_a
+                                         when "reopen"
+                                           @project.self_and_descendants.status(Project::STATUS_CLOSED).to_a
+                                         when "unarchive"
+                                           @project.self_and_ancestors.status(Project::STATUS_ARCHIVED).to_a
+                                         when "archive"
+                                           @project.self_and_descendants.to_a
+                                         end
   end
 end
