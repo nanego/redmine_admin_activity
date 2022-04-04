@@ -229,9 +229,6 @@ class ProjectsController
   end
 
   def get_self_and_descendants
-    @self_and_descendants = Array.new
-    @project.self_and_descendants.each do |project|
-        @self_and_descendants.push(project)
-    end
+    @self_and_descendants = @project.self_and_descendants.to_a
   end
 end
