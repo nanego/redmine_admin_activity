@@ -64,4 +64,29 @@ module RedmineAdminActivity::Journalizable
     value
   end
 
+  def get_previous_has_and_belongs_to_many(obj)
+    previous_has_and_belongs_to_many = {}
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      previous_has_and_belongs_to_many[reflect.name ] = [reflect_ids.map(&:id)]
+    end
+    previous_has_and_belongs_to_many
+  end
+
+  def add_has_and_belongs_to_many_to_previous_changes(obj, changes)
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      changes[reflect.name] = [nil, reflect_ids.map(&:id)] if reflect_ids.count > 0
+    end
+    changes
+  end
+
+  def update_has_and_belongs_to_many_in_previous_changes(obj, changes, previous_h_a_b_to_m)
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      # Don't save if the relation m_to_m not changed
+      changes[reflect.name] = [previous_h_a_b_to_m[reflect.name].first, reflect_ids.map(&:id)] unless previous_h_a_b_to_m[reflect.name].first.sort == reflect_ids.map(&:id).sort
+    end
+    changes
+  end
 end
