@@ -79,15 +79,29 @@ describe ProjectsController, type: :controller do
   end
 
   describe "DELETE destroy" do
-    it "logs change on JournalSetting" do
+    it "logs change on JournalSetting when we delete a parent project" do
       @request.session[:user_id] = 1
-      delete :destroy, :params => { :id => "ecookbook", :confirm => 'ecookbook' }
+      # get self and descendants before destroy it
+      pro_array = []
+      Project.find(1).self_and_descendants.each do |pro|
+        pro_array << pro
+      end
+
+      expect do
+        delete :destroy, :params => { :id => "ecookbook", :confirm => 'ecookbook' }
+      end.to change { JournalSetting.count }.by(5)
 
       expect(response).to redirect_to('/admin/projects')
       expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include({"name" => ["eCookbook", nil]})
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Project")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "destroy")
+
+      5.times do |i|
+        expect(JournalSetting.last(5)[i].value_changes).to include({"name" => [pro_array[i].name, nil]})
+        expect(JournalSetting.last(5)[i].value_changes).to include({ "parent_id" => [pro_array[i].parent_id, nil] })
+        expect(JournalSetting.last(5)[i]).to have_attributes(:journalized_type => "Project")
+        expect(JournalSetting.last(5)[i]).to have_attributes(:journalized_id => pro_array[i].id)
+        expect(JournalSetting.last(5)[i]).to have_attributes(:journalized_entry_type => "destroy")
+      end
+
     end
   end
 

@@ -1,0 +1,8 @@
+<% @journals = prepare_journal_for_history(@user.journals) %>
+
+<% if @journals.present? %>
+  <div id="history">
+    <h3><%= l(:label_history) %></h3>
+    <%= render :partial => 'projects/history', :locals => { :journals => @journals } %>
+  </div>
+<% end %>
