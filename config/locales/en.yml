@@ -65,3 +65,6 @@ en:
   text_setting_create_organization_journal_entry: "Organization <i>%{organization}</i> has been created."
   text_setting_destroy_organization_journal_entry: "Organization <i>%{organization_name}</i> has been deleted."
   text_setting_update_organization_journal_entry: "Organization <i>%{organization}</i> has been updated."
+  text_setting_create_custom_field_journal_entry: "Custom field <i>%{custom_field}</i> has been created."
+  text_setting_destroy_custom_field_journal_entry: "Custom field <i>%{custom_field}</i> has been deleted."
+  text_setting_update_custom_field_journal_entry: "Custom field <i>%{custom_field}</i> has been updated."
