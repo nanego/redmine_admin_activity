@@ -42,4 +42,8 @@ class JournalSetting < ActiveRecord::Base
     journalized_entry_type == "unlock"
   end
   
+  def updating?
+    journalized_entry_type == "update"
+  end
+
 end

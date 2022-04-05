@@ -229,50 +229,51 @@ module PluginAdminActivity
       value.split(",")
     end
 
-    def show_associations_details(detail, no_html , options = {})
-
-      association_class = User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.first.klass
+    def show_associations_details(klass_name, key, value, old_value, no_html , options = {})
+      klazz = Object.const_get(klass_name)
+      association_class = klazz.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == key }.first.klass
       label_class_name = "label_#{association_class.name.downcase}"
-      val = association_class.find_by(:id => detail.value)
-      old_val = association_class.find_by(:id => detail.old_value)
+      val = association_class.find_by(:id => value)
+      old_val = association_class.find_by(:id => old_value)
 
-      if detail.value.present?
-        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
+      if value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => value)
 
-        return l(:text_journal_association_added, :class_name => l(label_class_name), :new => label_new).html_safe
-      elsif detail.old_value.present?
-        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+        return l(:text_journal_association_added, :class_name => l(label_class_name), :new => label_new)
+      elsif old_value.present?
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => old_value)
 
-        return l(:text_journal_association_deleted, :class_name => l(label_class_name), :old => label_old).html_safe
+        return l(:text_journal_association_deleted, :class_name => l(label_class_name), :old => label_old)
       end
     end
 
-    def show_belongs_to_details(detail, no_html , options = {})
-      belongs_to_class = User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.first.klass
+    def show_belongs_to_details(klass_name, key, value, old_value, no_html = false , options = {})
+      klazz = Object.const_get(klass_name)
+      belongs_to_class = klazz.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == key }.first.klass
       label_class_name = "label_#{belongs_to_class.name.downcase}"
-      val = belongs_to_class.find_by(:id => detail.value)
-      old_val = belongs_to_class.find_by(:id => detail.old_value)
+      val = belongs_to_class.find_by(:id => value)
+      old_val = belongs_to_class.find_by(:id => old_value)
 
-      if detail.value.present? && detail.old_value.present?
-        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
-        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+      if value.present? && old_value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => value)
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => old_value)
 
         return l(:text_journal_belongs_to_changed, :class_name => l(label_class_name), :new => label_new, :old => label_old)
-      elsif detail.value.present?
-        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => detail.value)
+      elsif value.present?
+        label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => value)
 
-        return l(:text_journal_belongs_to_added, :class_name => l(label_class_name), :new => label_new).html_safe
-      elsif detail.old_value.present?
-        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => detail.old_value)
+        return l(:text_journal_belongs_to_added, :class_name => l(label_class_name), :new => label_new)
+      elsif old_value.present?
+        label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => old_value)
 
-        return l(:text_journal_belongs_to_deleted, :class_name => l(label_class_name), :old => label_old).html_safe
+        return l(:text_journal_belongs_to_deleted, :class_name => l(label_class_name), :old => label_old)
       end
     end
 
-    def show_boolean_details(detail, no_html , options = {})
-      field = detail.prop_key.to_s.gsub(/\_id$/, "")
+    def show_boolean_details(key, value, old_value, no_html = false , options = {})
+      field = key.to_s.gsub(/\_id$/, "")
       label = l(("field_" + field).to_sym)
-      l(:text_journal_changed, :label => label, :old => detail.old_value.to_bool ? l(:label_1) : l(:label_0), :new => detail.value.to_bool ? l(:label_1) : l(:label_0)).html_safe
+      l(:text_journal_changed, :label => label, :old => val_to_bool(old_value) ? l(:label_1) : l(:label_0), :new => val_to_bool(value) ? l(:label_1) : l(:label_0))
     end
 
     def show_principal_detail(detail, no_html , options = {})
@@ -280,15 +281,20 @@ module PluginAdminActivity
         show_user_status_details(detail, no_html, options)
       elsif detail.property == 'associations'
         if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
-          show_associations_details(detail, no_html, options)
+          show_associations_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)
         end
       elsif detail.property == 'attr'
         if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
-          show_belongs_to_details(detail, no_html, options)
+          show_belongs_to_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)
         elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean
-          show_boolean_details(detail, no_html, options)
+          show_boolean_details(detail.prop_key, detail.value, detail.old_value, no_html, options)
         end
       end
+    end
+
+    def val_to_bool(val)
+      return val if val.in? [true, false]
+      return !val.to_i.zero? if val.class.in? [String, Integer]
     end
   end
 end

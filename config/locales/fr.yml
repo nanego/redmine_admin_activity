@@ -63,3 +63,4 @@ fr:
   label_1: "Oui"
   text_setting_create_organization_journal_entry: "L'organisation <i>%{organization}</i> a été créée."
   text_setting_destroy_organization_journal_entry: "L'organisation <i>%{organization_name}</i> a été supprimée."
+  text_setting_update_organization_journal_entry: "L'organisation <i>%{organization}</i> a été modifiés."

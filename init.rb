@@ -12,6 +12,7 @@ ActiveSupport::Reloader.to_prepare do
   if Redmine::Plugin.installed?(:redmine_organizations)
     require_dependency 'redmine_admin_activity/controllers/organizations/memberships_controller'
     require_dependency 'redmine_admin_activity/controllers/organizations_controller'
+    require_dependency 'redmine_admin_activity/models/organization'
   end
 
   require_dependency 'redmine_admin_activity/controllers/users_controller'
