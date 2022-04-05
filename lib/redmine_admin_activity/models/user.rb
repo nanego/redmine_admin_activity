@@ -21,8 +21,10 @@ class User < Principal
 
   # Returns the names of attributes that are journalized when updating the user
   def journalized_attribute_names
-    excluded_names = User.column_names - %w(login firstname lastname admin status organization_id sudoer staff beta_tester instance_manager issue_display_mode trusted_api_user)
-    names = User.column_names - excluded_names + ["mails"]
+    names = %w(login firstname lastname status mails)
+    names << 'organization' if Redmine::Plugin.installed?(:redmine_organizations)
+    names |= %w(sudoer staff beta_tester instance_manager issue_display_mode trusted_api_user) if Redmine::Plugin.installed?(:redmine_scn)
+    names
   end
 
 	def create_journal
