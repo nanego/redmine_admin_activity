@@ -1,7 +1,7 @@
 require "spec_helper"
 
 RSpec.describe JournalSetting, type: :model do
-  let(:journal_setting) { described_class.new(:value_changes => {"name" => ["old_value", "value"]},
+  let(:journal_setting) { described_class.new(:value_changes => { "name" => ["old_value", "value"] },
                                               :user_id => 1) }
 
   context "with valid attributes" do
@@ -9,7 +9,7 @@ RSpec.describe JournalSetting, type: :model do
   end
 
   context "without a user" do
-    it { expect(described_class.new(:value_changes => {"name" => ["old_value", "value"]})).not_to be_valid }
+    it { expect(described_class.new(:value_changes => { "name" => ["old_value", "value"] })).not_to be_valid }
   end
 
   context "without value_changes" do

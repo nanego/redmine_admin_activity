@@ -23,7 +23,7 @@ describe VersionsController, type: :controller do
 
   describe "POST /" do
     it "creates a new version and a new entry in the project journal" do
-      post :create, params: {project_id: project.id, version: {name: "1.0.0"}}
+      post :create, params: { project_id: project.id, version: { name: "1.0.0" } }
       expect(response).to redirect_to('/projects/ecookbook/settings/versions')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "1.0.0", :old_value => nil)
@@ -32,7 +32,7 @@ describe VersionsController, type: :controller do
 
   describe "PATCH /:id" do
     it "updates a version and adds a new entry in the project journal" do
-      patch :update, params: {id: version.id, version: {name: "2.1"}}
+      patch :update, params: { id: version.id, version: { name: "2.1" } }
       expect(response).to redirect_to('/projects/ecookbook/settings/versions')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "2.1", :old_value => "2.0")
@@ -41,7 +41,7 @@ describe VersionsController, type: :controller do
 
   describe "DELETE /:id" do
     it "deletes a version and adds a new entry in the project journal" do
-      delete :destroy, params: {id: version.id}
+      delete :destroy, params: { id: version.id }
       expect(response).to redirect_to('/projects/ecookbook/settings/versions')
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => nil, :old_value => "2.0")

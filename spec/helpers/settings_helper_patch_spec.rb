@@ -6,8 +6,8 @@ describe SettingsHelper, :type => :controller do
 
   before do
     @controller = SettingsController.new
-    @request    = ActionDispatch::TestRequest.create
-    @response   = ActionDispatch::TestResponse.new
+    @request = ActionDispatch::TestRequest.create
+    @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 1
   end

@@ -25,7 +25,7 @@ describe CustomFieldsController, type: :controller do
       post :create, params: { type: "IssueCustomField", custom_field: { name: "CustomField",
                                                                         project_ids: [project.id],
                                                                         field_format: "string" } }
-      expect(response).to redirect_to(custom_fields_path({:tab => "IssueCustomField"}))
+      expect(response).to redirect_to(custom_fields_path({ :tab => "IssueCustomField" }))
       expect(project.journals).to_not be_nil
       expect(project.journals.last.details.last).to have_attributes(:value => "CustomField", :old_value => nil)
     end

@@ -18,7 +18,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
     describe "POST create" do
       it "logs change on JournalSetting" do
-        post :create, :params => { :organization => { :name => "Org child", :parent_id => 1} }
+        post :create, :params => { :organization => { :name => "Org child", :parent_id => 1 } }
 
         expect(JournalSetting).to_not be_nil
         expect(JournalSetting.last.value_changes).to include({ "name" => [nil, "Org child"] })
@@ -31,7 +31,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
     describe "DELETE destroy" do
       it "logs change on JournalSetting when we delete a child organization" do
-        org = Organization.create(:name => 'Org child', :parent_id => 1 )
+        org = Organization.create(:name => 'Org child', :parent_id => 1)
         id = Organization.last.id
         delete :destroy, :params => { :id => id, :confirm => true }
 

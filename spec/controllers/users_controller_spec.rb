@@ -30,14 +30,14 @@ describe UsersController, type: :controller do
       user = User.last
 
       expect(response).to redirect_to("/users/#{user.id}/edit")
-      expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include("id" => [nil, user.id])
-      expect(JournalSetting.all.last.value_changes).to include("login" => ["", "newuser"])
-      expect(JournalSetting.all.last.value_changes).to include("firstname" => ["", "new"])
-      expect(JournalSetting.all.last.value_changes).to include("lastname" => ["", "user"])
-      expect(JournalSetting.all.last.value_changes).to include("type" => [nil, "User"])
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "create")
+      expect(JournalSetting.all).to_not be_empty
+      expect(JournalSetting.last.value_changes).to include("id" => [nil, user.id])
+      expect(JournalSetting.last.value_changes).to include("login" => ["", "newuser"])
+      expect(JournalSetting.last.value_changes).to include("firstname" => ["", "new"])
+      expect(JournalSetting.last.value_changes).to include("lastname" => ["", "user"])
+      expect(JournalSetting.last.value_changes).to include("type" => [nil, "User"])
+      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
+      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "create")
     end
   end
 
@@ -45,10 +45,10 @@ describe UsersController, type: :controller do
     it "add logs on JournalSetting When locking the account of a user" do
       patch :update, :params => { :id => 7, :user => { :status => Principal::STATUS_LOCKED, :mail => 'newuser@example.net' } }
 
-      expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include({ "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] })
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "lock")
+      expect(JournalSetting.all).to_not be_empty
+      expect(JournalSetting.last.value_changes).to include({ "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] })
+      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
+      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "lock")
     end
 
     it "add logs on JournalSetting When unlocking the account of a user" do
@@ -56,10 +56,10 @@ describe UsersController, type: :controller do
       user.update_attribute :status, Principal::STATUS_LOCKED
       patch :update, :params => { :id => 7, :user => { :status => Principal::STATUS_ACTIVE, :mail => 'newuser@example.net' } }
 
-      expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include({ "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] })
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "unlock")
+      expect(JournalSetting.all).to_not be_empty
+      expect(JournalSetting.last.value_changes).to include({ "status" => [Principal::STATUS_LOCKED, Principal::STATUS_ACTIVE] })
+      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
+      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "unlock")
     end
 
     it "add logs on JournalSetting When activation the account of a user" do
@@ -67,10 +67,10 @@ describe UsersController, type: :controller do
       user.update_attribute :status, Principal::STATUS_REGISTERED
       patch :update, :params => { :id => 7, :user => { :status => Principal::STATUS_ACTIVE, :mail => 'newuser@example.net' } }
 
-      expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include({ "status" => [Principal::STATUS_REGISTERED, Principal::STATUS_ACTIVE] })
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "active")
+      expect(JournalSetting.all).to_not be_empty
+      expect(JournalSetting.last.value_changes).to include({ "status" => [Principal::STATUS_REGISTERED, Principal::STATUS_ACTIVE] })
+      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
+      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "active")
     end
 
     it "add logs on JournalDetail when changing his attributes" do
@@ -132,12 +132,12 @@ describe UsersController, type: :controller do
       delete :destroy, :params => { :id => 7, :confirm => "someone" }
 
       expect(response).to redirect_to('/users')
-      expect(JournalSetting.all).to_not be_nil
-      expect(JournalSetting.all.last.value_changes).to include({ "login" => ["someone", nil] })
-      expect(JournalSetting.all.last.value_changes).to include({ "firstname" => ["Some", nil] })
-      expect(JournalSetting.all.last.value_changes).to include({ "lastname" => ["One", nil] })
-      expect(JournalSetting.all.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.all.last).to have_attributes(:journalized_entry_type => "destroy")
+      expect(JournalSetting.all).to_not be_empty
+      expect(JournalSetting.last.value_changes).to include({ "login" => ["someone", nil] })
+      expect(JournalSetting.last.value_changes).to include({ "firstname" => ["Some", nil] })
+      expect(JournalSetting.last.value_changes).to include({ "lastname" => ["One", nil] })
+      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
+      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "destroy")
     end
   end
   describe "permission of user's history" do
