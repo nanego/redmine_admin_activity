@@ -23,7 +23,8 @@ class User < Principal
   def journalized_attribute_names
     names = %w(login firstname lastname status mails)
     names << 'organization' if Redmine::Plugin.installed?(:redmine_organizations)
-    names |= %w(sudoer staff beta_tester instance_manager issue_display_mode trusted_api_user) if Redmine::Plugin.installed?(:redmine_scn)
+    names << (Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin')
+    names |= %w(staff beta_tester instance_manager issue_display_mode trusted_api_user) if Redmine::Plugin.installed?(:redmine_scn)
     names
   end
 
