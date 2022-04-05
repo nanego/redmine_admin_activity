@@ -9,8 +9,8 @@ describe ProjectsHelper, :type => :controller do
 
   before do
     @controller = ProjectsController.new
-    @request    = ActionDispatch::TestRequest.create
-    @response   = ActionDispatch::TestResponse.new
+    @request = ActionDispatch::TestRequest.create
+    @response = ActionDispatch::TestResponse.new
     User.current = nil
     @request.session[:user_id] = 3
   end
@@ -23,14 +23,14 @@ describe ProjectsHelper, :type => :controller do
     role.permissions = []
     role.save
     get :settings, :params => {
-        :id => project.id
+      :id => project.id
     }
     assert_response 403
 
     role.add_permission! :see_project_activity, :manage_repository
 
     get :settings, :params => {
-        :id => project.id
+      :id => project.id
     }
     assert_response :success
     assert_select "a[href='/projects/1/settings/admin_activity']"

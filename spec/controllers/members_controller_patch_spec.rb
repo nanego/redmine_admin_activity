@@ -23,9 +23,9 @@ describe MembersController, type: :controller do
   end
 
   let(:project) { projects(:projects_001) }
-  let(:user)    { users(:users_009) } # User Misc
-  let(:member)  { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
-  let(:role)    { roles(:roles_002) } # Developer
+  let(:user) { users(:users_009) } # User Misc
+  let(:member) { members(:members_001) } # User 2 (John Smith) member of Project 1 with 'Manager' role
+  let(:role) { roles(:roles_002) } # Developer
 
   if Redmine::Plugin.installed?(:redmine_limited_visibility)
     let(:function) { functions(:functions_001) }
@@ -33,7 +33,7 @@ describe MembersController, type: :controller do
 
   describe "POST /" do
     it "adds a new member" do
-      post :create, params: {project_id: project.id, membership: {user_ids: [user.id], role_ids: [role.id]}}
+      post :create, params: { project_id: project.id, membership: { user_ids: [user.id], role_ids: [role.id] } }
 
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
@@ -50,14 +50,14 @@ describe MembersController, type: :controller do
 
     before do
       if Redmine::Plugin.installed?(:redmine_limited_visibility)
-        @functions_params = {function_ids: [Function.first.id]}
+        @functions_params = { function_ids: [Function.first.id] }
       else
         @functions_params = {}
       end
     end
 
     it "replaces current role by another" do
-      patch :update, params: {id: member.id, membership: {role_ids: [role.id]}.merge(@functions_params)}
+      patch :update, params: { id: member.id, membership: { role_ids: [role.id] }.merge(@functions_params) }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 
@@ -69,7 +69,7 @@ describe MembersController, type: :controller do
     end
 
     it "adds a role to a member" do
-      patch :update, params: {id: member.id, membership: {role_ids: member.roles.map(&:id) + [role.id]}.merge(@functions_params)}
+      patch :update, params: { id: member.id, membership: { role_ids: member.roles.map(&:id) + [role.id] }.merge(@functions_params) }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 
@@ -83,7 +83,7 @@ describe MembersController, type: :controller do
 
   describe "DELETE /:id" do
     it "removes a member" do
-      delete :destroy, params: {id: member.id}
+      delete :destroy, params: { id: member.id }
       expect(response).to redirect_to('/projects/ecookbook/settings/members')
       expect(project.journals).to_not be_nil
 

@@ -35,7 +35,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.users).to include user
 
           expect {
-            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [new_role.id], user_ids: [user.id]}}
+            patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [new_role.id], user_ids: [user.id] } }
           }.to change(project.journals, :count)
 
           expect(response).to have_http_status(:redirect)
@@ -43,8 +43,8 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.journals).to_not be_nil
           if Redmine::Plugin.installed?(:redmine_limited_visibility)
             expect(project.journals.last.details.last).to have_attributes(
-                                                              value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[]}",
-                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}"
+                                                            value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"],\"functions\":[]}",
+                                                            old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[]}"
                                                           )
           else
             expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\",\"Developer\"]}",
@@ -57,7 +57,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.users).to_not include new_user
 
           expect {
-            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [role.id], user_ids: [user.id, new_user.id]}}
+            patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [role.id], user_ids: [user.id, new_user.id] } }
           }.to change(project.journals, :count).by(1)
 
           expect(response).to have_http_status(:redirect)
@@ -65,8 +65,8 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.journals).to_not be_nil
           if Redmine::Plugin.installed?(:redmine_limited_visibility)
             expect(project.journals.last.details.last).to have_attributes(
-                                                              value: "{\"name\":\"Robert Hill\",\"roles\":[\"Manager\"],\"functions\":[]}",
-                                                              old_value: nil
+                                                            value: "{\"name\":\"Robert Hill\",\"roles\":[\"Manager\"],\"functions\":[]}",
+                                                            old_value: nil
                                                           )
           else
             expect(project.journals.last.details.last).to have_attributes(value: "{\"name\":\"Robert Hill\",\"roles\":[\"Manager\"]}",
@@ -82,7 +82,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           end
 
           expect {
-            patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [role.id], user_ids: ['']}}
+            patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [role.id], user_ids: [''] } }
           }.to change(project.journals, :count).by(1)
 
           expect(response).to have_http_status(:redirect)
@@ -90,8 +90,8 @@ if Redmine::Plugin.installed?(:redmine_organizations)
           expect(project.journals).to_not be_nil
           if Redmine::Plugin.installed?(:redmine_limited_visibility)
             expect(project.journals.last.details.last).to have_attributes(
-                                                              old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function3\"]}",
-                                                              value: nil
+                                                            old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"],\"functions\":[\"function3\"]}",
+                                                            value: nil
                                                           )
           else
             expect(project.journals.last.details.last).to have_attributes(old_value: "{\"name\":\"John Smith\",\"roles\":[\"Manager\"]}",
@@ -106,7 +106,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
           it "updates a membership through an organization and adds a new entry in the project journal" do
             expect {
-              patch :update, params: {id: organization.id, project_id: project.id, membership: {role_ids: [new_role.id], user_ids: [user.id], function_ids: [function.id]}}
+              patch :update, params: { id: organization.id, project_id: project.id, membership: { role_ids: [new_role.id], user_ids: [user.id], function_ids: [function.id] } }
             }.to change(project.journals, :count)
 
             expect(response).to have_http_status(:redirect)

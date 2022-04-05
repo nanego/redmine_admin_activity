@@ -79,9 +79,9 @@ describe "JournalSettingsHelper" do
                                    :journalized_entry_type => "destroy")
       journal.save
       expect(JournalSetting.count).to eq(3)
-      expect(project_update_text(JournalSetting.all.first)).to eq "Project <i>OnlineStore</i> has been archived."
-      expect(project_update_text(JournalSetting.all.second)).to eq "Project <i>OnlineStore</i> has been activated."
-      expect(project_update_text(JournalSetting.all.last)).to eq "Project <i>OnlineStore</i> has been deleted."
+      expect(project_update_text(JournalSetting.first)).to eq "Project <i>OnlineStore</i> has been archived."
+      expect(project_update_text(JournalSetting.second)).to eq "Project <i>OnlineStore</i> has been activated."
+      expect(project_update_text(JournalSetting.last)).to eq "Project <i>OnlineStore</i> has been deleted."
     end
   end
 
@@ -233,9 +233,9 @@ describe "JournalSettingsHelper" do
                                    :journalized_entry_type => "destroy")
       journal.save
       expect(JournalSetting.count).to eq(3)
-      expect(user_update_text(JournalSetting.all.first)).to eq "User <i>Some One</i> has been locked."
-      expect(user_update_text(JournalSetting.all.second)).to eq "User <i>Some One</i> has been unlocked."
-      expect(user_update_text(JournalSetting.all.last)).to eq "User <i>Some One</i> has been deleted."
+      expect(user_update_text(JournalSetting.first)).to eq "User <i>Some One</i> has been locked."
+      expect(user_update_text(JournalSetting.second)).to eq "User <i>Some One</i> has been unlocked."
+      expect(user_update_text(JournalSetting.last)).to eq "User <i>Some One</i> has been deleted."
     end
 
   end
@@ -245,7 +245,7 @@ describe "JournalSettingsHelper" do
       it "should generate the right translated sentence for a organization creation (parent or child)" do
         # ex: Org A/Team B/Org child0/Org child1/Org child2
         3.times do |i|
-          org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id )
+          org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id)
           org.save
 
           journal = JournalSetting.new(:user_id => User.current.id,
@@ -261,7 +261,7 @@ describe "JournalSettingsHelper" do
     it "should generate the right translated sentence for a organization deletion (parent or child)" do
       # ex: Org A/Team B/Org child0/Org child1/Org child2
       3.times do |i|
-        org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id )
+        org = Organization.new(:name => "Org child#{i}", :parent_id => Organization.last.id)
         org.save
 
         journal = JournalSetting.new(:user_id => User.current.id,
@@ -278,36 +278,36 @@ describe "JournalSettingsHelper" do
         org = Organization.last
 
         journal = JournalSetting.new(:user_id => User.current.id,
-                                       :value_changes => {
-                                          "name" => [org.name, "new_name"],
-                                          "description" => [org.description, "new_des"],
-                                          "parent_id" => [org.parent.id, 2],
-                                          "direction" => [false, true],
-                                          "mail" => [org.mail, "new_mail@test.com"],
-                                        },
-                                       :journalized => org,
-                                       :journalized_entry_type => "update")
+                                     :value_changes => {
+                                       "name" => [org.name, "new_name"],
+                                       "description" => [org.description, "new_des"],
+                                       "parent_id" => [org.parent.id, 2],
+                                       "direction" => [false, true],
+                                       "mail" => [org.mail, "new_mail@test.com"],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
 
         expect(organization_update_text(journal)).to include(
-          "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
 
         expect(organization_update_text(journal)).to include(
-          "#{l("field_name")} changed from #{org.name} to new_name")
+                                                       "#{l("field_name")} changed from #{org.name} to new_name")
 
         expect(organization_update_text(journal)).to include(
-          "#{l("field_description")} changed from #{org.description} to new_des")
+                                                       "#{l("field_description")} changed from #{org.description} to new_des")
 
         expect(organization_update_text(journal)).to include(
-          l(:text_journal_belongs_to_changed, :class_name =>"Organization",
-            :new => Organization.find(2).to_s,
-            :old => org.parent.to_s))
+                                                       l(:text_journal_belongs_to_changed, :class_name => "Organization",
+                                                         :new => Organization.find(2).to_s,
+                                                         :old => org.parent.to_s))
 
         # Here there is a boolean field, it will test both methods show_boolean_details and val_to_bool
         expect(organization_update_text(journal)).to include(
-          "#{l("field_direction")} changed from #{l("label_0")} to #{l("label_1")}")
+                                                       "#{l("field_direction")} changed from #{l("label_0")} to #{l("label_1")}")
 
         expect(organization_update_text(journal)).to include(
-          "#{l("field_mail")} changed from #{org.mail} to new_mail@test.com")
+                                                       "#{l("field_mail")} changed from #{org.mail} to new_mail@test.com")
       end
 
       # test show_belongs_to_details When the absence of the new value
@@ -315,46 +315,46 @@ describe "JournalSettingsHelper" do
         org = Organization.last
 
         journal = JournalSetting.new(:user_id => User.current.id,
-                                       :value_changes => {
-                                          "parent_id" => [org.parent.id, nil],
-                                        },
-                                       :journalized => org,
-                                       :journalized_entry_type => "update")
+                                     :value_changes => {
+                                       "parent_id" => [org.parent.id, nil],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
 
         expect(organization_update_text(journal)).to include(
-          "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
 
         expect(organization_update_text(journal)).to include(
-          l(:text_journal_belongs_to_deleted, :class_name =>"Organization",
-            :old => org.parent.to_s))
+                                                       l(:text_journal_belongs_to_deleted, :class_name => "Organization",
+                                                         :old => org.parent.to_s))
       end
 
       # test show_belongs_to_details When the absence of the old value
       it "should generate the right translated sentence, when adding the parent" do
         org = Organization.create(
-                  :name => 'org_name',
-                  :direction => true,
-                  :description => 'org_des',
-                  :name_with_parents => 'org_name',
-                  :parent_id => nil,)
+          :name => 'org_name',
+          :direction => true,
+          :description => 'org_des',
+          :name_with_parents => 'org_name',
+          :parent_id => nil,)
 
         journal = JournalSetting.new(:user_id => User.current.id,
-                                       :value_changes => {
-                                          "parent_id" => [nil, Organization.first.id],
-                                          "direction" => [true, false],
-                                        },
-                                       :journalized => org,
-                                       :journalized_entry_type => "update")
+                                     :value_changes => {
+                                       "parent_id" => [nil, Organization.first.id],
+                                       "direction" => [true, false],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
 
         expect(organization_update_text(journal)).to include(
-          "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
 
         expect(organization_update_text(journal)).to include(
-          "#{l("field_direction")} changed from #{l("label_1")} to #{l("label_0")}")
+                                                       "#{l("field_direction")} changed from #{l("label_1")} to #{l("label_0")}")
 
         expect(organization_update_text(journal)).to include(
-          l(:text_journal_belongs_to_added, :class_name =>"Organization",
-            :new => Organization.first.to_s))
+                                                       l(:text_journal_belongs_to_added, :class_name => "Organization",
+                                                         :new => Organization.first.to_s))
       end
     end
 

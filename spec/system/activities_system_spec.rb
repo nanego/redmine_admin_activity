@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe "activities", type: :system do
   fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :trackers, :projects_trackers, :issue_statuses, :issues, :custom_fields_trackers, 
+           :trackers, :projects_trackers, :issue_statuses, :issues, :custom_fields_trackers,
            :journals, :journal_details
 
   before do
