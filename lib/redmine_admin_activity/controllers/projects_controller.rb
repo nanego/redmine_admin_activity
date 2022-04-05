@@ -7,12 +7,11 @@ class ProjectsController
   after_action :journalized_projects_duplication, :only => [:copy]
   after_action :journalized_projects_creation, :only => [:create]
   after_action :journalized_projects_deletion, :only => [:destroy]
-  before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen]
+  before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen, :destroy]
   after_action :journalized_projects_activation, :only => [:unarchive]
   after_action :journalized_projects_closing, :only => [:close]
   after_action :journalized_projects_archivation, :only => [:archive]
   after_action :journalized_projects_reopen, :only => [:reopen]
-  before_action :get_self_and_descendants, :only => [:destroy]
 
   def init_journal
     @project.init_journal(User.current)
@@ -93,7 +92,7 @@ class ProjectsController
   def journalized_projects_deletion
     return unless @project_to_destroy.present? && @project_to_destroy.destroyed?
 
-    @self_and_descendants.each do |project|
+    @self_and_descendants_or_ancestors.each do |project|
       changes = project.attributes.to_a.map { |i| [i[0], [i[1], nil]] }.to_h
 
       JournalSetting.create(
@@ -214,12 +213,9 @@ class ProjectsController
                                            @project.self_and_descendants.status(Project::STATUS_CLOSED).to_a
                                          when "unarchive"
                                            @project.self_and_ancestors.status(Project::STATUS_ARCHIVED).to_a
-                                         when "archive"
+                                         when "archive", "destroy"
                                            @project.self_and_descendants.to_a
                                          end
   end
 
-  def get_self_and_descendants
-    @self_and_descendants = @project.self_and_descendants.to_a
-  end
 end
