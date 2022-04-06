@@ -20,12 +20,17 @@ class CustomFieldsController
     return unless @custom_field.persisted?
 
     # Tracing on JournalSetting
-    changes = add_has_and_belongs_to_many_to_previous_changes(@custom_field, @custom_field.previous_changes)
-
+    changes = add_has_and_belongs_to_many_to_previous_changes(
+              @custom_field,
+              @custom_field.previous_changes
+             )
+    # Pass @custom_field.class.name in order to use the child class,
+    # not to use the parent class, to be able to retrieve the correct associations
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => changes,
-      :journalized => @custom_field,
+      :journalized_type => @custom_field.class.name,
+      :journalized_id => @custom_field.id,
       :journalized_entry_type => "create",
     )
 
@@ -42,12 +47,17 @@ class CustomFieldsController
 
   def custom_fields_upgrade
     # Tracing on JournalSetting
-    changes = update_has_and_belongs_to_many_in_previous_changes(@custom_field, @custom_field.previous_changes, @previous_has_and_belongs_to_many)
-
+    changes = update_has_and_belongs_to_many_in_previous_changes(@custom_field,
+                @custom_field.previous_changes,
+                @previous_has_and_belongs_to_many
+              )
+    # Pass @custom_field.class.name in order to use the child class,
+    # not to use the parent class, to be able to retrieve the correct associations
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => changes,
-      :journalized => @custom_field,
+      :journalized_type => @custom_field.class.name,
+      :journalized_id => @custom_field.id,
       :journalized_entry_type => "update",
     )
 
@@ -99,7 +109,8 @@ class CustomFieldsController
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes =>  changes.to_h,
-      :journalized => @custom_field,
+      :journalized_type => @custom_field.class.name,
+      :journalized_id => @custom_field.id,
       :journalized_entry_type => "destroy",
     )
 
