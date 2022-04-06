@@ -20,7 +20,7 @@ module PluginAdminActivity
 
     def project_update_text(journal)
       if journal.creation? || journal.duplication? || journal.activation? || journal.closing? || journal.archivation? || journal.reopening?
-        project_text = link_to_project_if_exists(journal.journalized) || name_project_if_not_exists(journal)
+        project_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
 
         return sanitize l(".text_setting_create_project_journal_entry", project: project_text) if journal.creation?
         return sanitize l(".text_setting_active_project_journal_entry", project: project_text) if journal.activation?
@@ -32,7 +32,7 @@ module PluginAdminActivity
         return sanitize l(".text_setting_reopen_project_journal_entry", project: project_text) if journal.reopening?
 
         source_project = Project.find_by(id: journal.value_changes["source_project"])
-        source_project_text = link_to_project_if_exists(source_project) || journal.value_changes["source_project_name"]
+        source_project_text = link_to_journalized_if_exists(source_project) || journal.value_changes["source_project_name"]
 
         sanitize l(".text_setting_copy_project_journal_entry", project: project_text,
                    source_project: source_project_text)
@@ -57,12 +57,12 @@ module PluginAdminActivity
 
     def organization_update_text(journal)
       if journal.creation?
-        organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
+        organization_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
         return sanitize l(".text_setting_create_organization_journal_entry", organization: organization_text) if journal.creation?
       elsif journal.deletion?
         return sanitize l(".text_setting_destroy_organization_journal_entry", organization_name: journal.value_changes["name_with_parents"][0])
       elsif journal.updating?
-          organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
+          organization_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
           s = sanitize l(".text_setting_update_organization_journal_entry", organization: organization_text) if journal.updating?
           content = ''
           if journal.value_changes.any?
@@ -79,12 +79,12 @@ module PluginAdminActivity
 
     def custom_field_update_text(journal)
       if journal.creation?
-        custom_field_text = link_to_custom_field_if_exists(journal.journalized) || name_custom_field_if_not_exists(journal)
+        custom_field_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
         return sanitize l(".text_setting_create_custom_field_journal_entry", custom_field: custom_field_text) if journal.creation?
       elsif journal.deletion?
         return sanitize l(".text_setting_destroy_custom_field_journal_entry", custom_field: journal.value_changes["name"][0])
       elsif journal.updating?
-          custom_field_text = link_to_custom_field_if_exists(journal.journalized) || name_custom_field_if_not_exists(journal)
+          custom_field_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
           s = sanitize l(".text_setting_update_custom_field_journal_entry", custom_field: custom_field_text) if journal.updating?
           content = ''
           if journal.value_changes.any?
@@ -101,15 +101,6 @@ module PluginAdminActivity
 
     private
 
-    def link_to_project_if_exists(project)
-      link_to(project.name, project_path(project)) if project.present? && project.persisted?
-    end
-
-    def name_project_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["name"][0]      
-    end
-
     def link_to_user_if_exists(user)
       link_to(user.name, user_path(user)) if user.present? && user.persisted?
     end
@@ -120,22 +111,23 @@ module PluginAdminActivity
       journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
     end
 
-    def link_to_organization_if_exists(organization)
-      link_to(organization.fullname, organization_path(organization)) if organization.present? && organization.persisted?
+    def link_to_journalized_if_exists(journalized)
+      if journalized.class.respond_to?(:representative_link_path) && journalized.respond_to?(:to_s)
+        link_to((journalized.to_s), (journalized.class.send :representative_link_path, journalized)) if journalized.present? && journalized.persisted?
+      else
+        # case of absence of implementation methods representative_link_path, to_s
+        return l(:label_absence_methodes) if journalized.present?
+      end
     end
 
-    def name_organization_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["name_with_parents"][0]
-    end
-
-    def link_to_custom_field_if_exists(custom_field)
-      link_to(custom_field.name, edit_custom_field_path(custom_field)) if custom_field.present? && custom_field.persisted?
-    end
-
-    def name_custom_field_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["name"][0]
+    def name_journalized_if_not_exists(journal)
+      klass_name =journal.journalized_type
+      obj_const = Object.const_get(klass_name)
+      if obj_const.respond_to?(:representative_column)
+        col = obj_const.send :representative_column
+        journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
+        journal_row_destroy.value_changes[col][0]
+      end
     end
 
     # Returns the textual representation of a journal details
