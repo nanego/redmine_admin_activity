@@ -67,3 +67,5 @@ fr:
   text_setting_create_custom_field_journal_entry: "Le champ personnalisé <i>%{custom_field}</i> a été créée."
   text_setting_destroy_custom_field_journal_entry: "Le champ personnalisé <i>%{custom_field}</i> a été supprimée."
   text_setting_update_custom_field_journal_entry: "Le champ personnalisé <i>%{custom_field}</i> a été modifiés."
+  text_journal_has_and_belongs_to_many_changed: "%{class_name} a été changé de %{old} à %{new}"
+  label_customfieldssection: Section
