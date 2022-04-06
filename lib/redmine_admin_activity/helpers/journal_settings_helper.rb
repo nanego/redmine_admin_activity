@@ -77,6 +77,28 @@ module PluginAdminActivity
       end
     end
 
+    def custom_field_update_text(journal)
+      if journal.creation?
+        custom_field_text = link_to_custom_field_if_exists(journal.journalized) || name_custom_field_if_not_exists(journal)
+        return sanitize l(".text_setting_create_custom_field_journal_entry", custom_field: custom_field_text) if journal.creation?
+      elsif journal.deletion?
+        return sanitize l(".text_setting_destroy_custom_field_journal_entry", custom_field: journal.value_changes["name"][0])
+      elsif journal.updating?
+          custom_field_text = link_to_custom_field_if_exists(journal.journalized) || name_custom_field_if_not_exists(journal)
+          s = sanitize l(".text_setting_update_custom_field_journal_entry", custom_field: custom_field_text) if journal.updating?
+          content = ''
+          if journal.value_changes.any?
+            content += content_tag(:ul, :class => 'details') do
+              journal_setting_to_strings(journal).collect do |item|
+                content_tag(:li, item)
+              end.reduce(&:+)
+            end
+          end
+
+          return s += content.html_safe
+      end
+    end
+
     private
 
     def link_to_project_if_exists(project)
@@ -106,6 +128,16 @@ module PluginAdminActivity
       journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
       journal_row_destroy.value_changes["name_with_parents"][0]
     end
+
+    def link_to_custom_field_if_exists(custom_field)
+      link_to(custom_field.name, custom_field_path(custom_field)) if custom_field.present? && custom_field.persisted?
+    end
+
+    def name_custom_field_if_not_exists(journal)
+      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
+      journal_row_destroy.value_changes["name"][0]
+    end
+
     # Returns the textual representation of a journal details
     # as an array of strings
     def journal_setting_to_strings(journal)
@@ -117,6 +149,8 @@ module PluginAdminActivity
         # If we want to treat associations many_to_many
         #elsif klazz.reflect_on_all_associations(:has_many).select{ |a| a.foreign_key == value[0] }.count > 0
           #strings << show_associations_details(journal.journalized_type, value[0], value[1][1], value[1][0])
+        elsif klazz.reflect_on_all_associations(:has_and_belongs_to_many).select{ |a| a.name == value[0].to_sym }.count > 0
+          strings << show_has_and_belongs_to_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         else
           type = klazz.columns_hash[value[0]].type
           case type
