@@ -89,4 +89,16 @@ module RedmineAdminActivity::Journalizable
     end
     changes
   end
+
+  def get_has_many_ids(obj, previous_h_m_ids)
+    changes = {}
+      # Case of deleting
+      obj.reload
+    obj.class.reflect_on_all_associations(:has_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      # Don't save if the relation m_to_m not changed
+      changes[reflect.name] = [previous_h_m_ids, reflect_ids.map(&:id)] unless previous_h_m_ids.sort == reflect_ids.map(&:id).sort
+    end
+    changes
+  end
 end

@@ -8,6 +8,7 @@ ActiveSupport::Reloader.to_prepare do
   require_dependency 'redmine_admin_activity/controllers/trackers_controller'
   require_dependency 'redmine_admin_activity/controllers/custom_fields_controller'
   require_dependency 'redmine_admin_activity/controllers/settings_controller'
+  require_dependency 'redmine_admin_activity/controllers/custom_field_enumerations_controller'
 
   if Redmine::Plugin.installed?(:redmine_organizations)
     require_dependency 'redmine_admin_activity/controllers/organizations/memberships_controller'

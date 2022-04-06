@@ -139,8 +139,8 @@ module PluginAdminActivity
         if klazz.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == value[0] }.count > 0
           strings << show_belongs_to_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         # If we want to treat associations many_to_many
-        #elsif klazz.reflect_on_all_associations(:has_many).select{ |a| a.foreign_key == value[0] }.count > 0
-          #strings << show_associations_details(journal.journalized_type, value[0], value[1][1], value[1][0])
+        elsif klazz.reflect_on_all_associations(:has_many).select{ |a| a.name == value[0].to_sym }.count > 0
+          strings << show_has_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         elsif klazz.reflect_on_all_associations(:has_and_belongs_to_many).select{ |a| a.name == value[0].to_sym }.count > 0
           strings << show_has_and_belongs_to_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         else

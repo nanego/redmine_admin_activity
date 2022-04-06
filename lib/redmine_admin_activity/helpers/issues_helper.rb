@@ -257,6 +257,10 @@ module PluginAdminActivity
       return l(:text_journal_has_and_belongs_to_many_changed, :class_name => l(label_class_name), :new => val.map(&:to_s), :old => old_val.map(&:to_s))
     end
 
+    def show_has_many_details(klass_name, key, value, old_value, no_html = false , options = {})
+      "TODO enumerations add"
+    end
+
     def show_belongs_to_details(klass_name, key, value, old_value, no_html = false , options = {})
       klazz = Object.const_get(klass_name)
       belongs_to_class = klazz.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == key }.first.klass
