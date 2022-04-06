@@ -8,4 +8,16 @@ class CustomField < ActiveRecord::Base
     names = %w(type name field_format visible)
     names
   end
+
+  def to_s
+    name
+  end
+
+  def self.representative_column
+    return "name"
+  end
+
+  def self.representative_link_path(obj)
+    Rails.application.routes.url_helpers.edit_custom_field_url(obj, only_path: true)
+  end
 end
