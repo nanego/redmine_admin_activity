@@ -229,7 +229,7 @@ module PluginAdminActivity
       value.split(",")
     end
 
-    def show_associations_details(klass_name, key, value, old_value, no_html , options = {})
+    def show_associations_details(klass_name, key, value, old_value, no_html = false , options = {})
       klazz = Object.const_get(klass_name)
       association_class = klazz.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == key }.first.klass
       label_class_name = "label_#{association_class.name.downcase}"
@@ -245,6 +245,16 @@ module PluginAdminActivity
 
         return l(:text_journal_association_deleted, :class_name => l(label_class_name), :old => label_old)
       end
+    end
+
+    def show_has_and_belongs_to_many_details(klass_name, key, value, old_value, no_html = false , options = {})
+      klazz = Object.const_get(klass_name)
+      association_class = klazz.reflect_on_all_associations(:has_and_belongs_to_many).select { |a| a.name.to_s == key }.first.klass
+      label_class_name = "label_#{association_class.name.downcase}"
+      val = association_class.where(:id => value)
+      old_val = association_class.where(:id => old_value)
+
+      return l(:text_journal_has_and_belongs_to_many_changed, :class_name => l(label_class_name), :new => val.map(&:to_s), :old => old_val.map(&:to_s))
     end
 
     def show_belongs_to_details(klass_name, key, value, old_value, no_html = false , options = {})
