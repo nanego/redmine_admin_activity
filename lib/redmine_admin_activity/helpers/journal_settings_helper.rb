@@ -130,7 +130,7 @@ module PluginAdminActivity
     end
 
     def link_to_custom_field_if_exists(custom_field)
-      link_to(custom_field.name, custom_field_path(custom_field)) if custom_field.present? && custom_field.persisted?
+      link_to(custom_field.name, edit_custom_field_path(custom_field)) if custom_field.present? && custom_field.persisted?
     end
 
     def name_custom_field_if_not_exists(journal)
