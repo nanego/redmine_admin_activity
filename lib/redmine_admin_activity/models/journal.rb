@@ -5,8 +5,9 @@ module RedmineAdminActivity
   module Journal
 
     def send_notification
-      # Do not send any notification after create project's journals
-      super unless journalized.class == Project
+      # Do not send any notification after create project's or user's journals
+      return if journalized.class == Project || journalized.class == User
+      super
     end
 
   end
