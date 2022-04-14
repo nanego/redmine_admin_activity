@@ -1,8 +1,13 @@
+<div class="contextual">
+<%= link_to l(:label_profile), user_path(@user), :class => 'icon icon-user' %>
+</div>
+<%=
+  page_title = title [@user.name, user_path(@user)], l(:label_history)
+  page_title.insert(page_title.rindex(' ') + 1, avatar(@user).to_s)
+%>
+
 <% @journals = prepare_journal_for_history(@user.journals) %>
 
 <% if @journals.present? %>
-  <div id="history">
-    <h3><%= l(:label_history) %></h3>
-    <%= render :partial => 'projects/history', :locals => { :journals => @journals } %>
-  </div>
+  <%= render :partial => 'projects/history', :locals => { :journals => @journals } %>
 <% end %>
