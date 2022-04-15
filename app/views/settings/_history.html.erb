@@ -11,7 +11,9 @@
       <% elsif journal.journalized_type == "Principal" %>
         <li><%= user_update_text(journal) %></li>
       <% elsif journal.journalized_type == 'Organization' %>
-        <li><%= organization_update_text(journal) %></li>
+        <% if Redmine::Plugin.installed?(:redmine_organizations) %>
+          <li><%= organization_update_text(journal) %></li>
+        <% end %>
       <% else %>
         <% journal.value_changes.each do |name, changes| %>
           <li><%= settings_update_text(name, changes) %></li>
