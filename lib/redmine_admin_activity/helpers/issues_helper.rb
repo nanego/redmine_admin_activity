@@ -35,7 +35,7 @@ module PluginAdminActivity
           details ? details : super
         else
           # Process standard properties like 'attr', 'attachment' or 'cf'
-           super
+          super
         end
       end
     end
@@ -253,8 +253,14 @@ module PluginAdminActivity
       label_class_name = "label_#{association_class.name.downcase}"
       val = association_class.where(:id => value)
       old_val = association_class.where(:id => old_value)
+      # Set id, if the value does not exist, when we trace all models, we can use the function name_journalized_if_not_exists
+      deleted_ids = (value - val.map(&:id)).map { |s| s.to_s.prepend('#') }
+      old_deleted_ids = (old_value - old_val.map(&:id)).map { |s| s.to_s.prepend('#') }
 
-      return l(:text_journal_has_and_belongs_to_many_changed, :class_name => l(label_class_name), :new => val.map(&:to_s), :old => old_val.map(&:to_s))
+      return l(:text_journal_has_and_belongs_to_many_changed,
+        :class_name => l(label_class_name),
+        :new => val.map(&:to_s) + deleted_ids,
+        :old => old_val.map(&:to_s) + old_deleted_ids)
     end
 
     def show_has_many_details(klass_name, key, value, old_value, no_html = false , options = {})
