@@ -264,7 +264,20 @@ module PluginAdminActivity
     end
 
     def show_has_many_details(klass_name, key, value, old_value, no_html = false , options = {})
-      "TODO enumerations add"
+      klazz = Object.const_get(klass_name)
+      association_class = klazz.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == key }.first.klass
+      label_class_name = "label_#{association_class.name.downcase}"
+
+      val = association_class.where(:id => value)
+      old_val = association_class.where(:id => old_value)
+
+      deleted_ids = (value - val.map(&:id)).map { |s| s.to_s.prepend('#') }
+      old_deleted_ids = (old_value - old_val.map(&:id)).map { |s| s.to_s.prepend('#') }
+
+      return l(:text_journal_has_many_changed,
+        :class_name => l(label_class_name),
+        :new => val.map(&:to_s) + deleted_ids,
+        :old => old_val.map(&:to_s) + old_deleted_ids)
     end
 
     def show_belongs_to_details(klass_name, key, value, old_value, no_html = false , options = {})

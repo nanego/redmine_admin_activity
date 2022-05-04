@@ -3,18 +3,18 @@ require_dependency 'custom_field_enumerations_controller'
 class CustomFieldEnumerationsController
   include RedmineAdminActivity::Journalizable
 
-  append_before_action :get_previous_custom_field_enumerations, :only => [:create, :destroy]
-  after_action :create_custom_field_history, :only => [:create, :destroy]
+  append_before_action :get_previous_custom_field_enumerations, :only => [:create, :destroy, :update_each]
+  after_action :create_custom_field_history, :only => [:create, :destroy, :update_each]
 
   private
 
   def get_previous_custom_field_enumerations
-  	@previous_custom_field_enumerations_ids = @custom_field.enumerations.map(&:id)
+  	@previous_custom_field_enumerations_ids = @custom_field.enumerations.select { |i| i.active }.map(&:id)
   end
 
   def create_custom_field_history
 
-  	changes = get_has_many_ids(@custom_field, @previous_custom_field_enumerations_ids)
+  	changes = get_custom_field_enumerations_changes(@custom_field, @previous_custom_field_enumerations_ids)
 
   	JournalSetting.create(
       :user_id => User.current.id,

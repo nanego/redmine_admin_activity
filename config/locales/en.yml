@@ -69,5 +69,7 @@ en:
   text_setting_destroy_custom_field_journal_entry: "Custom field <i>%{custom_field}</i> has been deleted."
   text_setting_update_custom_field_journal_entry: "Custom field <i>%{custom_field}</i> has been updated."
   text_journal_has_and_belongs_to_many_changed: "%{class_name} has been changed from %{old} to %{new}"
+  text_journal_has_many_changed: "%{class_name} has been changed from %{old} to %{new}"
+  label_customfieldenumeration: Key/value list
   label_customfieldssection: Section
   label_absence_methodes: TODO Absence of methods implementation representative_link_path or to_s
