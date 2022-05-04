@@ -43,7 +43,7 @@ module PluginAdminActivity
 
     def user_update_text(journal)
       if journal.creation? || journal.activation? || journal.locking? || journal.unlocking?
-        user_text = link_to_user_if_exists(journal.journalized) || name_user_if_not_exists(journal)
+        user_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
 
         return sanitize l(".text_setting_create_user_journal_entry", user: user_text) if journal.creation?
         return sanitize l(".text_setting_active_user_journal_entry", user: user_text) if journal.activation?
@@ -101,16 +101,6 @@ module PluginAdminActivity
 
     private
 
-    def link_to_user_if_exists(user)
-      link_to(user.name, user_path(user)) if user.present? && user.persisted?
-    end
-
-    def name_user_if_not_exists(journal)
-        
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
-    end
-
     def link_to_journalized_if_exists(journalized)
       if journalized.class.respond_to?(:representative_link_path) && journalized.respond_to?(:to_s)
         link_to((journalized.to_s), (journalized.class.send :representative_link_path, journalized)) if journalized.present? && journalized.persisted?
@@ -121,12 +111,13 @@ module PluginAdminActivity
     end
 
     def name_journalized_if_not_exists(journal)
-      klass_name =journal.journalized_type
-      obj_const = Object.const_get(klass_name)
+      klass_name = journal.journalized_type
+      klass_name == "Principal" ? obj_const = Object.const_get("User") : obj_const = Object.const_get(klass_name)
       if obj_const.respond_to?(:representative_column)
-        col = obj_const.send :representative_column
+        cols = obj_const.send :representative_column
         journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
-        journal_row_destroy.value_changes[col][0]
+
+        return cols.map { |i| journal_row_destroy.value_changes[i][0] }.join(' ')
       end
     end
 

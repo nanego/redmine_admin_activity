@@ -9,7 +9,7 @@ class Organization < ActiveRecord::Base
   end
 
   def self.representative_column
-    return "name_with_parents"
+    return ["name_with_parents"]
   end
 
   def self.representative_link_path(obj)

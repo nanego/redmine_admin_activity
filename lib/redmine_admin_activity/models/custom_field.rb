@@ -14,7 +14,7 @@ class CustomField < ActiveRecord::Base
   end
 
   def self.representative_column
-    return "name"
+    return ["name"]
   end
 
   def self.representative_link_path(obj)
