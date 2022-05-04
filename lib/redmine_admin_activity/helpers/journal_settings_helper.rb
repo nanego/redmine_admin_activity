@@ -35,7 +35,7 @@ module PluginAdminActivity
         source_project_text = link_to_journalized_if_exists(source_project) || journal.value_changes["source_project_name"]
 
         sanitize l(".text_setting_copy_project_journal_entry", project: project_text,
-                   source_project: source_project_text)
+                  source_project: source_project_text)
       elsif journal.deletion?
         sanitize l(".text_setting_destroy_project_journal_entry", project_name: journal.value_changes["name"][0])
       end
@@ -56,36 +56,24 @@ module PluginAdminActivity
     end
 
     def organization_update_text(journal)
-      if journal.creation?
-        organization_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
-        return sanitize l(".text_setting_create_organization_journal_entry", organization: organization_text) if journal.creation?
-      elsif journal.deletion?
-        return sanitize l(".text_setting_destroy_organization_journal_entry", organization_name: journal.value_changes["name_with_parents"][0])
-      elsif journal.updating?
-          organization_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
-          s = sanitize l(".text_setting_update_organization_journal_entry", organization: organization_text) if journal.updating?
-          content = ''
-          if journal.value_changes.any?
-            content += content_tag(:ul, :class => 'details') do
-              journal_setting_to_strings(journal).collect do |item|
-                content_tag(:li, item)
-              end.reduce(&:+)
-            end
-          end
-
-          return s += content.html_safe
-      end
+      journalized_update_text(journal, l(:label_organization), 'name_with_parents')
     end
 
     def custom_field_update_text(journal)
+      journalized_update_text(journal, l(:label_custom_field), 'name')
+    end
+
+    private
+
+    def journalized_update_text(journal, journalized_label, journalized_col)
       if journal.creation?
-        custom_field_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
-        return sanitize l(".text_setting_create_custom_field_journal_entry", custom_field: custom_field_text) if journal.creation?
+        journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+        return sanitize l(".text_setting_create_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.creation?
       elsif journal.deletion?
-        return sanitize l(".text_setting_destroy_custom_field_journal_entry", custom_field: journal.value_changes["name"][0])
+        return sanitize l(".text_setting_destroy_journal_entry", class_name: journalized_label, journalized_name: journal.value_changes[journalized_col][0])
       elsif journal.updating?
-          custom_field_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
-          s = sanitize l(".text_setting_update_custom_field_journal_entry", custom_field: custom_field_text) if journal.updating?
+          journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+          s = sanitize l(".text_setting_update_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.updating?
           content = ''
           if journal.value_changes.any?
             content += content_tag(:ul, :class => 'details') do
@@ -98,8 +86,6 @@ module PluginAdminActivity
           return s += content.html_safe
       end
     end
-
-    private
 
     def link_to_journalized_if_exists(journalized)
       if journalized.class.respond_to?(:representative_link_path) && journalized.respond_to?(:to_s)
