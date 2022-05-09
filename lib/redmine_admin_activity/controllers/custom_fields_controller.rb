@@ -25,7 +25,7 @@ class CustomFieldsController
               @custom_field.previous_changes
              )
     # Pass @custom_field.class.name in order to use the child class,
-    # not to use the parent class, to be able to retrieve the correct associations
+    # Not using the parent class, to be able to retrieve the correct associations
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => changes,
@@ -47,12 +47,14 @@ class CustomFieldsController
 
   def custom_fields_upgrade
     # Tracing on JournalSetting
+    journalized_changes = @custom_field.previous_changes.select { |key, val| @custom_field.journalized_attribute_names.include?(key) }
+
     changes = update_has_and_belongs_to_many_in_previous_changes(@custom_field,
-                @custom_field.previous_changes,
+                journalized_changes,
                 @previous_has_and_belongs_to_many
               )
     # Pass @custom_field.class.name in order to use the child class,
-    # not to use the parent class, to be able to retrieve the correct associations
+    # Not using the parent class, to be able to retrieve the correct associations
     JournalSetting.create(
       :user_id => User.current.id,
       :value_changes => changes,
