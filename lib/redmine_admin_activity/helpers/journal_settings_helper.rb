@@ -20,7 +20,7 @@ module PluginAdminActivity
 
     def project_update_text(journal)
       if journal.creation? || journal.duplication? || journal.activation? || journal.closing? || journal.archivation? || journal.reopening?
-        project_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+        project_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
 
         return sanitize l(".text_setting_create_project_journal_entry", project: project_text) if journal.creation?
         return sanitize l(".text_setting_active_project_journal_entry", project: project_text) if journal.activation?
@@ -43,7 +43,7 @@ module PluginAdminActivity
 
     def user_update_text(journal)
       if journal.creation? || journal.activation? || journal.locking? || journal.unlocking?
-        user_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+        user_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
 
         return sanitize l(".text_setting_create_user_journal_entry", user: user_text) if journal.creation?
         return sanitize l(".text_setting_active_user_journal_entry", user: user_text) if journal.activation?
@@ -67,12 +67,12 @@ module PluginAdminActivity
 
     def journalized_update_text(journal, journalized_label, journalized_col)
       if journal.creation?
-        journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+        journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
         return sanitize l(".text_setting_create_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.creation?
       elsif journal.deletion?
         return sanitize l(".text_setting_destroy_journal_entry", class_name: journalized_label, journalized_name: journal.value_changes[journalized_col][0])
       elsif journal.updating?
-          journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal)
+          journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
           s = sanitize l(".text_setting_update_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.updating?
           content = ''
           if journal.value_changes.any?
@@ -96,14 +96,13 @@ module PluginAdminActivity
       end
     end
 
-    def name_journalized_if_not_exists(journal)
-      klass_name = journal.journalized_type
+    def name_journalized_if_not_exists(klass_name, id)
       klass_name == "Principal" ? obj_const = Object.const_get("User") : obj_const = Object.const_get(klass_name)
       if obj_const.respond_to?(:representative_columns)
         cols = obj_const.send :representative_columns
-        journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
+        journal_row_destroy = JournalSetting.find_by journalized_id: id, journalized_type: klass_name, journalized_entry_type: 'destroy'
 
-        return cols.map { |i| journal_row_destroy.value_changes[i][0] }.join(' ')
+        return cols.map { |i| journal_row_destroy.value_changes[i][0] }.join(' ') if journal_row_destroy.present?
       end
     end
 

@@ -253,9 +253,11 @@ module PluginAdminActivity
       label_class_name = "label_#{association_class.name.downcase}_plural"
       val = association_class.where(:id => value)
       old_val = association_class.where(:id => old_value)
-      # Set id, if the value does not exist.In the future (when all models will be traced, we can use the function name_journalized_if_not_exists instead of ids)
-      deleted_ids = (value - val.map(&:id)).map { |s| s.to_s.prepend('#') }
-      old_deleted_ids = (old_value - old_val.map(&:id)).map { |s| s.to_s.prepend('#') }
+
+      # If the value is deleted and journalized, try to search it in the journalsetting table(journal_row_destroy) else set Id
+      #In the future (when all models will be traced, we can use the function name_journalized_if_not_exists instead of ids)
+      deleted_ids = (value - val.map(&:id)).map { |s| name_journalized_if_not_exists(association_class.name, s) || s.to_s.prepend('#') }
+      old_deleted_ids = (old_value - old_val.map(&:id)).map { |s| name_journalized_if_not_exists(association_class.name, s) || s.to_s.prepend('#') }
 
       return l(:text_journal_has_and_belongs_to_many_changed,
         :class_name => l(label_class_name),
