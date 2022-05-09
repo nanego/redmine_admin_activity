@@ -117,7 +117,7 @@ module RedmineAdminActivity::Journalizable
     new_enumerations = obj.send reflect[0].name
     new_enumerations_ids = new_enumerations.where(active: true).map(&:id).sort
 
-    # Don't save if the relation m_to_m not changed case of adding or (deleting of active enumerations)
+    # Don't save if the relation m_to_m not changed case adding / deleting of active enumerations)
     if previous_h_m_ids.sort != new_enumerations_ids
       changes[reflect[0].name] = [previous_h_m_ids, new_enumerations.select { |i| i.active }.map(&:id)]
     # (case of activation/ inactivation don't save if the activation m_to_m not changed) or (deleting of inactive enumerations)
