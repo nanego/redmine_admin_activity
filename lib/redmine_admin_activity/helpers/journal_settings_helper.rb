@@ -99,8 +99,8 @@ module PluginAdminActivity
     def name_journalized_if_not_exists(journal)
       klass_name = journal.journalized_type
       klass_name == "Principal" ? obj_const = Object.const_get("User") : obj_const = Object.const_get(klass_name)
-      if obj_const.respond_to?(:representative_column)
-        cols = obj_const.send :representative_column
+      if obj_const.respond_to?(:representative_columns)
+        cols = obj_const.send :representative_columns
         journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
 
         return cols.map { |i| journal_row_destroy.value_changes[i][0] }.join(' ')

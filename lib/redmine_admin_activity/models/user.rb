@@ -41,7 +41,7 @@ class User < Principal
     []
   end
 
-  def self.representative_column
+  def self.representative_columns
     return "firstname" , "lastname"
   end
 

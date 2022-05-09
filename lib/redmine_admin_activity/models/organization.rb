@@ -8,7 +8,7 @@ class Organization < ActiveRecord::Base
     names
   end
 
-  def self.representative_column
+  def self.representative_columns
     return ["name_with_parents"]
   end
 

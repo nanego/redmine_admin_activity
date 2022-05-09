@@ -43,7 +43,7 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def self.representative_column
+  def self.representative_columns
     return ["name"]
   end
 

@@ -5,7 +5,7 @@ class CustomField < ActiveRecord::Base
 	# TODO à discuter
 
   def journalized_attribute_names
-    names = %w(type name field_format visible)
+    names = %w(type name field_format visible is_required description)
     names
   end
 
@@ -13,7 +13,7 @@ class CustomField < ActiveRecord::Base
     name
   end
 
-  def self.representative_column
+  def self.representative_columns
     return ["name"]
   end
 
