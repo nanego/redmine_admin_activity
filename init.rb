@@ -17,17 +17,13 @@ ActiveSupport::Reloader.to_prepare do
   end
 
   require_dependency 'redmine_admin_activity/controllers/users_controller'
-  
+
   require_dependency 'redmine_admin_activity/models/project'
   require_dependency 'redmine_admin_activity/models/member'
   require_dependency 'redmine_admin_activity/models/journal'
   require_dependency 'redmine_admin_activity/models/version'
   require_dependency 'redmine_admin_activity/models/user'
   require_dependency 'redmine_admin_activity/models/custom_field'
-
-  if Redmine::Plugin.installed?(:redmine_custom_fields_sections)
-    require_dependency 'redmine_admin_activity/models/custom_fields_section'
-  end
 
   require_dependency 'redmine_admin_activity/helpers/projects_helper'
   require_dependency 'redmine_admin_activity/helpers/issues_helper'
