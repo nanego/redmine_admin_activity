@@ -42,4 +42,12 @@ class User < Principal
     []
   end
 
+  def self.representative_columns
+    return "firstname" , "lastname"
+  end
+
+  def self.representative_link_path(obj)
+    Rails.application.routes.url_helpers.user_url(obj, only_path: true)
+  end
+
 end

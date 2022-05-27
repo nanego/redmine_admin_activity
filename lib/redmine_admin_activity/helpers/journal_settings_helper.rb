@@ -20,7 +20,7 @@ module PluginAdminActivity
 
     def project_update_text(journal)
       if journal.creation? || journal.duplication? || journal.activation? || journal.closing? || journal.archivation? || journal.reopening?
-        project_text = link_to_project_if_exists(journal.journalized) || name_project_if_not_exists(journal)
+        project_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
 
         return sanitize l(".text_setting_create_project_journal_entry", project: project_text) if journal.creation?
         return sanitize l(".text_setting_active_project_journal_entry", project: project_text) if journal.activation?
@@ -32,10 +32,10 @@ module PluginAdminActivity
         return sanitize l(".text_setting_reopen_project_journal_entry", project: project_text) if journal.reopening?
 
         source_project = Project.find_by(id: journal.value_changes["source_project"])
-        source_project_text = link_to_project_if_exists(source_project) || journal.value_changes["source_project_name"]
+        source_project_text = link_to_journalized_if_exists(source_project) || journal.value_changes["source_project_name"]
 
         sanitize l(".text_setting_copy_project_journal_entry", project: project_text,
-                   source_project: source_project_text)
+                  source_project: source_project_text)
       elsif journal.deletion?
         sanitize l(".text_setting_destroy_project_journal_entry", project_name: journal.value_changes["name"][0])
       end
@@ -43,7 +43,7 @@ module PluginAdminActivity
 
     def user_update_text(journal)
       if journal.creation? || journal.activation? || journal.locking? || journal.unlocking?
-        user_text = link_to_user_if_exists(journal.journalized) || name_user_if_not_exists(journal)
+        user_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
 
         return sanitize l(".text_setting_create_user_journal_entry", user: user_text) if journal.creation?
         return sanitize l(".text_setting_active_user_journal_entry", user: user_text) if journal.activation?
@@ -56,11 +56,7 @@ module PluginAdminActivity
     end
 
     def organization_update_text(journal)
-      if journal.creation?
-        organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
-        return sanitize l(".text_setting_create_organization_journal_entry", organization: organization_text) if journal.creation?
-      elsif journal.deletion?
-        return sanitize l(".text_setting_destroy_organization_journal_entry", organization_name: journal.value_changes["name_with_parents"][0])
+      journalized_update_text(journal, l(:label_organization), 'name_with_parents')
       elsif journal.updating?
           organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
           s = sanitize l(".text_setting_update_organization_journal_entry", organization: organization_text) if journal.updating?
@@ -74,38 +70,86 @@ module PluginAdminActivity
           end
 
           return s += content.html_safe
-      end
+    end
+
+    def custom_field_update_text(journal)
+      journalized_update_text(journal, l(:label_custom_field), 'name')
     end
 
     private
 
-    def link_to_project_if_exists(project)
-      link_to(project.name, project_path(project)) if project.present? && project.persisted?
+    def journalized_update_text(journal, journalized_label, journalized_col)
+      if journal.creation?
+        journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
+        return sanitize l(".text_setting_create_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.creation?
+      elsif journal.deletion?
+        return sanitize l(".text_setting_destroy_journal_entry", class_name: journalized_label, journalized_name: journal.value_changes[journalized_col][0])
+      elsif journal.updating?
+          journalized_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
+          s = sanitize l(".text_setting_update_journal_entry", class_name: journalized_label, journalized_name: journalized_text) if journal.updating?
+          content = ''
+          if journal.value_changes.any?
+            content += content_tag(:ul, :class => 'details') do
+              journal_setting_to_strings(journal).collect do |item|
+                content_tag(:li, item)
+              end.reduce(&:+)
+            end
+          end
+
+          return s += content.html_safe
+      end
     end
 
-    def name_project_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["name"][0]      
+    def link_to_journalized_if_exists(journalized)
+      if journalized.class.respond_to?(:representative_link_path) && journalized.respond_to?(:to_s)
+        link_to((journalized.to_s), (journalized.class.send :representative_link_path, journalized)) if journalized.present? && journalized.persisted?
+      else
+        # case of absence of implementation methods representative_link_path, to_s
+        return l(:label_absence_methodes) if journalized.present?
+      end
     end
 
-    def link_to_user_if_exists(user)
-      link_to(user.name, user_path(user)) if user.present? && user.persisted?
+    def name_journalized_if_not_exists(klass_name, id)
+      klass_name == "Principal" ? obj_const = Object.const_get("User") : obj_const = Object.const_get(klass_name)
+      if obj_const.respond_to?(:representative_columns)
+        cols = obj_const.send :representative_columns
+        journal_row_destroy = JournalSetting.find_by journalized_id: id, journalized_type: klass_name, journalized_entry_type: 'destroy'
+
+        return cols.map { |i| journal_row_destroy.value_changes[i][0] }.join(' ') if journal_row_destroy.present?
+      end
     end
 
-    def name_user_if_not_exists(journal)
-        
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type, journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["firstname"][0] + " " + journal_row_destroy.value_changes["lastname"][0]
+    # Returns the textual representation of a journal details
+    # as an array of strings
+    def journal_setting_to_strings(journal)
+      strings = []
+      klazz = Object.const_get(journal.journalized_type)
+      journal.value_changes.each do |value|
+        if klazz.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == value[0] }.count > 0
+          strings << show_belongs_to_details(journal.journalized_type, value[0], value[1][1], value[1][0])
+        # If we want to treat associations many_to_many
+        elsif klazz.reflect_on_all_associations(:has_many).select{ |a| a.name == value[0].to_sym }.count > 0
+          strings << show_has_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
+        elsif klazz.reflect_on_all_associations(:has_and_belongs_to_many).select{ |a| a.name == value[0].to_sym }.count > 0
+          strings << show_has_and_belongs_to_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
+        else
+          type = klazz.columns_hash[value[0]].type
+          case type
+          when :boolean
+            strings << show_boolean_details(value[0], value[1][1], value[1][0])
+          #when ,if we want to treat another type
+          else
+            strings << show_details_by_default(value)
+          end
+        end
+      end
+      strings
     end
 
-    def link_to_organization_if_exists(organization)
-      link_to(organization.fullname, organization_path(organization)) if organization.present? && organization.persisted?
-    end
-
-    def name_organization_if_not_exists(journal)
-      journal_row_destroy = JournalSetting.find_by journalized_id: journal.journalized_id, journalized_type: journal.journalized_type , journalized_entry_type: 'destroy'
-      journal_row_destroy.value_changes["name_with_parents"][0]
-    end
+    # Returns the textual representation of a single journal setting by default
+    def show_details_by_default(detail)
+      label = l(("field_" + detail[0]).to_sym)
+      l(:text_journal_changed, :label => label, :old => detail[1].first, :new => detail[1].second)
     # Returns the textual representation of a journal details
     # as an array of strings
     def journal_setting_to_strings(journal)

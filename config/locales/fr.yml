@@ -61,6 +61,12 @@ fr:
   label_id_deleted: "(#%{id})"
   label_0: "Non"
   label_1: "Oui"
-  text_setting_create_organization_journal_entry: "L'organisation <i>%{organization}</i> a été créée."
-  text_setting_destroy_organization_journal_entry: "L'organisation <i>%{organization_name}</i> a été supprimée."
-  text_setting_update_organization_journal_entry: "L'organisation <i>%{organization}</i> a été modifiés."
+  text_setting_create_journal_entry: "%{class_name} <i>%{journalized_name}</i> a été créée."
+  text_setting_destroy_journal_entry: "%{class_name} <i>%{journalized_name}</i> a été supprimée."
+  text_setting_update_journal_entry: "%{class_name} <i>%{journalized_name}</i> a été modifiés."
+
+  text_journal_has_and_belongs_to_many_changed: "%{class_name} ont été changés de [%{old}] à [%{new}]"
+  text_journal_has_many_changed: "%{class_name} a été changé de [%{old}] à [%{new}]"
+  label_customfieldenumeration: Liste clé/valeur
+  label_customfieldssection: Section
+  label_absence_methodes: TODO Absence d'implémentation des méthodes representative_link_path or to_s

@@ -359,4 +359,191 @@ describe "JournalSettingsHelper" do
     end
 
   end
+
+  describe "custom field creation / deletion" do
+    it "should generate the right translated sentence for a custom field creation, by using the function representative_link_path" do
+      field = CustomField.new(:name => "test field",
+                              :type => "IssueCustomField",
+                              :field_format => "string")
+      field.save
+
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                    :value_changes => { "name" => ["", field.name], "field_format" => ["", "string"] },
+                                    :journalized_id => field.id,
+                                    :journalized_type => "IssueCustomField",
+                                    :journalized_entry_type => "create")
+      expect(custom_field_update_text(journal)).to eq "#{l(:label_custom_field)} <i><a href=\"#{CustomField.representative_link_path(field)}\">#{field.name}</a></i> has been created."
+    end
+
+    it "should generate the right translated sentence for a custom field deleting, by using the function representative_columns" do
+      field = CustomField.new(:name => "test field",
+                              :type => "IssueCustomField",
+                              :field_format => "string")
+      field.save
+
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                    :value_changes => { "name" => [field.name, ""], "field_format" => ["string", ""] },
+                                    :journalized_id => field.id,
+                                    :journalized_type => "IssueCustomField",
+                                    :journalized_entry_type => "destroy")
+
+      expect(field.send CustomField.representative_columns[0]).to include(field.name)
+      expect(custom_field_update_text(journal)).to eq "#{l(:label_custom_field)} <i>#{field.name}</i> has been deleted."
+    end
+  end
+
+  describe "custom filed updating" do
+    it "should generate the right translated sentence, when changing its attributes and its has_and_belongs_to_many association" do
+      field = IssueCustomField.last
+
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                    :value_changes => {
+                                      "name" => [field.name, "new_name"],
+                                      "description" => [field.description, "new_des"],
+                                      "is_required" => [false, true],
+                                      "roles" => [[], [1]],
+                                      "projects" => [[1], [1, 2]],
+                                    },
+                                    :journalized_id => field.id,
+                                    :journalized_type => "IssueCustomField",
+                                    :journalized_entry_type => "update")
+
+
+      expect(custom_field_update_text(journal)).to include(
+        "#{l(:label_custom_field)} <i><a href=\"#{CustomField.representative_link_path(field)}\">#{field.name}</a></i> has been updated.")
+
+      expect(custom_field_update_text(journal)).to include(
+        "#{l("field_name")} changed from #{field.name} to new_name")
+
+      expect(custom_field_update_text(journal)).to include(
+        "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, #{Project.find(2).name}]")
+      expect(custom_field_update_text(journal)).to include(
+        "#{l(:label_role_plural)} have been changed from [] to [#{Role.find(1).name}]")
+    end
+
+    it "should generate the right translated sentence, when changing has_and_belongs_to_many association (case of association deleting show(#id))" do
+      field = IssueCustomField.last
+      pro = Project.create(name: 'test', identifier: 'test')
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                    :value_changes => {
+                                      "name" => [field.name, "new_name"],
+                                      "description" => [field.description, "new_des"],
+                                      "projects" => [[1], [1, pro.id]],
+                                    },
+                                    :journalized_id => field.id,
+                                    :journalized_type => "IssueCustomField",
+                                    :journalized_entry_type => "update")
+      pro.delete
+      expect(custom_field_update_text(journal)).to include(
+        "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, ##{pro.id}]")
+    end
+
+    it "should generate the right translated sentence, when changing the enumerations(test the function show_has_many_details)" do
+      field = CustomField.new(:name => "test field",
+        :type => "IssueCustomField",
+        :field_format => "enumeration")
+      field.save
+
+      c_f_e1 = CustomFieldEnumeration.create(name: 'val1', position: 1, active: true, custom_field_id: field.id)
+      c_f_e2 = CustomFieldEnumeration.create(name: 'val2', position: 1, active: true, custom_field_id: field.id)
+
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                    :value_changes => {
+                                      "enumerations" => [[c_f_e1.id], [c_f_e1.id, c_f_e2.id]],
+                                    },
+                                    :journalized_id => field.id,
+                                    :journalized_type => "IssueCustomField",
+                                    :journalized_entry_type => "update")
+      c_f_e2.delete
+
+      expect(custom_field_update_text(journal)).to include(
+        "#{l(:label_customfieldenumeration)} has been changed from [#{c_f_e1.name}] to [#{c_f_e1.name}, ##{c_f_e2.id}]")
+    end
+
+    describe "organization updating" do
+      it "should generate the right translated sentence, when changing its parent" do
+        org = Organization.last
+
+        journal = JournalSetting.new(:user_id => User.current.id,
+                                     :value_changes => {
+                                       "name" => [org.name, "new_name"],
+                                       "description" => [org.description, "new_des"],
+                                       "parent_id" => [org.parent.id, 2],
+                                       "direction" => [false, true],
+                                       "mail" => [org.mail, "new_mail@test.com"],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "#{l("field_name")} changed from #{org.name} to new_name")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "#{l("field_description")} changed from #{org.description} to new_des")
+
+        expect(organization_update_text(journal)).to include(
+                                                       l(:text_journal_belongs_to_changed, :class_name => "Organization",
+                                                         :new => Organization.find(2).to_s,
+                                                         :old => org.parent.to_s))
+
+        # Here there is a boolean field, it will test both methods show_boolean_details and val_to_bool
+        expect(organization_update_text(journal)).to include(
+                                                       "#{l("field_direction")} changed from #{l("label_0")} to #{l("label_1")}")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "#{l("field_mail")} changed from #{org.mail} to new_mail@test.com")
+      end
+
+      # test show_belongs_to_details When the absence of the new value
+      it "should generate the right translated sentence, when removing its parent" do
+        org = Organization.last
+
+        journal = JournalSetting.new(:user_id => User.current.id,
+                                     :value_changes => {
+                                       "parent_id" => [org.parent.id, nil],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+
+        expect(organization_update_text(journal)).to include(
+                                                       l(:text_journal_belongs_to_deleted, :class_name => "Organization",
+                                                         :old => org.parent.to_s))
+      end
+
+      # test show_belongs_to_details When the absence of the old value
+      it "should generate the right translated sentence, when adding the parent" do
+        org = Organization.create(
+          :name => 'org_name',
+          :direction => true,
+          :description => 'org_des',
+          :name_with_parents => 'org_name',
+          :parent_id => nil,)
+
+        journal = JournalSetting.new(:user_id => User.current.id,
+                                     :value_changes => {
+                                       "parent_id" => [nil, Organization.first.id],
+                                       "direction" => [true, false],
+                                     },
+                                     :journalized => org,
+                                     :journalized_entry_type => "update")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "Organization <i><a href=\"/organizations/#{org.id}\">#{org.fullname}</a></i> has been updated.")
+
+        expect(organization_update_text(journal)).to include(
+                                                       "#{l("field_direction")} changed from #{l("label_1")} to #{l("label_0")}")
+
+        expect(organization_update_text(journal)).to include(
+                                                       l(:text_journal_belongs_to_added, :class_name => "Organization",
+                                                         :new => Organization.first.to_s))
+      end
+    end
+
+  end
 end

@@ -1,4 +1,7 @@
 require_relative 'lib/redmine_admin_activity/hooks'
+  require_dependency 'redmine_admin_activity/controllers/custom_field_enumerations_controller'
+    require_dependency 'redmine_admin_activity/models/organization'
+  require_dependency 'redmine_admin_activity/models/custom_field'
 
 Redmine::Plugin.register :redmine_admin_activity do
   name 'Redmine Admin Activity plugin'

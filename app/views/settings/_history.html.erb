@@ -14,6 +14,8 @@
         <% if Redmine::Plugin.installed?(:redmine_organizations) %>
           <li><%= organization_update_text(journal) %></li>
         <% end %>
+      <% elsif journal.journalized_type.present? && Object.const_get(journal.journalized_type).superclass.name == 'CustomField' %>
+        <li><%= custom_field_update_text(journal) %></li>
       <% else %>
         <% journal.value_changes.each do |name, changes| %>
           <li><%= settings_update_text(name, changes) %></li>
