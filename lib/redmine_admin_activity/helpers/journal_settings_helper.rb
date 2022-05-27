@@ -57,19 +57,6 @@ module PluginAdminActivity
 
     def organization_update_text(journal)
       journalized_update_text(journal, l(:label_organization), 'name_with_parents')
-      elsif journal.updating?
-          organization_text = link_to_organization_if_exists(journal.journalized) || name_organization_if_not_exists(journal)
-          s = sanitize l(".text_setting_update_organization_journal_entry", organization: organization_text) if journal.updating?
-          content = ''
-          if journal.value_changes.any?
-            content += content_tag(:ul, :class => 'details') do
-              journal_setting_to_strings(journal).collect do |item|
-                content_tag(:li, item)
-              end.reduce(&:+)
-            end
-          end
-
-          return s += content.html_safe
     end
 
     def custom_field_update_text(journal)
@@ -132,35 +119,6 @@ module PluginAdminActivity
           strings << show_has_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         elsif klazz.reflect_on_all_associations(:has_and_belongs_to_many).select{ |a| a.name == value[0].to_sym }.count > 0
           strings << show_has_and_belongs_to_many_details(journal.journalized_type, value[0], value[1][1], value[1][0])
-        else
-          type = klazz.columns_hash[value[0]].type
-          case type
-          when :boolean
-            strings << show_boolean_details(value[0], value[1][1], value[1][0])
-          #when ,if we want to treat another type
-          else
-            strings << show_details_by_default(value)
-          end
-        end
-      end
-      strings
-    end
-
-    # Returns the textual representation of a single journal setting by default
-    def show_details_by_default(detail)
-      label = l(("field_" + detail[0]).to_sym)
-      l(:text_journal_changed, :label => label, :old => detail[1].first, :new => detail[1].second)
-    # Returns the textual representation of a journal details
-    # as an array of strings
-    def journal_setting_to_strings(journal)
-      strings = []
-      klazz = Object.const_get(journal.journalized_type)
-      journal.value_changes.each do |value|
-        if klazz.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == value[0] }.count > 0
-          strings << show_belongs_to_details(journal.journalized_type, value[0], value[1][1], value[1][0])
-        # If we want to treat associations many_to_many
-        #elsif klazz.reflect_on_all_associations(:has_many).select{ |a| a.foreign_key == value[0] }.count > 0
-          #strings << show_associations_details(journal.journalized_type, value[0], value[1][1], value[1][0])
         else
           type = klazz.columns_hash[value[0]].type
           case type
