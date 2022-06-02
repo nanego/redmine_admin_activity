@@ -9,6 +9,8 @@ This Redmine plugin keeps a log of all admin actions:
 
 ## Requirements:
 
+* this plugin requires you to install the redmine_base_deface plugin (see [here](https://github.com/jbbarth/redmine_base_deface))
+
     ruby >= 2.1.0
 
 To run tests, install the redmine_base_rspec plugin (https://github.com/jbbarth/redmine_base_rspec)
