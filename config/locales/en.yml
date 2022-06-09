@@ -40,7 +40,7 @@ en:
   text_setting_journal_entry: "%{field} changed from <i>%{old_value}</i> to <i>%{value}</i>."
   text_setting_create_project_journal_entry: "Project <i>%{project}</i> has been created."
   text_setting_destroy_project_journal_entry: "Project <i>%{project_name}</i> has been deleted."
-  text_setting_copy_project_journal_entry: "Projet <i>%{project}</i> has been copied from <i>%{source_project}</i>."
+  text_setting_copy_project_journal_entry: "Project <i>%{project}</i> has been copied from <i>%{source_project}</i>."
   text_setting_active_project_journal_entry: "Project <i>%{project}</i> has been activated."
   text_setting_close_project_journal_entry: "Project <i>%{project}</i> has been closed."
   text_setting_archive_project_journal_entry: "Project <i>%{project}</i> has been archived."
@@ -54,8 +54,8 @@ en:
   field_mails: "Mail"
   field_organization: "Organization"
   field_sudoer: "Sudoer"
-  text_journal_association_added: "%{class_name} %{new} added"
-  text_journal_association_deleted: "%{class_name} %{old} deleted"
+  text_journal_association_added: "%{journalized} has been added %{class_name} %{new}"
+  text_journal_association_deleted: "%{journalized} has been deleted %{class_name} %{old}"
   text_journal_belongs_to_changed: "%{class_name} has been changed from %{old} to %{new}"
   text_journal_belongs_to_added: "%{class_name} %{new} added."
   text_journal_belongs_to_deleted: "%{class_name} %{old} deleted."
@@ -65,9 +65,11 @@ en:
   text_setting_create_journal_entry: "%{class_name} <i>%{journalized_name}</i> has been created."
   text_setting_destroy_journal_entry: "%{class_name} <i>%{journalized_name}</i> has been deleted."
   text_setting_update_journal_entry: "%{class_name} <i>%{journalized_name}</i> has been updated."
-
   text_journal_has_and_belongs_to_many_changed: "%{class_name} have been changed from [%{old}] to [%{new}]"
   text_journal_has_many_changed: "%{class_name} has been changed from [%{old}] to [%{new}]"
   label_customfieldenumeration: Key/value list
   label_customfieldssection: Section
   label_absence_methodes: TODO Absence of methods implementation representative_link_path or to_s
+  label_this_user: "This user"
+  label_from_project: "from the project"
+  label_to_project: "to the project"
