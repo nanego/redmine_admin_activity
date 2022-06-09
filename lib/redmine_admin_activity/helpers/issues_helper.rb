@@ -229,21 +229,22 @@ module PluginAdminActivity
       value.split(",")
     end
 
-    def show_associations_details(klass_name, key, value, old_value, no_html = false , options = {})
+    def show_associations_details(klass_name, key, value, old_value, no_html = false , options = {}, label_this_journaized)
       klazz = Object.const_get(klass_name)
       association_class = klazz.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == key }.first.klass
-      label_class_name = "label_#{association_class.name.downcase}"
+      label_from_class_name = "label_from_#{association_class.name.downcase}"
+      label_to_class_name = "label_to_#{association_class.name.downcase}"
       val = association_class.find_by(:id => value)
       old_val = association_class.find_by(:id => old_value)
 
       if value.present?
         label_new = val.present? ? val.to_s : l(:label_id_deleted, :id => value)
 
-        return l(:text_journal_association_added, :class_name => l(label_class_name), :new => label_new)
+        return l(:text_journal_association_added, :class_name => l(label_to_class_name), :new => label_new, :journalized => label_this_journaized)
       elsif old_value.present?
         label_old = old_val.present? ? old_val.to_s : l(:label_id_deleted, :id => old_value)
 
-        return l(:text_journal_association_deleted, :class_name => l(label_class_name), :old => label_old)
+        return l(:text_journal_association_deleted, :class_name => l(label_from_class_name), :old => label_old, :journalized => label_this_journaized)
       end
     end
 
@@ -316,7 +317,7 @@ module PluginAdminActivity
         show_user_status_details(detail, no_html, options)
       elsif detail.property == 'associations'
         if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
-          show_associations_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)
+          show_associations_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options, l(:label_this_user))
         end
       elsif detail.property == 'attr'
         if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0

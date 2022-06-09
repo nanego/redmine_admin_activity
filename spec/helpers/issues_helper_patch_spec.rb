@@ -309,13 +309,13 @@ describe "IssuesHelperPatch" do
   it 'should IssuesHelper#show_detail should show Project followed by (its name) added when a project is added to him' do
     p = Project.find(1)
     detail = JournalDetail.new(:journal => journal, :property => 'associations', :old_value => nil, :value => "#{p.id}", :prop_key => 'projects')
-    expect(show_detail(detail, true)).to eq "Project #{p.name} added"
+    expect(show_detail(detail, true)).to eq "This user has been added to the projet #{p.name}"
   end
 
   it 'should IssuesHelper#show_detail should show Project followed by (its name) deleted when a project is no longer added to him ' do
     p = Project.find(1)
     detail = JournalDetail.new(:journal => journal, :property => 'associations', :old_value => "#{p.id}", :value => nil, :prop_key => 'projects')
-    expect(show_detail(detail, true)).to eq "Project #{p.name} deleted"
+    expect(show_detail(detail, true)).to eq "This user has been deleted from the projet #{p.name}"
   end
 
   if Redmine::Plugin.installed?(:redmine_organizations)

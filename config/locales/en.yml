@@ -54,8 +54,8 @@ en:
   field_mails: "Mail"
   field_organization: "Organization"
   field_sudoer: "Sudoer"
-  text_journal_association_added: "%{class_name} %{new} added"
-  text_journal_association_deleted: "%{class_name} %{old} deleted"
+  text_journal_association_added: "%{journalized} has been added %{class_name} %{new}"
+  text_journal_association_deleted: "%{journalized} has been deleted %{class_name} %{old}"
   text_journal_belongs_to_changed: "%{class_name} has been changed from %{old} to %{new}"
   text_journal_belongs_to_added: "%{class_name} %{new} added."
   text_journal_belongs_to_deleted: "%{class_name} %{old} deleted."
@@ -71,3 +71,6 @@ en:
   label_customfieldenumeration: Key/value list
   label_customfieldssection: Section
   label_absence_methodes: TODO Absence of methods implementation representative_link_path or to_s
+  label_this_user: "This user"
+  label_from_project: "from the projet"
+  label_to_project: "to the projet"
