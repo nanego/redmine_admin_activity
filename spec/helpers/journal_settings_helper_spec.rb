@@ -98,7 +98,7 @@ describe "JournalSettingsHelper" do
                                    :journalized_entry_type => "copy")
 
       source_project.save
-      expect(project_update_text(journal)).to eq "Projet <i><a href=\"/projects/test-create\">Test create</a></i> has been copied from <i>Source project</i>."
+      expect(project_update_text(journal)).to eq "Project <i><a href=\"/projects/test-create\">Test create</a></i> has been copied from <i>Source project</i>."
     end
   end
 
