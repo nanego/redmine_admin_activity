@@ -64,4 +64,66 @@ module RedmineAdminActivity::Journalizable
     value
   end
 
+  def get_previous_has_and_belongs_to_many(obj)
+    previous_has_and_belongs_to_many = {}
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      previous_has_and_belongs_to_many[reflect.name ] = [reflect_ids.map(&:id)]
+    end
+    previous_has_and_belongs_to_many
+  end
+
+  def add_has_and_belongs_to_many_to_previous_changes(obj, changes)
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      changes[reflect.name] = [nil, reflect_ids.map(&:id)] if reflect_ids.count > 0
+    end
+    changes
+  end
+
+  def update_has_and_belongs_to_many_in_previous_changes(obj, changes, previous_h_a_b_to_m)
+    obj.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      # Don't save if the relation m_to_m not changed
+      changes[reflect.name] = [previous_h_a_b_to_m[reflect.name].first, reflect_ids.map(&:id)] unless previous_h_a_b_to_m[reflect.name].first.sort == reflect_ids.map(&:id).sort
+    end
+    changes
+  end
+
+  # We can use this function for the relation has_many (cas add, remove), if we want in the future.
+  def get_has_many_ids_changes(obj, previous_h_m_ids)
+    changes = {}
+    # reload the object for the deleting case
+    obj.reload
+    obj.class.reflect_on_all_associations(:has_many).each do |reflect|
+      reflect_ids = obj.send reflect.name
+      # Don't save if the relation m_to_m not changed
+      changes[reflect.name] = [previous_h_m_ids, reflect_ids.map(&:id)] unless previous_h_m_ids.sort == reflect_ids.map(&:id).sort
+    end
+    changes
+  end
+
+  # This function for Custom fields / enumerations(active, inactive)
+  def get_custom_field_enumerations_changes(obj, previous_h_m_ids)
+    changes = {}
+
+    reflect = obj.class.reflect_on_all_associations(:has_many).select{ |ref| ref.name == :enumerations }
+    previous_enumerations = obj.send reflect[0].name
+    previous_enumerations_ids = previous_enumerations.where(active: true).map(&:id).sort
+    # reload the object for the deleting case
+    obj.reload
+
+    reflect = obj.class.reflect_on_all_associations(:has_many).select{ |ref| ref.name == :enumerations }
+    new_enumerations = obj.send reflect[0].name
+    new_enumerations_ids = new_enumerations.where(active: true).map(&:id).sort
+
+    # Don't save if the relation m_to_m not changed case adding / deleting of active enumerations)
+    if previous_h_m_ids.sort != new_enumerations_ids
+      changes[reflect[0].name] = [previous_h_m_ids, new_enumerations.select { |i| i.active }.map(&:id)]
+    # (case of activation/ inactivation don't save if the activation m_to_m not changed) or (deleting of inactive enumerations)
+    elsif new_enumerations.map(&:active) != previous_enumerations.map(&:active) && previous_enumerations_ids != new_enumerations_ids
+      changes[reflect[0].name] = [previous_enumerations_ids , new_enumerations_ids]
+    end
+    changes
+  end
 end

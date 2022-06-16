@@ -8,4 +8,11 @@ class Organization < ActiveRecord::Base
     names
   end
 
+  def self.representative_columns
+    return ["name_with_parents"]
+  end
+
+  def self.representative_link_path(obj)
+    Rails.application.routes.url_helpers.organization_url(obj, only_path: true)
+  end
 end

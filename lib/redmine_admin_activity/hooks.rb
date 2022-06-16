@@ -13,6 +13,7 @@ module RedmineAdminActivity
         require_relative 'controllers/trackers_controller'
         require_relative 'controllers/custom_fields_controller'
         require_relative 'controllers/settings_controller'
+        require_relative 'controllers/custom_field_enumerations_controller'
 
         if Redmine::Plugin.installed?(:redmine_organizations)
           require_relative 'controllers/organizations/memberships_controller'
@@ -26,6 +27,7 @@ module RedmineAdminActivity
         require_relative 'models/member'
         require_relative 'models/journal'
         require_relative 'models/version'
+        require_relative 'models/custom_field'
         require_relative 'models/user'
 
         require_relative 'helpers/projects_helper'

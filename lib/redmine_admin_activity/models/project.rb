@@ -43,4 +43,12 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def self.representative_columns
+    return ["name"]
+  end
+
+  def self.representative_link_path(obj)
+    Rails.application.routes.url_helpers.project_url(obj, only_path: true)
+  end
+
 end
