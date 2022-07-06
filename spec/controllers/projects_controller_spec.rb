@@ -5,10 +5,11 @@ describe ProjectsController, type: :controller do
   render_views
 
   fixtures :projects, :users, :roles, :members, :member_roles, :issues, :issue_statuses, :versions,
-           :trackers, :projects_trackers, :issue_categories, :enabled_modules, :enumerations, :attachments,
-           :workflows, :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
-           :time_entries, :journals, :journal_details, :queries, :repositories, :changesets
+            :trackers, :projects_trackers, :issue_categories, :enabled_modules, :enumerations, :attachments,
+            :workflows, :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
+            :time_entries, :journals, :journal_details, :queries, :repositories, :changesets
 
+  fixtures :issue_template_projects, :issue_templates if Redmine::Plugin.installed?(:redmine_templates)
   include Redmine::I18n
 
   before do
@@ -217,6 +218,31 @@ describe ProjectsController, type: :controller do
         expect(journal.details.last).to have_attributes(:old_value => "#{Project::STATUS_CLOSED}", :value => "#{Project::STATUS_ACTIVE}")
       end
 
+    end
+  end
+
+  if Redmine::Plugin.installed?(:redmine_templates)
+    describe "Trace template activation/deactivation in project history" do
+      it "when activating a template on a project" do
+        expect do
+          patch :update, params: { id: 1, project: { issue_template_ids: ["1", "3"], tab: "issue_templates" } }
+        end.to change { IssueTemplateProject.count }.by(2)
+        .and change { JournalDetail.count }.by(2)
+        expect(JournalDetail.last(2)[0].prop_key).to eq('enabled_template')
+        expect(JournalDetail.last(2)[0].property).to eq('templates')
+        expect(JournalDetail.last(2)[0].value).to eq(IssueTemplate.find(1).template_title)
+        expect(JournalDetail.last(2)[1].value).to eq(IssueTemplate.find(3).template_title)
+      end
+
+      it "when deactivation a template on a project" do
+        expect do
+          patch :update, params: { id: 2, project: { issue_template_ids: ["1", "2", "3", "4", "5"], tab: "issue_templates" } }
+        end.to change { IssueTemplateProject.count }.by(-1)
+        .and change { JournalDetail.count }.by(1)
+        expect(JournalDetail.last.prop_key).to eq('enabled_template')
+        expect(JournalDetail.last.property).to eq('templates')
+        expect(JournalDetail.last.old_value).to eq(IssueTemplate.find(6).template_title)
+      end
     end
   end
 end

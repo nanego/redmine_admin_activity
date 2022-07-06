@@ -76,6 +76,11 @@ describe "IssuesHelperPatch" do
       detail = JournalDetail.new(:property => 'templates', :old_value => nil, :value => 'template-name', :prop_key => 'enabled_template')
       expect(show_detail(detail, false)).to eq 'New template enabled: ["template-name"]'
     end
+
+    it "shows a template disabled with HTML highlights" do
+      detail = JournalDetail.new(:property => 'templates', :old_value => 'template-name', :value => nil, :prop_key => 'enabled_template')
+      expect(show_detail(detail, false)).to eq 'A template disabled: ["template-name"]'
+    end
   end
 
   describe "members property" do

@@ -8,6 +8,7 @@ en:
   text_journal_functions_removed: "removed [%{value}] %{and} "
   text_journal_functions_added: "added [%{value}]"
   text_journal_templates_enabled: "New template enabled: %{value}"
+  text_journal_templates_disabled: "A template disabled: %{old_value}"
   text_journal_members_changed: "Members changed: %{deleted} %{new}"
   text_journal_members_removed: "removed [%{value}] %{and}"
   text_journal_members_added: "added [%{value}]"
