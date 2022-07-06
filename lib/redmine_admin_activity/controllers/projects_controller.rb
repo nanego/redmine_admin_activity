@@ -18,12 +18,14 @@ class ProjectsController
     @previous_enabled_module_names = @project.enabled_module_names
     @previous_enabled_tracker_ids = @project.tracker_ids
     @previous_enabled_issue_custom_field_ids = @project.issue_custom_field_ids
+    @previous_enabled_template_ids = @project.issue_template_ids if Redmine::Plugin.installed?(:redmine_templates)
   end
 
-  def add_journal_entry(property:, value: nil, old_value: nil)
+  def add_journal_entry(property:, prop_key: nil, value: nil, old_value: nil)
+    prop_key = property if prop_key.nil?
     @project.current_journal.details << JournalDetail.new(
       :property => property,
-      :prop_key => property,
+      :prop_key => prop_key,
       :value => value,
       :old_value => old_value
     )
@@ -50,6 +52,23 @@ class ProjectsController
                         old_value: @previous_enabled_module_names.join(','))
     end
 
+    if Redmine::Plugin.installed?(:redmine_templates) && (@previous_enabled_template_ids != @project.issue_template_ids)
+      previous_issue_templates_titles = IssueTemplate.where(:id => @previous_enabled_template_ids.map(&:to_i)).pluck(:template_title)
+      activated_templates_titles = @project.issue_templates.map(&:template_title) - previous_issue_templates_titles
+      deactivated_templates_titles = previous_issue_templates_titles - @project.issue_templates.map(&:template_title)
+      activated_templates_titles.each do | temp_title |
+        add_journal_entry(property: 'templates',
+                          prop_key: 'enabled_template',
+                          value: temp_title,
+                          old_value: nil)
+      end
+      deactivated_templates_titles.each do | temp_title |
+        add_journal_entry(property: 'templates',
+                          prop_key: 'enabled_template',
+                          value: nil,
+                          old_value: temp_title)
+      end
+    end
     @project.current_journal.save if @project.current_journal.details.any?
   end
 

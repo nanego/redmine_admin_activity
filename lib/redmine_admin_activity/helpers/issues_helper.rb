@@ -169,10 +169,12 @@ module PluginAdminActivity
     end
 
     def show_templates_details(detail, options = {})
-      value = string_list_to_array(detail.value)
+      value = string_list_to_array(detail.value) if detail.value.present?
+      old_value = string_list_to_array(detail.old_value) if detail.old_value.present?
       case detail.prop_key
       when 'enabled_template'
-        return l(:text_journal_templates_enabled, :value => value)
+        return l(:text_journal_templates_enabled, :value => value) if value.present?
+        return l(:text_journal_templates_disabled, :old_value => old_value) if old_value.present?
       end
     end
 

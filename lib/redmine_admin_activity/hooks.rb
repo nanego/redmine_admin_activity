@@ -29,6 +29,7 @@ module RedmineAdminActivity
         require_relative 'models/version'
         require_relative 'models/custom_field'
         require_relative 'models/user'
+        require_relative 'models/issue_template' if Redmine::Plugin.installed?(:redmine_templates)
 
         require_relative 'helpers/projects_helper'
         require_relative 'helpers/issues_helper'
