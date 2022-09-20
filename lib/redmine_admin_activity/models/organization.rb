@@ -15,4 +15,15 @@ class Organization < ActiveRecord::Base
   def self.representative_link_path(obj)
     Rails.application.routes.url_helpers.organization_url(obj, only_path: true)
   end
+
+  def journalize_creation(user)
+    return if !persisted?
+    changes = self.attributes.to_a.map { |i| [i[0], [nil, i[1]]] }.to_h
+    JournalSetting.create(
+      :user_id => user.id,
+      :value_changes => changes,
+      :journalized => self,
+      :journalized_entry_type => "create",
+      )
+  end
 end

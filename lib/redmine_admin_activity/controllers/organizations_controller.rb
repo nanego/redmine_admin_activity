@@ -12,17 +12,7 @@ class OrganizationsController < ApplicationController
 
   def journalized_organizations_creation
     return unless @organization.present? && @organization.persisted?
-
-    # build hash of previous_changes manually, because of in OrganizationsController(new), there is Organization.managed_by
-    changes = @organization.attributes.to_a.map { |i| [i[0], [nil, i[1]]] }.to_h
-
-    JournalSetting.create(
-      :user_id => User.current.id,
-      :value_changes => changes,
-      :journalized => @organization,
-      :journalized_entry_type => "create",
-    )
-
+    @organization.journalize_creation(User.current)
   end
 
   def journalized_organizations_deletion
