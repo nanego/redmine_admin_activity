@@ -34,7 +34,6 @@ module RedmineAdminActivity
         require_relative 'helpers/projects_helper'
         require_relative 'helpers/issues_helper'
         require_relative 'helpers/settings_helper'
-        require_relative 'helpers/journal_settings_helper'
       end
     end
   end

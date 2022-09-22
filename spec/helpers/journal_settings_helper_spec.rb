@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe "JournalSettingsHelper" do
   include ApplicationHelper
-  include PluginAdminActivity::JournalSettingsHelper
+  include JournalSettingsHelper
   include PluginAdminActivity::IssuesHelper
 
   fixtures :projects, :users

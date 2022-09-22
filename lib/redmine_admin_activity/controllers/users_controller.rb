@@ -2,6 +2,9 @@ require_dependency 'users_controller'
 
 class UsersController
 
+  helper :journal_settings
+  include JournalSettingsHelper
+
   after_action :journalized_users_creation, :only => [:create]
   after_action :journalized_users_update_status, :only => [:update]
   after_action :journalized_users_deletion, :only => [:destroy]
