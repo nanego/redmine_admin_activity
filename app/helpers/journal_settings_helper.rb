@@ -2,15 +2,32 @@ module JournalSettingsHelper
 
   include ApplicationHelper
 
-  def prepare_journal_for_history(journals)
+  # def prepare_journal_for_history(journals)
+  #   journals = journals.includes(:user, :details).
+  #     references(:user, :details).
+  #     reorder(:created_on, :id).to_a
+  #   journals.each_with_index { |j, i| j.indice = i + 1 }
+  #   Journal.preload_journals_details_custom_fields(journals)
+  #   journals.select! { |journal| journal.notes? || journal.visible_details.any? }
+  #   journals.reverse! # Last changes first
+  # end
+  
+  def get_journal_for_history(journals)
     journals = journals.includes(:user, :details).
-      references(:user, :details).
-      reorder(:created_on, :id).to_a
-    journals.each_with_index { |j, i| j.indice = i + 1 }
-    Journal.preload_journals_details_custom_fields(journals)
-    journals.select! { |journal| journal.notes? || journal.visible_details.any? }
-    journals.reverse! # Last changes first
+      reorder(created_on: :desc).
+      references(:user, :details)
+    Journal.preload_journals_details_custom_fields(journals)  
   end
+
+  def add_index_to_journal_for_history(journals)
+    per_page = @journal_pages.per_page.to_i
+    page = @journal_pages.page.to_i
+    position = @journal_count.to_i - (per_page * (page - 1))
+    journals.each do |journal|
+      journal.indice = position
+      position -=1
+    end
+  end  
 
   def settings_update_text(name, changes)
     field_name = l("setting_#{name}")
