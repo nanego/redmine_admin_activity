@@ -1,17 +1,7 @@
 module JournalSettingsHelper
 
   include ApplicationHelper
-
-  # def prepare_journal_for_history(journals)
-  #   journals = journals.includes(:user, :details).
-  #     references(:user, :details).
-  #     reorder(:created_on, :id).to_a
-  #   journals.each_with_index { |j, i| j.indice = i + 1 }
-  #   Journal.preload_journals_details_custom_fields(journals)
-  #   journals.select! { |journal| journal.notes? || journal.visible_details.any? }
-  #   journals.reverse! # Last changes first
-  # end
-  
+ 
   def get_journal_for_history(journals)
     journals = journals.includes(:user, :details).
       reorder(created_on: :desc).
