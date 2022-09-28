@@ -12,6 +12,12 @@ class ProjectsController
   after_action :journalized_projects_closing, :only => [:close]
   after_action :journalized_projects_archivation, :only => [:archive]
   after_action :journalized_projects_reopen, :only => [:reopen]
+  before_action :get_projects_journals_for_pagination, :only => [:settings]
+
+  alias_method :settings, :settings
+
+  helper :journal_settings
+  include JournalSettingsHelper
 
   def init_journal
     @project.init_journal(User.current)
@@ -235,6 +241,14 @@ class ProjectsController
                                          when "archive", "destroy"
                                            @project.self_and_descendants.to_a
                                          end
+  end
+
+  def get_projects_journals_for_pagination
+    @scope = get_journal_for_history(@project.journals)
+    @journal_count = @scope.count
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journals = add_index_to_journal_for_history(@journals)
   end
 
 end
