@@ -3,6 +3,10 @@ require_dependency 'settings_controller'
 class SettingsController
   before_action :intialize_settings_was, :only => [:edit]
   after_action :track_settings_was_changes, :only => [:edit]
+  before_action :get_settings_journals_for_pagination, :only => [:index]
+
+  helper :journal_settings
+  include JournalSettingsHelper
 
   private
 
@@ -30,4 +34,15 @@ class SettingsController
       :value_changes => changes
     )
   end
+
+  def get_settings_journals_for_pagination
+    @scope = JournalSetting.includes(:user).
+    reorder(created_on: :desc).
+    references(:user)
+    @journal_count = @scope.count
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journals = add_index_to_journal_for_history(@journals)
+  end
+
 end
