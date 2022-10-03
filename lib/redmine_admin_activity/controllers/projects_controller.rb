@@ -2,6 +2,9 @@ require_dependency 'projects_controller'
 
 class ProjectsController
 
+  helper :journal_settings
+  include JournalSettingsHelper
+
   before_action :init_journal, :only => [:update]
   after_action :update_journal, :only => [:update]
   after_action :journalized_projects_duplication, :only => [:copy]
