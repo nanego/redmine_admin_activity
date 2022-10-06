@@ -3,7 +3,7 @@
     <h3><%=l(:label_history)%></h3>
     <%= render :partial => 'history', :locals => { :journals => @journals } %>
     <span class="pagination"><%=  pagination_links_full(@journal_pages, @journal_count, 
-                                                        :per_page_links => false) do |text, parameters, options|
+                                                        :per_page_links => true) do |text, parameters, options|
                                                           unless parameters.key?(:tab)
                                                             parameters[:tab] = tab[:name]
                                                           end
