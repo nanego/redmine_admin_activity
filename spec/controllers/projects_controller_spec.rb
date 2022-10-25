@@ -253,9 +253,9 @@ describe ProjectsController, type: :controller do
 
     it "check the number of elements by page" do
       # Generating 5 Journals Settings
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name' }}
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 2' }}
+      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 1' }}
       patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 3' }}
+      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 2' }}
       patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 4' }}
       patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 5' }}
 
@@ -270,10 +270,7 @@ describe ProjectsController, type: :controller do
       # Tests
       expect(first_page.count).to eq(3)
       expect(second_page.count).to eq(2)
-      expect(first_page.first.id).to be > second_page.first.id
-
-      
+      expect(first_page.first.id).to be > second_page.first.id      
     end
   end
-
 end
