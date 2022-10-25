@@ -253,11 +253,9 @@ describe ProjectsController, type: :controller do
 
     it "check the number of elements by page" do
       # Generating 5 Journals Settings
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 1' }}
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 3' }}
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 2' }}
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 4' }}
-      patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => 'Test changed name 5' }}
+      5.times do |index|
+        patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => "Test changed name #{index}" }}
+      end
 
       # Get all journals of the first page
       get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 1}

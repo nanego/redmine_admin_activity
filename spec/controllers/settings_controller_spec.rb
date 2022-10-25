@@ -32,12 +32,10 @@ describe SettingsController, type: :controller do
 
     it "check the number of elements by page" do
       Setting[:app_title] = "Redmine"
-      post :edit, params: { "settings" => { "app_title" => "Redmine test 1" } }
-      post :edit, params: { "settings" => { "app_title" => "Redmine test 2" } }
-      post :edit, params: { "settings" => { "app_title" => "Redmine test 3" } }
-      post :edit, params: { "settings" => { "app_title" => "Redmine test 4" } }
-      post :edit, params: { "settings" => { "app_title" => "Redmine test 5" } }
-      
+      5.times do |index|
+        post :edit, params: { "settings" => { "app_title" => "Redmine test #{index}" } }
+      end
+    
       # Get all journals of the first page
       get :index, :params => { :tab => "admin_activity", page: 1}
       first_page = assigns(:journals)
