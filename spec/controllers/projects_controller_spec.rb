@@ -245,4 +245,30 @@ describe ProjectsController, type: :controller do
       end
     end
   end
+
+  describe "Pagination of project history" do
+    before do
+      session[:per_page] = 3
+    end
+
+    it "check the number of elements by page" do
+      # Generating 5 Journals Settings
+      5.times do |index|
+        patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => "Test changed name #{index}" }}
+      end
+
+      # Get all journals of the first page
+      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 1}
+      first_page = assigns(:journals)
+
+      # Get all journals of the second page
+      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 2}
+      second_page = assigns(:journals)
+
+      # Tests
+      expect(first_page.count).to eq(3)
+      expect(second_page.count).to eq(2)
+      expect(first_page.first.id).to be > second_page.first.id      
+    end
+  end
 end

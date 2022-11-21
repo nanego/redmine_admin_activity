@@ -6,8 +6,7 @@
   page_title.insert(page_title.rindex(' ') + 1, avatar(@user).to_s)
 %>
 
-<% @journals = prepare_journal_for_history(@user.journals) %>
-
-<% if @journals.present? %>
+<% if @journals.any? %>
   <%= render :partial => 'projects/history', :locals => { :journals => @journals } %>
+  <span class="pagination"><%= pagination_links_full @journal_pages, @journal_count %></span> 
 <% end %>

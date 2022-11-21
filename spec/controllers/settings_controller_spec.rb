@@ -24,4 +24,31 @@ describe SettingsController, type: :controller do
       expect(JournalSetting.last).to have_attributes(:value_changes => { "app_title" => ["Redmine", "Redmine test"] })
     end
   end
+
+  describe "Pagination of user history" do
+    before do
+      session[:per_page] = 3
+    end
+
+    it "check the number of elements by page" do
+      Setting[:app_title] = "Redmine"
+      5.times do |index|
+        post :edit, params: { "settings" => { "app_title" => "Redmine test #{index}" } }
+      end
+    
+      # Get all journals of the first page
+      get :index, :params => { :tab => "admin_activity", page: 1}
+      first_page = assigns(:journals)
+
+      # Get all journals of the second page
+      get :index, :params => { :tab => "admin_activity", page: 2}
+      second_page = assigns(:journals)
+
+      # Tests
+      expect(first_page.count).to eq(3)
+      expect(second_page.count).to eq(2)
+      expect(first_page.first.id).to be > second_page.first.id      
+    end
+  end
+
 end

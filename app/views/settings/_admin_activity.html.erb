@@ -1,12 +1,16 @@
-<%
-  @journals = JournalSetting.includes(:user).order(:created_on => :asc)
-                                            .each_with_index {|j, i| j.indice = i+1}
-                                            .reverse
-%>
-
 <% if @journals.present? %>
   <div id="history">
     <h3><%=l(:label_history)%></h3>
     <%= render :partial => 'history', :locals => { :journals => @journals } %>
+    <span class="pagination"><%=  pagination_links_full(@journal_pages, @journal_count, 
+                                                        :per_page_links => true) do |text, parameters, options|
+                                                          unless parameters.key?(:tab)
+                                                            parameters[:tab] = tab[:name]
+                                                          end
+                                                          link_to text, request.path + "?" + parameters.to_query
+                                                        end %>
+    </span>
+
+
   </div>
 <% end %>

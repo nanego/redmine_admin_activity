@@ -1,8 +1,11 @@
-<% @journals = prepare_journal_for_history(@project.journals) %>
-
-<% if @journals.present? %>
+<% if @journals.any? %>
   <div id="history">
     <h3><%=l(:label_history)%></h3>
     <%= render :partial => 'history', :locals => { :journals => @journals } %>
+    <span class="pagination"><%=  pagination_links_full(@journal_pages, @journal_count, 
+                                                        :per_page_links => true) do |text, parameters, options|
+                                                          link_to text, request.path + "?" + parameters.to_query
+                                                        end %>
+    </span>
   </div>
 <% end %>

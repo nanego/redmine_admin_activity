@@ -44,7 +44,6 @@ describe UsersController, type: :controller do
   describe "POST update" do
     it "add logs on JournalSetting When locking the account of a user" do
       patch :update, :params => { :id => 7, :user => { :status => Principal::STATUS_LOCKED, :mail => 'newuser@example.net' } }
-
       expect(JournalSetting.all).to_not be_empty
       expect(JournalSetting.last.value_changes).to include({ "status" => [Principal::STATUS_ACTIVE, Principal::STATUS_LOCKED] })
       expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
@@ -163,6 +162,31 @@ describe UsersController, type: :controller do
       get :edit, :params => { id: 1 }
       expect(response).to have_http_status(:success)
       expect(response.body).to have_css("a[class='icon icon-time']")
+    end
+  end
+
+  describe "Pagination of user history" do
+    before do
+      session[:per_page] = 3
+    end
+
+    it "check the number of elements by page" do
+      user = User.find(2)
+      5.times do |index|
+        patch :update, :params => { :id => user.id, :user => { :mail => "test#{index}@example.net" } }
+      end
+      # Get all journals of the first page
+      get :history, :params => { :id => user.id, page: 1}
+      first_page = assigns(:journals)
+
+      # Get all journals of the second page
+      get :history, :params => { :id => user.id, page: 2}
+      second_page = assigns(:journals)
+
+      # Tests
+      expect(first_page.count).to eq(3)
+      expect(second_page.count).to eq(2)
+      expect(first_page.first.id).to be > second_page.first.id      
     end
   end
 end

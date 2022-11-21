@@ -12,7 +12,11 @@ class UsersController
   before_action lambda { find_user(false) }, :only => :history
 
   def history
-
+    @scope = get_journal_for_history(@user.journals)
+    @journal_count = @scope.count
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journals = add_index_to_journal_for_history(@journals)
   end
 
   def journalized_users_creation
