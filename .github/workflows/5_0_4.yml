@@ -1,8 +1,8 @@
-name: Tests 5.0.2
+name: Tests 5.0.4
 
 env:
   PLUGIN_NAME: redmine_admin_activity
-  REDMINE_VERSION: 5.0.2
+  REDMINE_VERSION: 5.0.4
   RAILS_ENV: test
 
 on:
