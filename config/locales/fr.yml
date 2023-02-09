@@ -78,3 +78,6 @@ fr:
   label_manual_creation: manuellement
   label_auto_creation: automatiquement
   text_setting_auto_create_user_journal_entry: "L'utilisateur <i>%{user}</i> a été créé automatiquement."
+  text_journal_members_exception_changed: "%{prop_key} du membre exception %{name} ont été modifiés de [%{old}] à [%{new}]"
+  text_journal_members_exception_added: "Membre exception %{name} a été ajouté avec %{prop_key} [%{new}]"
+  text_journal_members_exception_removed: "Membre %{name}, avec %{changes}, a été supprimé"
