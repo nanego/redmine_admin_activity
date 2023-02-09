@@ -74,3 +74,8 @@ en:
   label_this_user: "This user"
   label_from_project: "from the project"
   label_to_project: "to the project"
+  text_journal_members_exception_changed: "%{prop_key} of member exception %{name} have been changed from [%{old}] to [%{new}]"
+  text_journal_members_exception_added: "Member exception %{name} has been added with %{prop_key} [%{new}]"
+  text_journal_members_exception_removed: "Member %{name}, with %{changes}, has been removed"
+  label_function: "Function"
+ 

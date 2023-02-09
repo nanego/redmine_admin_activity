@@ -29,6 +29,9 @@ module PluginAdminActivity
         show_project_status_details(detail, no_html, options)
       when 'functions'
         show_functions_details(detail, options)
+      when 'members_exception'        
+        str = detail.prop_key.delete_prefix! "members_exception_with_"
+        show_members_exception_details(detail, str, options)
       else
         if detail.property != 'cf' && detail.journal.present? && detail.journal.journalized_type == 'Principal'
           details = show_principal_detail(detail, no_html, options)
@@ -64,6 +67,35 @@ module PluginAdminActivity
       new_values = new_values.any? ? l(:text_journal_functions_added, :value => new_values.join(', ')) : ""
 
       l(:text_journal_functions_changed, :deleted => deleted_values, :new => new_values)
+    end
+
+    def show_members_exception_details(detail, prop_key, options = {})
+      value = JSON.parse(detail.value || "{}")
+      old_value = JSON.parse(detail.old_value || "{}")
+      name = value["name"] || old_value["name"]
+      case prop_key 
+      when "roles", "functions"
+        new_roles_or_functions = value.fetch(prop_key, []).join(", ")
+        old_roles_or_functions = old_value.fetch(prop_key, []).join(", ")
+        prop_name = prop_key == "roles" ? l(:label_role) : l(:label_function)
+      when "roles_functions"
+        new_roles = value.fetch("roles", []).join(", ")
+        old_roles = old_value.fetch("roles", []).join(", ")
+        new_functions = value.fetch("functions", []).join(", ")
+        old_functions = old_value.fetch("functions", []).join(", ")
+      end
+       
+      if value.present? && old_value.present?
+        l(:text_journal_members_exception_changed, :prop_key => prop_name,  :name => name, :new => new_roles_or_functions, :old => old_roles_or_functions)
+      elsif value.present? && old_value.empty?
+        l(:text_journal_members_exception_added, :prop_key => prop_name, :name => name, :new => new_roles_or_functions)
+      else
+        changes = []
+        changes << l(:text_journal_member_roles, :roles => old_roles) if old_roles.present?
+        changes << l(:text_journal_member_functions, :functions => old_functions) if old_functions.present?
+        changes = changes.join(" #{l(:and)} ")
+        l(:text_journal_members_exception_removed, :name => name, :changes => changes)
+      end
     end
 
     def show_members_details(detail, options = {})

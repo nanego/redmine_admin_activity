@@ -5,6 +5,13 @@ class Organizations::MembershipsController
 
   before_action :store_previous_values, :only => [:update]
   after_action :journalized_memberships_edition, :only => [:update]
+  after_action :journalized_non_members_roles_creation , :only => [:create_non_members_roles]
+
+  before_action :store_previous_values_non_members_roles, :only => [:update_non_members_roles, :destroy_non_members_roles, :update_non_members_functions]
+  after_action :journalized_non_members_roles_edition, :only => [:update_non_members_roles]
+  after_action :journalized_non_members_functions_edition, :only => [:update_non_members_functions]
+  after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
+  after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
 
   private
 
@@ -86,4 +93,30 @@ class Organizations::MembershipsController
     end
   end
 
+  def journalized_non_members_roles_creation
+    if @organization.present? && @organization.persisted?
+      add_member_exception_creation_to_journal(@current_organization_roles, @current_organization_roles.role.id)
+    end
+  end
+
+  def store_previous_values_non_members_roles
+    @previous_roles_ids = OrganizationNonMemberRole.where(project_id: @project.id, organization_id: @organization.id).map(&:role_id)
+    @previous_functions_ids = []
+    @previous_functions_ids = OrganizationNonMemberFunction.where(project_id: @project.id, organization_id: @organization.id).map(&:function_id) if Redmine::Plugin.installed?(:redmine_limited_visibility)
+    @member_exception = OrganizationNonMemberRole.where(project_id: @project.id, organization_id: @organization.id).first 
+  end
+
+  def journalized_non_members_roles_edition
+    new_roles_ids = params[:membership][:role_ids].reject(&:empty?).map(&:to_i)
+    add_member_exception_edition_roles_to_journal(@member_exception, @previous_roles_ids, new_roles_ids)
+  end
+
+  def journalized_non_members_functions_edition    
+    new_functions_ids = params[:membership][:function_ids].reject(&:empty?).map(&:to_i)
+    add_member_exception_edition_functions_to_journal(@member_exception, @previous_functions_ids, new_functions_ids)
+  end
+
+  def add_non_members_deletion_to_journal    
+    add_member_exception_deletion_to_journal(@member_exception, @previous_roles_ids, @previous_functions_ids)
+  end
 end
