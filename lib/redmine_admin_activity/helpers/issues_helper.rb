@@ -10,25 +10,27 @@ module PluginAdminActivity
     def show_detail(detail, no_html = false, options = {})
       case detail.property
       when 'modules'
-        show_modules_details(detail, options)
+        show_activation_inactivation_property_details(detail, 'modules', options)
       when 'members'
         show_members_details(detail, options)
       when 'issue_category'
-        show_issue_category_details(detail, options)
+        show_add_delete_rename_property_details(detail,"issue_category", options)
       when 'versions'
-        show_versions_details(detail, options)
+        show_add_delete_rename_property_details(detail,"version", options)
       when 'trackers'
-        show_trackers_details(detail, options)
+        show_activation_inactivation_property_details(detail, 'trackers', options)
       when 'templates'
         show_templates_details(detail, options)
       when 'custom_fields'
-        show_custom_fields_details(detail, options)
+        show_activation_inactivation_property_details(detail, 'custom_fields', options)
       when 'copy_project'
+        return "copy_project"
         show_copy_project_details(detail, options)
       when 'status'
+        return "status"
         show_project_status_details(detail, no_html, options)
       when 'functions'
-        show_functions_details(detail, options)
+        show_activation_inactivation_property_details(detail, 'functions', options)
       when 'members_exception'        
         str = detail.prop_key.delete_prefix! "members_exception_with_"
         show_members_exception_details(detail, str, options)
@@ -45,28 +47,16 @@ module PluginAdminActivity
 
     private
 
-    def show_modules_details(detail, options = {})
+    def show_activation_inactivation_property_details(detail, property, options = {})
       value = string_list_to_array(detail.value)
       old_value = string_list_to_array(detail.old_value)
       deleted_values = old_value - value
       new_values = value - old_value
 
-      deleted_values = deleted_values.any? ? l(:text_journal_modules_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
-      new_values = new_values.any? ? l(:text_journal_modules_added, :value => new_values.join(', ')) : ""
+      deleted_values = deleted_values.any? ? l("text_journal_#{property}_removed", :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
+      new_values = new_values.any? ? l("text_journal_#{property}_added", :value => new_values.join(', ')) : ""
 
-      l(:text_journal_modules_changed, :deleted => deleted_values, :new => new_values)
-    end
-
-    def show_functions_details(detail, options = {})
-      value = string_list_to_array(detail.value)
-      old_value = string_list_to_array(detail.old_value)
-      deleted_values = old_value - value
-      new_values = value - old_value
-
-      deleted_values = deleted_values.any? ? l(:text_journal_functions_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
-      new_values = new_values.any? ? l(:text_journal_functions_added, :value => new_values.join(', ')) : ""
-
-      l(:text_journal_functions_changed, :deleted => deleted_values, :new => new_values)
+      l("text_journal_#{property}_changed", :deleted => deleted_values, :new => new_values)
     end
 
     def show_members_exception_details(detail, prop_key, options = {})
@@ -160,45 +150,19 @@ module PluginAdminActivity
       end
     end
 
-    def show_issue_category_details(detail, options = {})
+    def show_add_delete_rename_property_details(detail, property, options = {})
       value = detail.value
       old_value = detail.old_value
       data = { :old_value => old_value, :value => value }
 
       if value.present? && old_value.present?
-        l(:text_journal_issue_category_changed, data)
+        l("text_journal_#{property}_changed", data)
       elsif value.present? && old_value.blank?
-        l(:text_journal_issue_category_added, data)
+        l("text_journal_#{property}_added", data)
       elsif value.blank? && old_value.present?
-        l(:text_journal_issue_category_removed, data)
+        l("text_journal_#{property}_removed", data)
       end
-    end
-
-    def show_versions_details(detail, options = {})
-      value = detail.value
-      old_value = detail.old_value
-      data = { :old_value => old_value, :value => value }
-
-      if value.present? && old_value.present?
-        l(:text_journal_version_changed, data)
-      elsif value.present? && old_value.blank?
-        l(:text_journal_version_added, data)
-      elsif value.blank? && old_value.present?
-        l(:text_journal_version_removed, data)
-      end
-    end
-
-    def show_trackers_details(detail, options = {})
-      value = string_list_to_array(detail.value)
-      old_value = string_list_to_array(detail.old_value)
-      deleted_values = old_value - value
-      new_values = value - old_value
-
-      deleted_values = deleted_values.any? ? l(:text_journal_trackers_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
-      new_values = new_values.any? ? l(:text_journal_trackers_added, :value => new_values.join(', ')) : ""
-
-      l(:text_journal_trackers_changed, :deleted => deleted_values, :new => new_values)
-    end
+    end    
 
     def show_templates_details(detail, options = {})
       value = string_list_to_array(detail.value) if detail.value.present?
@@ -208,19 +172,7 @@ module PluginAdminActivity
         return l(:text_journal_templates_enabled, :value => value) if value.present?
         return l(:text_journal_templates_disabled, :old_value => old_value) if old_value.present?
       end
-    end
-
-    def show_custom_fields_details(detail, options = {})
-      value = string_list_to_array(detail.value)
-      old_value = string_list_to_array(detail.old_value)
-      deleted_values = old_value - value
-      new_values = value - old_value
-
-      deleted_values = deleted_values.any? ? l(:text_journal_custom_fields_removed, :value => deleted_values.join(', '), :and => (new_values.any? ? l(:and) : '')) : ""
-      new_values = new_values.any? ? l(:text_journal_custom_fields_added, :value => new_values.join(', ')) : ""
-
-      l(:text_journal_custom_fields_changed, :deleted => deleted_values, :new => new_values)
-    end
+    end    
 
     def show_copy_project_details(detail, options = {})
       l(:text_journal_copy_project, :value => detail.value)
