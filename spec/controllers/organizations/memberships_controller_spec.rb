@@ -118,5 +118,66 @@ if Redmine::Plugin.installed?(:redmine_organizations)
         end
       end
     end
+
+    describe "non_members_roles (exception)" do
+
+      before do
+        OrganizationNonMemberRole.create(project_id: project.id, organization_id: organization.id, role_id: 1)
+      end
+
+      it "creates, adds a new entry in the project journal" do
+        expect do
+          post :create_non_members_roles, params: { project_id: project.id, membership: { organization_id: 2 } }
+        end.to change { JournalDetail.count }.by(1)
+        
+        journal = JournalDetail.last
+        expect(journal.property).to eq("members_exception")
+        expect(journal.prop_key).to eq("members_exception_with_roles")
+        expect(journal.value).to eq("{\"name\":\"Team A\",\"roles\":[\"Non member\"]}")
+      end    
+
+      it "update roles, adds a new entry in the project journal" do      
+        expect do
+          post :update_non_members_roles, params: { :id => organization.id, project_id: project.id, membership: { role_ids: ["2", "3"] } }
+        end.to change { JournalDetail.count }.by(1)
+        
+        journal = JournalDetail.last
+
+        expect(journal.property).to eq("members_exception")
+        expect(journal.prop_key).to eq("members_exception_with_roles")
+        expect(journal.old_value).to eq("{\"name\":\"Org A\",\"roles\":[\"Manager\"]}")
+        expect(journal.value).to eq("{\"name\":\"Org A\",\"roles\":[\"Developer\",\"Reporter\"]}")
+      end
+
+      if Redmine::Plugin.installed?(:redmine_limited_visibility)
+        it "update functions, adds a new entry in the project journal" do
+          OrganizationNonMemberFunction.create(project_id: project.id, organization_id: organization.id, function_id: 1)
+
+          expect do
+            post :update_non_members_functions, params: { :id => organization.id, project_id: project.id, membership: { function_ids: ["2", "3"] } }
+          end.to change { JournalDetail.count }.by(1)
+          
+          journal = JournalDetail.last
+          expect(journal.property).to eq("members_exception")
+          expect(journal.prop_key).to eq("members_exception_with_functions")
+          expect(journal.old_value).to eq("{\"name\":\"Org A\",\"functions\":[\"function1\"]}")
+          expect(journal.value).to eq("{\"name\":\"Org A\",\"functions\":[\"function2\",\"function3\"]}")
+        end
+      end
+
+      it "delete, adds a new entry in the project journal" do      
+        expect do
+          delete :destroy_non_members_roles, params: { :id => organization.id, project_id: project.id }
+        end.to change { JournalDetail.count }.by(1)
+        
+        journal = JournalDetail.last
+        
+        expect(journal.property).to eq("members_exception")
+        expect(journal.prop_key).to eq("members_exception_with_roles_functions")
+        expect(journal.old_value).to eq("{\"name\":\"Org A\",\"roles\":[\"Manager\"]}")
+        expect(journal.value).to be_nil
+      end
+
+    end
   end
 end
