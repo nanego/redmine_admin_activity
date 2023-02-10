@@ -24,10 +24,8 @@ module PluginAdminActivity
       when 'custom_fields'
         show_activation_inactivation_property_details(detail, 'custom_fields', options)
       when 'copy_project'
-        return "copy_project"
         show_copy_project_details(detail, options)
       when 'status'
-        return "status"
         show_project_status_details(detail, no_html, options)
       when 'functions'
         show_activation_inactivation_property_details(detail, 'functions', options)
