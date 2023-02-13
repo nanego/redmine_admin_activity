@@ -29,7 +29,7 @@ module PluginAdminActivity
         show_project_status_details(detail, no_html, options)
       when 'functions'
         show_activation_inactivation_property_details(detail, 'functions', options)
-      when 'members_exception'        
+      when 'members_exception'
         str = detail.prop_key.delete_prefix! "members_exception_with_"
         show_members_exception_details(detail, str, options)
       else
@@ -65,7 +65,7 @@ module PluginAdminActivity
       when "roles", "functions"
         new_roles_or_functions = value.fetch(prop_key, []).join(", ")
         old_roles_or_functions = old_value.fetch(prop_key, []).join(", ")
-        prop_name = prop_key == "roles" ? l(:label_role) : l(:label_function)
+        prop_name = prop_key == "roles" ? l(:label_role_plural) : l(:label_function_plural)
       when "roles_functions"
         new_roles = value.fetch("roles", []).join(", ")
         old_roles = old_value.fetch("roles", []).join(", ")

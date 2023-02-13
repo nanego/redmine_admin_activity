@@ -175,7 +175,7 @@ describe "IssuesHelperPatch" do
         expect(show_detail(detail, true)).to eq "Member user1 has been changed with roles from [Developer] to [Developer, Manager]"
       end
 
-      it "should IssuesHelper#show_detail with no_html should show a changing functions onlu" do
+      it "should IssuesHelper#show_detail with no_html should show a changing functions only" do
         detail = JournalDetail.new(:property => 'members', :old_value => '{"name":"user1","roles":["Developer"],"functions":[]}', :value => '{"name":"user1","roles":["Developer"],"functions":["function1"]}', :prop_key => 'member_roles_and_functions')
         expect(show_detail(detail, true)).to eq "Member user1 has been changed with functions from [] to [function1]"
       end
@@ -218,6 +218,29 @@ describe "IssuesHelperPatch" do
         expect(result).to eq(html)
       end
     end
+
+    describe "Exception members property with role and functions in JSON format" do
+      it "should IssuesHelper#show_detail with no_html should show a new member" do
+        detail = JournalDetail.new(:property => 'members_exception', :old_value => nil, :value => '{"name":"org2","roles":["Non member"]}', :prop_key => 'members_exception_with_roles')
+        expect(show_detail(detail, true)).to eq "Exception member org2 has been added with Roles [Non member]"
+      end
+
+      it "should IssuesHelper#show_detail with no_html should show a changing functions only" do
+        detail = JournalDetail.new(:property => 'members_exception', :old_value => '{"name":"Org A","functions":["function1"]}', :value => '{"name":"Org A","functions":["function1", "function2"]}', :prop_key => 'members_exception_with_functions')
+        expect(show_detail(detail, true)).to eq "Functions of exception member Org A have been changed from [function1] to [function1, function2]"
+      end
+
+      it "should IssuesHelper#show_detail with no_html should show a changing roles only" do
+        detail = JournalDetail.new(:property => 'members_exception', :old_value => '{"name":"Org A","roles":["Non member"]}', :value => '{"name":"Org A","roles":["Developer", "Manager"]}', :prop_key => 'members_exception_with_roles')
+        expect(show_detail(detail, true)).to eq "Roles of exception member Org A have been changed from [Non member] to [Developer, Manager]"
+      end
+
+      it "should IssuesHelper#show_detail with no_html should show a changing should show a deleted exception member" do
+        detail = JournalDetail.new(:property => 'members_exception', :old_value => '{"name":"Org A","roles":["Developer"],"functions":["function1"]}', :value => nil, :prop_key => 'members_exception_with_roles_functions')        
+        expect(show_detail(detail, true)).to eq "Exception member Org A, with roles [Developer] and functions [function1], has been removed"
+      end
+    end
+
   end
 
   describe "copy project" do
