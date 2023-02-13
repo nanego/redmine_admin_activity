@@ -65,7 +65,7 @@ module PluginAdminActivity
       when "roles", "functions"
         new_roles_or_functions = value.fetch(prop_key, []).join(", ")
         old_roles_or_functions = old_value.fetch(prop_key, []).join(", ")
-        prop_name = prop_key == "roles" ? l(:label_role) : l(:label_functional_role)
+        prop_name = prop_key == "roles" ? l(:label_technical_role_plural) : l(:label_functional_roles)
       when "roles_functions"
         new_roles = value.fetch("roles", []).join(", ")
         old_roles = old_value.fetch("roles", []).join(", ")

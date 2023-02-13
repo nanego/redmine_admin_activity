@@ -381,10 +381,10 @@ describe "JournalSettingsHelper" do
       field.save
 
       journal = JournalSetting.new(:user_id => User.current.id,
-                                    :value_changes => { "name" => ["", field.name], "field_format" => ["", "string"] },
-                                    :journalized_id => field.id,
-                                    :journalized_type => "IssueCustomField",
-                                    :journalized_entry_type => "create")
+                                   :value_changes => { "name" => ["", field.name], "field_format" => ["", "string"] },
+                                   :journalized_id => field.id,
+                                   :journalized_type => "IssueCustomField",
+                                   :journalized_entry_type => "create")
       expect(custom_field_update_text(journal)).to eq "#{l(:label_custom_field)} <i><a href=\"#{CustomField.representative_link_path(field)}\">#{field.name}</a></i> has been created."
     end
 
@@ -395,10 +395,10 @@ describe "JournalSettingsHelper" do
       field.save
 
       journal = JournalSetting.new(:user_id => User.current.id,
-                                    :value_changes => { "name" => [field.name, ""], "field_format" => ["string", ""] },
-                                    :journalized_id => field.id,
-                                    :journalized_type => "IssueCustomField",
-                                    :journalized_entry_type => "destroy")
+                                   :value_changes => { "name" => [field.name, ""], "field_format" => ["string", ""] },
+                                   :journalized_id => field.id,
+                                   :journalized_type => "IssueCustomField",
+                                   :journalized_entry_type => "destroy")
 
       expect(field.send CustomField.representative_columns[0]).to include(field.name)
       expect(custom_field_update_text(journal)).to eq "#{l(:label_custom_field)} <i>#{field.name}</i> has been deleted."
@@ -410,67 +410,66 @@ describe "JournalSettingsHelper" do
       field = IssueCustomField.last
 
       journal = JournalSetting.new(:user_id => User.current.id,
-                                    :value_changes => {
-                                      "name" => [field.name, "new_name"],
-                                      "description" => [field.description, "new_des"],
-                                      "is_required" => [false, true],
-                                      "roles" => [[], [1]],
-                                      "projects" => [[1], [1, 2]],
-                                    },
-                                    :journalized_id => field.id,
-                                    :journalized_type => "IssueCustomField",
-                                    :journalized_entry_type => "update")
-
-
-      expect(custom_field_update_text(journal)).to include(
-        "#{l(:label_custom_field)} <i><a href=\"#{CustomField.representative_link_path(field)}\">#{field.name}</a></i> has been updated.")
+                                   :value_changes => {
+                                     "name" => [field.name, "new_name"],
+                                     "description" => [field.description, "new_des"],
+                                     "is_required" => [false, true],
+                                     "roles" => [[], [1]],
+                                     "projects" => [[1], [1, 2]],
+                                   },
+                                   :journalized_id => field.id,
+                                   :journalized_type => "IssueCustomField",
+                                   :journalized_entry_type => "update")
 
       expect(custom_field_update_text(journal)).to include(
-        "#{l("field_name")} changed from #{field.name} to new_name")
+                                                     "#{l(:label_custom_field)} <i><a href=\"#{CustomField.representative_link_path(field)}\">#{field.name}</a></i> has been updated.")
 
       expect(custom_field_update_text(journal)).to include(
-        "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, #{Project.find(2).name}]")
+                                                     "#{l("field_name")} changed from #{field.name} to new_name")
+
       expect(custom_field_update_text(journal)).to include(
-        "#{l(:label_role_plural)} have been changed from [] to [#{Role.find(1).name}]")
+                                                     "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, #{Project.find(2).name}]")
+      expect(custom_field_update_text(journal)).to include(
+                                                     "#{l(:label_technical_role_plural)} have been changed from [] to [#{Role.find(1).name}]")
     end
 
     it "should generate the right translated sentence, when changing has_and_belongs_to_many association (case of association deleting show(#id))" do
       field = IssueCustomField.last
       pro = Project.create(name: 'test', identifier: 'test')
       journal = JournalSetting.new(:user_id => User.current.id,
-                                    :value_changes => {
-                                      "name" => [field.name, "new_name"],
-                                      "description" => [field.description, "new_des"],
-                                      "projects" => [[1], [1, pro.id]],
-                                    },
-                                    :journalized_id => field.id,
-                                    :journalized_type => "IssueCustomField",
-                                    :journalized_entry_type => "update")
+                                   :value_changes => {
+                                     "name" => [field.name, "new_name"],
+                                     "description" => [field.description, "new_des"],
+                                     "projects" => [[1], [1, pro.id]],
+                                   },
+                                   :journalized_id => field.id,
+                                   :journalized_type => "IssueCustomField",
+                                   :journalized_entry_type => "update")
       pro.delete
       expect(custom_field_update_text(journal)).to include(
-        "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, ##{pro.id}]")
+                                                     "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, ##{pro.id}]")
     end
 
     it "should generate the right translated sentence, when changing the enumerations(test the function show_has_many_details)" do
       field = CustomField.new(:name => "test field",
-        :type => "IssueCustomField",
-        :field_format => "enumeration")
+                              :type => "IssueCustomField",
+                              :field_format => "enumeration")
       field.save
 
       c_f_e1 = CustomFieldEnumeration.create(name: 'val1', position: 1, active: true, custom_field_id: field.id)
       c_f_e2 = CustomFieldEnumeration.create(name: 'val2', position: 1, active: true, custom_field_id: field.id)
 
       journal = JournalSetting.new(:user_id => User.current.id,
-                                    :value_changes => {
-                                      "enumerations" => [[c_f_e1.id], [c_f_e1.id, c_f_e2.id]],
-                                    },
-                                    :journalized_id => field.id,
-                                    :journalized_type => "IssueCustomField",
-                                    :journalized_entry_type => "update")
+                                   :value_changes => {
+                                     "enumerations" => [[c_f_e1.id], [c_f_e1.id, c_f_e2.id]],
+                                   },
+                                   :journalized_id => field.id,
+                                   :journalized_type => "IssueCustomField",
+                                   :journalized_entry_type => "update")
       c_f_e2.delete
 
       expect(custom_field_update_text(journal)).to include(
-        "#{l(:label_customfieldenumeration)} has been changed from [#{c_f_e1.name}] to [#{c_f_e1.name}, ##{c_f_e2.id}]")
+                                                     "#{l(:label_customfieldenumeration)} has been changed from [#{c_f_e1.name}] to [#{c_f_e1.name}, ##{c_f_e2.id}]")
     end
   end
 end
