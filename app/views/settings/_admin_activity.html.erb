@@ -1,6 +1,16 @@
-<% if @journals.present? %>
-  <div id="history">
-    <h3><%=l(:label_history)%></h3>
+<div id="history">
+  <h3><%=l(:label_history)%></h3>
+  <%= form_tag( {:action => 'index', :tab => 'admin_activity' }, :method => :get) do %>
+    <fieldset>
+      <legend><%= l(:label_filter_plural) %></legend>
+      <label for='name'><%= l(:field_name) %>:</label>
+      <%= text_field_tag 'name', params[:name], :size => 30 %>
+      <%= button_tag l(:button_apply), value: "admin_activity", type: :submit, :name => 'tab' %>
+      <%= link_to l(:button_clear), settings_path(:tab => 'admin_activity'), :class => 'icon icon-reload' %>
+    </fieldset>
+  <% end %>
+  <% if @journals.present? %>
+    <br>
     <%= render :partial => 'history', :locals => { :journals => @journals } %>
     <span class="pagination"><%=  pagination_links_full(@journal_pages, @journal_count, 
                                                         :per_page_links => true) do |text, parameters, options|
@@ -11,6 +21,6 @@
                                                         end %>
     </span>
 
+  <% end %>
+</div>
 
-  </div>
-<% end %>
