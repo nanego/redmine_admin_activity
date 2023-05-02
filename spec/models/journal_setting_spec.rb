@@ -85,7 +85,7 @@ RSpec.describe JournalSetting, type: :model do
       if Redmine::Plugin.installed?(:redmine_organizations)
         expect(JournalSetting.search_scope('TEst').count).to eq(3)
       else
-        expect(JournalSetting.search_scope('').count).to eq(2)
+        expect(JournalSetting.search_scope('TEst').count).to eq(2)
       end
     end
 
