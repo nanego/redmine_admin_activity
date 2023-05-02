@@ -4,6 +4,7 @@ class JournalSetting < ActiveRecord::Base
 
   attr_accessor :indice
   scope :by_type, ->(type) { where(journalized_type: type) }
+  scope :type_custom_field, -> { where("journalized_type LIKE '%CustomField' ") }
 
   scope :search_scope, (lambda do |q|
     q = q.to_s
@@ -18,7 +19,7 @@ class JournalSetting < ActiveRecord::Base
       # union of 4 query
       array_all = by_type('Project').where(journalized_id: query_project.map(&:journalized_id)) + 
         by_type('Organization').where(journalized_id: query_organization.map(&:journalized_id)) + 
-        by_type('IssueCustomField').where(journalized_id: query_customfield.map(&:journalized_id))+
+        type_custom_field.where(journalized_id: query_customfield.map(&:journalized_id))+
         by_type('Principal').where(journalized_id: query_principal.map(&:journalized_id))
 
       JournalSetting.where(id: array_all.map(&:id))
