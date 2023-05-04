@@ -10,13 +10,13 @@ class JournalSetting < ActiveRecord::Base
     q = q.to_s
     if q.present?
 
-      query_project = find_by_sql "SELECT * FROM journal_settings JOIN #{Project.table_name} ON journalized_id = #{Project.table_name}.id and LOWER(#{Project.table_name}.name) LIKE LOWER('%#{q}%') "
       
-      query_organization = find_by_sql "SELECT * FROM journal_settings JOIN #{Organization.table_name} ON journalized_id = #{Organization.table_name}.id and LOWER(#{Organization.table_name}.name) LIKE LOWER('%#{q}%') " if Redmine::Plugin.installed?(:redmine_organizations)
-      query_customfield = find_by_sql "SELECT * FROM journal_settings JOIN #{CustomField.table_name} ON journalized_id = #{CustomField.table_name}.id and LOWER(#{CustomField.table_name}.name) LIKE LOWER('%#{q}%') "
-      query_principal = find_by_sql "SELECT * FROM journal_settings JOIN #{Principal.table_name} ON journalized_id = #{Principal.table_name}.id  and ((LOWER(#{Principal.table_name}.lastname) || ' ' || LOWER(#{Principal.table_name}.firstname)) LIKE LOWER('%#{q}%')
-               OR (LOWER(#{Principal.table_name}.firstname) || ' ' || LOWER(#{Principal.table_name}.lastname)) LIKE LOWER('%#{q}%'))"
-     
+      query_project = find_by_sql ["SELECT * FROM journal_settings JOIN #{Project.table_name} ON journalized_id = #{Project.table_name}.id and LOWER(#{Project.table_name}.name) LIKE LOWER(?) ", "%#{q}%"]
+      query_organization = find_by_sql ["SELECT * FROM journal_settings JOIN #{Organization.table_name} ON journalized_id = #{Organization.table_name}.id and LOWER(#{Organization.table_name}.name) LIKE LOWER(?) ", "%#{q}%"] if Redmine::Plugin.installed?(:redmine_organizations)
+      query_customfield = find_by_sql ["SELECT * FROM journal_settings JOIN #{CustomField.table_name} ON journalized_id = #{CustomField.table_name}.id and LOWER(#{CustomField.table_name}.name) LIKE LOWER(?) ","%#{q}%"]
+      query_principal = find_by_sql ["SELECT * FROM journal_settings JOIN #{Principal.table_name} ON journalized_id = #{Principal.table_name}.id  and ((LOWER(#{Principal.table_name}.lastname) || ' ' || LOWER(#{Principal.table_name}.firstname)) LIKE LOWER(?)
+               OR (LOWER(#{Principal.table_name}.firstname) || ' ' || LOWER(#{Principal.table_name}.lastname)) LIKE LOWER(?))", "%#{q}%", "%#{q}%"]
+
       # union of 4 query
       array_all = by_type('Project').where(journalized_id: query_project.map(&:journalized_id)) +
         type_custom_field.where(journalized_id: query_customfield.map(&:journalized_id))+
