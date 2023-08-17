@@ -1,12 +1,12 @@
 module JournalSettingsHelper
 
   include ApplicationHelper
- 
+
   def get_journal_for_history(journals)
     journals = journals.includes(:user, :details).
       reorder(created_on: :desc).
       references(:user, :details)
-    Journal.preload_journals_details_custom_fields(journals)  
+    Journal.preload_journals_details_custom_fields(journals)
   end
 
   def add_index_to_journal_for_history(journals)
@@ -17,7 +17,7 @@ module JournalSettingsHelper
       journal.indice = position
       position -=1
     end
-  end  
+  end
 
   def settings_update_text(name, changes)
     field_name = l("setting_#{name}")
@@ -50,13 +50,14 @@ module JournalSettingsHelper
   end
 
   def user_update_text(journal)
-    if journal.creation? || journal.activation? || journal.locking? || journal.unlocking?
+    if journal.creation? || journal.activation? || journal.locking? || journal.unlocking? || journal.auto_creation?
       user_text = link_to_journalized_if_exists(journal.journalized) || name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
 
       return sanitize l(".text_setting_create_user_journal_entry", user: user_text) if journal.creation?
       return sanitize l(".text_setting_active_user_journal_entry", user: user_text) if journal.activation?
       return sanitize l(".text_setting_lock_user_journal_entry", user: user_text) if journal.locking?
       return sanitize l(".text_setting_unlock_user_journal_entry", user: user_text) if journal.unlocking?
+      return sanitize l(".text_setting_auto_create_user_journal_entry", user: user_text) if journal.auto_creation?
 
     elsif journal.deletion?
       sanitize l(".text_setting_destroy_user_journal_entry", user_name: journal.value_changes["firstname"][0] + " " + journal.value_changes["lastname"][0])

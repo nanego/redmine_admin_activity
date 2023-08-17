@@ -10,6 +10,9 @@ class User < Principal
 
 	after_save :create_journal
 
+  USER_MANUAL_CREATION = 'manual'
+  USER_AUTO_CREATION = 'auto'
+
 	def init_journal(user)
 		@current_journal ||= Journal.new(:journalized => self, :user => user)
 	end

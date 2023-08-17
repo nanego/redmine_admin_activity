@@ -208,6 +208,11 @@ module PluginAdminActivity
       l(:text_journal_changed, :label => label, :old => old_value, :new => value).html_safe
     end
 
+    def show_user_creation_details(detail, no_html , options = {})
+      label = get_user_creation_label_for_history[detail.value]
+      l(:text_journal_create_user_journal_entry, :label => label).html_safe
+    end
+
     def get_project_status_label_for_history
       {
         Project::STATUS_ACTIVE.to_s => l(:project_status_active),
@@ -222,6 +227,13 @@ module PluginAdminActivity
         User::STATUS_ACTIVE.to_s => l(:status_active),
         User::STATUS_REGISTERED.to_s => l(:status_registered),
         User::STATUS_LOCKED.to_s => l(:status_locked),
+      }
+    end
+
+    def get_user_creation_label_for_history
+      {
+        User::USER_MANUAL_CREATION.to_s => l(:label_manual_creation),
+        User::USER_AUTO_CREATION.to_s => l(:label_auto_creation),
       }
     end
 
@@ -321,6 +333,8 @@ module PluginAdminActivity
         if User.reflect_on_all_associations(:has_many).select { |a| a.name.to_s == detail.prop_key }.count > 0
           show_associations_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options, l(:label_this_user))
         end
+      elsif detail.property == 'creation'
+        show_user_creation_details(detail, no_html, options)
       elsif detail.property == 'attr'
         if User.reflect_on_all_associations(:belongs_to).select{ |a| a.foreign_key == detail.prop_key }.count > 0
           show_belongs_to_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)

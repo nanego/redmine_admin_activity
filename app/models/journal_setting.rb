@@ -18,19 +18,19 @@ class JournalSetting < ActiveRecord::Base
     journalized_entry_type == "copy"
   end
 
-  def activation? 
+  def activation?
     journalized_entry_type == "active"
   end
 
-  def closing?    
+  def closing?
     journalized_entry_type == "close"
   end
 
-  def archivation?    
+  def archivation?
     journalized_entry_type == "archive"
   end
 
-  def reopening?    
+  def reopening?
     journalized_entry_type == "reopen"
   end
 
@@ -41,9 +41,12 @@ class JournalSetting < ActiveRecord::Base
   def unlocking?
     journalized_entry_type == "unlock"
   end
-  
+
   def updating?
     journalized_entry_type == "update"
   end
 
+  def auto_creation?
+    journalized_entry_type == "auto_creation"
+  end
 end
