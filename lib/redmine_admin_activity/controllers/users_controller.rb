@@ -4,6 +4,7 @@ class UsersController
 
   helper :journal_settings
   include JournalSettingsHelper
+  include RedmineAdminActivity::Journalizable
 
   after_action :journalized_users_creation, :only => [:create]
   after_action :journalized_users_update_status, :only => [:update]
@@ -14,8 +15,8 @@ class UsersController
   def history
     @scope = get_journal_for_history(@user.journals)
     @journal_count = @scope.count
-    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
-    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page']
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a
     @journals = add_index_to_journal_for_history(@journals)
   end
 
@@ -29,6 +30,7 @@ class UsersController
       :journalized => @user,
       :journalized_entry_type => "create",
     )
+    add_journal_entry_for_user(user: @user, property: 'creation', prop_key: 'creation', value: User::USER_MANUAL_CREATION)
   end
 
   def journalized_users_update_status

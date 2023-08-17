@@ -30,14 +30,25 @@ describe UsersController, type: :controller do
       user = User.last
 
       expect(response).to redirect_to("/users/#{user.id}/edit")
+
       expect(JournalSetting.all).to_not be_empty
-      expect(JournalSetting.last.value_changes).to include("id" => [nil, user.id])
-      expect(JournalSetting.last.value_changes).to include("login" => ["", "newuser"])
-      expect(JournalSetting.last.value_changes).to include("firstname" => ["", "new"])
-      expect(JournalSetting.last.value_changes).to include("lastname" => ["", "user"])
-      expect(JournalSetting.last.value_changes).to include("type" => [nil, "User"])
-      expect(JournalSetting.last).to have_attributes(:journalized_type => "Principal")
-      expect(JournalSetting.last).to have_attributes(:journalized_entry_type => "create")
+
+      journal_setting_last = JournalSetting.last
+
+      expect(journal_setting_last.value_changes).to include("id" => [nil, user.id])
+      expect(journal_setting_last.value_changes).to include("login" => ["", "newuser"])
+      expect(journal_setting_last.value_changes).to include("firstname" => ["", "new"])
+      expect(journal_setting_last.value_changes).to include("lastname" => ["", "user"])
+      expect(journal_setting_last.value_changes).to include("type" => [nil, "User"])
+      expect(journal_setting_last).to have_attributes(:journalized_type => "Principal")
+      expect(journal_setting_last).to have_attributes(:journalized_entry_type => "create")
+
+      journal_detail_last = JournalDetail.last
+
+      expect(journal_detail_last.property).to eq('creation')
+      expect(journal_detail_last.prop_key).to eq('creation')
+      expect(journal_detail_last.value).to eq(User::USER_MANUAL_CREATION)
+      expect(Journal.last.journalized_id).to eq(user.id)
     end
   end
 
@@ -186,7 +197,7 @@ describe UsersController, type: :controller do
       # Tests
       expect(first_page.count).to eq(3)
       expect(second_page.count).to eq(2)
-      expect(first_page.first.id).to be > second_page.first.id      
+      expect(first_page.first.id).to be > second_page.first.id
     end
   end
 end

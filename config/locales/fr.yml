@@ -74,3 +74,7 @@ fr:
   label_this_user: "Cet utilisateur"
   label_from_project: "du projet"
   label_to_project: "au projet"
+  text_journal_create_user_journal_entry: "Cet utilisateur a été créé %{label}."
+  label_manual_creation: manuellement
+  label_auto_creation: automatiquement
+  text_setting_auto_create_user_journal_entry: "L'utilisateur <i>%{user}</i> a été créé automatiquement."

@@ -353,4 +353,12 @@ describe "IssuesHelperPatch" do
     detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => user.mails, :value => "newmails@example.com", :prop_key => 'mails')
     expect(show_detail(detail, true)).to eq "Mail changed from #{user.mails} to newmails@example.com"
   end
+
+  it 'should IssuesHelper#show_detail should show the creation action for a user' do
+    detail = JournalDetail.new(:journal => journal, :property => 'creation', :value => User::USER_MANUAL_CREATION, :prop_key => 'creation')
+    expect(show_detail(detail, true)).to eq "This user has been created manually."
+
+    detail = JournalDetail.new(:journal => journal, :property => 'creation', :value => User::USER_AUTO_CREATION, :prop_key => 'creation')
+    expect(show_detail(detail, true)).to eq "This user has been created automatically."
+  end
 end
