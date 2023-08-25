@@ -10,10 +10,10 @@ module RedmineAdminActivity::Journalizable
 
   # Store a [JournalDetail] or an array of [JournalDetail]s in a new
   # journal entry (project , user) for current User.
-  def add_journal_entry(journalized, journal_details)
+  def add_journal_entry(journalized, journal_details, author: User.current)
     return unless (journalized.respond_to?(:init_journal) && journalized.respond_to?(:current_journal))
 
-    journalized.init_journal(User.current)
+    journalized.init_journal(author)
 
     journal_details = [journal_details] unless journal_details.is_a?(Array)
     journal_details.each do |journal_detail|
@@ -34,12 +34,12 @@ module RedmineAdminActivity::Journalizable
         old_value: old_value)
   end
 
-  def add_journal_entry_for_user(user:, property:, prop_key:, value: nil, old_value: nil)
+  def add_journal_entry_for_user(user:, property:, prop_key:, value: nil, old_value: nil, author: User.current)
     add_journal_entry user, JournalDetail.new(
         property: property,
         prop_key: prop_key,
         value: value,
-        old_value: old_value)
+        old_value: old_value), author: author
   end
 
   def add_member_creation_to_journal(member, role_ids, function_ids = nil)
