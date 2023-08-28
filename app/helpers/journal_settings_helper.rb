@@ -15,7 +15,7 @@ module JournalSettingsHelper
     position = @journal_count.to_i - (per_page * (page - 1))
     journals.each do |journal|
       journal.indice = position
-      position -=1
+      position -= 1
     end
   end
 
@@ -133,7 +133,7 @@ module JournalSettingsHelper
         case type
         when :boolean
           strings << show_boolean_details(value[0], value[1][1], value[1][0])
-          #when ,if we want to treat another type
+          # when , if we want to treat another type
         else
           strings << show_details_by_default(value)
         end

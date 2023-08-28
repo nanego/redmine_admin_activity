@@ -13,7 +13,7 @@ describe UsersController, type: :controller do
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
     User.current = nil
-    @request.session[:user_id] = 1 #permissions admin
+    @request.session[:user_id] = 1 # permissions admin
   end
 
   describe "POST create" do
@@ -27,28 +27,28 @@ describe UsersController, type: :controller do
           :generate_password => '1',
         }
       }
-      user = User.last
+      new_user = User.last
 
-      expect(response).to redirect_to("/users/#{user.id}/edit")
+      expect(response).to redirect_to("/users/#{new_user.id}/edit")
 
       expect(JournalSetting.all).to_not be_empty
 
-      journal_setting_last = JournalSetting.last
+      last_journal_setting = JournalSetting.last
 
-      expect(journal_setting_last.value_changes).to include("id" => [nil, user.id])
-      expect(journal_setting_last.value_changes).to include("login" => ["", "newuser"])
-      expect(journal_setting_last.value_changes).to include("firstname" => ["", "new"])
-      expect(journal_setting_last.value_changes).to include("lastname" => ["", "user"])
-      expect(journal_setting_last.value_changes).to include("type" => [nil, "User"])
-      expect(journal_setting_last).to have_attributes(:journalized_type => "Principal")
-      expect(journal_setting_last).to have_attributes(:journalized_entry_type => "create")
+      expect(last_journal_setting.value_changes).to include("id" => [nil, new_user.id])
+      expect(last_journal_setting.value_changes).to include("login" => ["", "newuser"])
+      expect(last_journal_setting.value_changes).to include("firstname" => ["", "new"])
+      expect(last_journal_setting.value_changes).to include("lastname" => ["", "user"])
+      expect(last_journal_setting.value_changes).to include("type" => [nil, "User"])
+      expect(last_journal_setting).to have_attributes(:journalized_type => "Principal")
+      expect(last_journal_setting).to have_attributes(:journalized_entry_type => "create")
 
-      journal_detail_last = JournalDetail.last
+      last_journal_detail = JournalDetail.last
 
-      expect(journal_detail_last.property).to eq('creation')
-      expect(journal_detail_last.prop_key).to eq('creation')
-      expect(journal_detail_last.value).to eq(User::USER_MANUAL_CREATION)
-      expect(Journal.last.journalized_id).to eq(user.id)
+      expect(last_journal_detail.property).to eq('creation')
+      expect(last_journal_detail.prop_key).to eq('creation')
+      expect(last_journal_detail.value).to eq(User::USER_MANUAL_CREATION)
+      expect(Journal.last.journalized_id).to eq(new_user.id)
     end
   end
 
@@ -187,11 +187,11 @@ describe UsersController, type: :controller do
         patch :update, :params => { :id => user.id, :user => { :mail => "test#{index}@example.net" } }
       end
       # Get all journals of the first page
-      get :history, :params => { :id => user.id, page: 1}
+      get :history, :params => { :id => user.id, page: 1 }
       first_page = assigns(:journals)
 
       # Get all journals of the second page
-      get :history, :params => { :id => user.id, page: 2}
+      get :history, :params => { :id => user.id, page: 2 }
       second_page = assigns(:journals)
 
       # Tests

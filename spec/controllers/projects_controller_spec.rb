@@ -5,9 +5,9 @@ describe ProjectsController, type: :controller do
   render_views
 
   fixtures :projects, :users, :roles, :members, :member_roles, :issues, :issue_statuses, :versions,
-            :trackers, :projects_trackers, :issue_categories, :enabled_modules, :enumerations, :attachments,
-            :workflows, :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
-            :time_entries, :journals, :journal_details, :queries, :repositories, :changesets
+           :trackers, :projects_trackers, :issue_categories, :enabled_modules, :enumerations, :attachments,
+           :workflows, :custom_fields, :custom_values, :custom_fields_projects, :custom_fields_trackers,
+           :time_entries, :journals, :journal_details, :queries, :repositories, :changesets
 
   fixtures :issue_template_projects, :issue_templates if Redmine::Plugin.installed?(:redmine_templates)
   include Redmine::I18n
@@ -17,7 +17,7 @@ describe ProjectsController, type: :controller do
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
     User.current = nil
-    @request.session[:user_id] = 2 #permissions are hard
+    @request.session[:user_id] = 2 # permissions are hard
   end
 
   describe "POST modules" do
@@ -227,7 +227,7 @@ describe ProjectsController, type: :controller do
         expect do
           patch :update, params: { id: 1, project: { issue_template_ids: ["1", "3"], tab: "issue_templates" } }
         end.to change { IssueTemplateProject.count }.by(2)
-        .and change { JournalDetail.count }.by(2)
+                                                    .and change { JournalDetail.count }.by(2)
         expect(JournalDetail.last(2)[0].prop_key).to eq('enabled_template')
         expect(JournalDetail.last(2)[0].property).to eq('templates')
         expect(JournalDetail.last(2)[0].value).to eq(IssueTemplate.find(1).template_title)
@@ -238,7 +238,7 @@ describe ProjectsController, type: :controller do
         expect do
           patch :update, params: { id: 2, project: { issue_template_ids: ["1", "2", "3", "4", "5"], tab: "issue_templates" } }
         end.to change { IssueTemplateProject.count }.by(-1)
-        .and change { JournalDetail.count }.by(1)
+                                                    .and change { JournalDetail.count }.by(1)
         expect(JournalDetail.last.prop_key).to eq('enabled_template')
         expect(JournalDetail.last.property).to eq('templates')
         expect(JournalDetail.last.old_value).to eq(IssueTemplate.find(6).template_title)
@@ -254,21 +254,21 @@ describe ProjectsController, type: :controller do
     it "check the number of elements by page" do
       # Generating 5 Journals Settings
       5.times do |index|
-        patch :update, :params => { :id => "ecookbook" , :project => { issue_template_ids: [], :name => "Test changed name #{index}" }}
+        patch :update, :params => { :id => "ecookbook", :project => { issue_template_ids: [], :name => "Test changed name #{index}" } }
       end
 
       # Get all journals of the first page
-      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 1}
+      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 1 }
       first_page = assigns(:journals)
 
       # Get all journals of the second page
-      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 2}
+      get :settings, :params => { :id => Project.find(1).id, :tab => "admin_activity", page: 2 }
       second_page = assigns(:journals)
 
       # Tests
       expect(first_page.count).to eq(3)
       expect(second_page.count).to eq(2)
-      expect(first_page.first.id).to be > second_page.first.id      
+      expect(first_page.first.id).to be > second_page.first.id
     end
   end
 end
