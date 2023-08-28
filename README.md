@@ -20,8 +20,8 @@ To run tests, install the redmine_base_rspec plugin (https://github.com/jbbarth/
 
 |Plugin branch| Redmine Version | Test Status       |
 |-------------|-----------------|-------------------|
-|master       | 5.0.5           | [![5.0.5][1]][5]  |  
-|master       | 4.2.10           | [![4.2.10][2]][5]  |
+|master       | 5.0.5           | [![5.0.5][1]][5]  |
+|master       | 4.2.10          | [![4.2.10][2]][5] |
 |master       | master          | [![master][4]][5] |
 
 [1]: https://github.com/nanego/redmine_admin_activity/actions/workflows/5_0_5.yml/badge.svg
