@@ -3,31 +3,40 @@ class JournalSetting < ActiveRecord::Base
   belongs_to :journalized, :polymorphic => true, :optional => true
 
   attr_accessor :indice
-  scope :by_type, ->(type) { where(journalized_type: type) }
-  scope :type_custom_field, -> { where("journalized_type LIKE '%CustomField' ") }
 
-  scope :search_scope, (lambda do |q|
-    q = q.to_s
+  scope :by_type, ->(type) { where(journalized_type: type) }
+  scope :type_custom_field, -> { where("journalized_type  ") }
+
+  scope :search_scope, ->(q) do
+    q = q.to_s.strip
     if q.present?
 
-      query_project = find_by_sql "SELECT * FROM journal_settings JOIN #{Project.table_name} ON journalized_id = #{Project.table_name}.id and LOWER(#{Project.table_name}.name) LIKE LOWER('%#{q}%') "
-      
-      query_organization = find_by_sql "SELECT * FROM journal_settings JOIN #{Organization.table_name} ON journalized_id = #{Organization.table_name}.id and LOWER(#{Organization.table_name}.name) LIKE LOWER('%#{q}%') " if Redmine::Plugin.installed?(:redmine_organizations)
-      query_customfield = find_by_sql "SELECT * FROM journal_settings JOIN #{CustomField.table_name} ON journalized_id = #{CustomField.table_name}.id and LOWER(#{CustomField.table_name}.name) LIKE LOWER('%#{q}%') "
-      query_principal = find_by_sql "SELECT * FROM journal_settings JOIN #{Principal.table_name} ON journalized_id = #{Principal.table_name}.id  and ((LOWER(#{Principal.table_name}.lastname) || ' ' || LOWER(#{Principal.table_name}.firstname)) LIKE LOWER('%#{q}%')
-               OR (LOWER(#{Principal.table_name}.firstname) || ' ' || LOWER(#{Principal.table_name}.lastname)) LIKE LOWER('%#{q}%'))"
-     
-      # union of 4 query
-      array_all = by_type('Project').where(journalized_id: query_project.map(&:journalized_id)) +
-        type_custom_field.where(journalized_id: query_customfield.map(&:journalized_id))+
-        by_type('Principal').where(journalized_id: query_principal.map(&:journalized_id))
-        
-        array_all += by_type('Organization').where(journalized_id: query_organization.map(&:journalized_id)) if Redmine::Plugin.installed?(:redmine_organizations)
+      projects_journals_ids = JournalSetting.joins("LEFT JOIN #{Project.table_name} ON journalized_id = #{Project.table_name}.id AND journalized_type = '#{Project.name}'")
+                                            .where("LOWER(#{Project.table_name}.name) LIKE LOWER(?)", "%#{q}%")
+                                            .pluck(:id)
 
-      JournalSetting.where(id: array_all.map(&:id))
- 
+      custom_fields_journals_ids = JournalSetting.joins("LEFT JOIN #{CustomField.table_name} ON journalized_id = #{CustomField.table_name}.id AND journalized_type LIKE '%CustomField'")
+                                                 .where("LOWER(#{CustomField.table_name}.name) LIKE LOWER(?)", "%#{q}%")
+                                                 .pluck(:id)
+
+      users_journals_ids = JournalSetting.joins("LEFT JOIN #{Principal.table_name} ON journalized_id = #{Principal.table_name}.id AND journalized_type = '#{Principal.name}'")
+                                         .where("(LOWER(#{Principal.table_name}.lastname) || ' ' || LOWER(#{Principal.table_name}.firstname)) LIKE LOWER(?) OR
+                                         (LOWER(#{Principal.table_name}.firstname) || ' ' || LOWER(#{Principal.table_name}.lastname)) LIKE LOWER(?)", "%#{q}%", "%#{q}%")
+                                         .pluck(:id)
+
+      journal_ids = projects_journals_ids + custom_fields_journals_ids + users_journals_ids
+
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        organizations_journals_ids = JournalSetting.joins("LEFT JOIN #{Organization.table_name} ON journalized_id = #{Organization.table_name}.id AND journalized_type = '#{Organization.name}'")
+                                                   .where("LOWER(#{Organization.table_name}.name) LIKE LOWER(?)", "%#{q}%")
+                                                   .pluck(:id)
+        journal_ids += organizations_journals_ids
+      end
+
+      where(id: journal_ids)
+
     end
-  end)
+  end
 
   validates :value_changes, :presence => true
 
