@@ -4,9 +4,6 @@ class JournalSetting < ActiveRecord::Base
 
   attr_accessor :indice
 
-  scope :by_type, ->(type) { where(journalized_type: type) }
-  scope :type_custom_field, -> { where("journalized_type  ") }
-
   scope :search_scope, ->(q) do
     q = q.to_s.strip
     if q.present?
