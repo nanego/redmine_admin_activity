@@ -169,6 +169,19 @@ describe "JournalSettingsHelper" do
                                    :journalized_entry_type => "create")
       expect(user_update_text(journal)).to eq "User <i><a href=\"/users/15\">new user</a></i> has been created."
     end
+    it "should generate the right translated sentence for a user auto creation" do
+      user = User.new(:login => 'newuser',
+                      :firstname => 'new',
+                      :lastname => 'user',
+                      :mail => 'newuser@example.net'
+      )
+      user.save
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "login" => ["", "newuser"], "firstname" => ["", "new"], "lastname" => ["", "user"] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "auto_creation")
+      expect(user_update_text(journal)).to eq "User <i><a href=\"/users/#{user.id}\">new user</a></i> has been created automatically."
+    end
   end
 
   describe "Change the user status" do

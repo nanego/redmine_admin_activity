@@ -36,12 +36,12 @@ class SettingsController
   end
 
   def get_settings_journals_for_pagination
-    @scope = JournalSetting.includes(:user).
+    @scope = JournalSetting.includes(:user).search_scope(params[:name]).
     reorder(created_on: :desc).
     references(:user)
     @journal_count = @scope.count
     @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
-    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a
     @journals = add_index_to_journal_for_history(@journals)
   end
 

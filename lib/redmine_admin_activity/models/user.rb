@@ -2,19 +2,21 @@ require_dependency 'user'
 
 class User < Principal
 
-	has_many :JournalSetting, :dependent => :nullify
+  has_many :journal_settings, :dependent => :nullify
+  has_many :journals, :as => :journalized, :dependent => :destroy, :inverse_of => :journalized
 
-	has_many :journals, :as => :journalized, :dependent => :destroy, :inverse_of => :journalized
+  attr_reader :current_journal
 
-	attr_reader :current_journal
+  after_save :create_journal
 
-	after_save :create_journal
+  USER_MANUAL_CREATION = 'manual'
+  USER_AUTO_CREATION = 'auto'
 
-	def init_journal(user)
-		@current_journal ||= Journal.new(:journalized => self, :user => user)
-	end
+  def init_journal(user)
+    @current_journal ||= Journal.new(:journalized => self, :user => user)
+  end
 
-	# Returns the current journal or nil if it's not initialized
+  # Returns the current journal or nil if it's not initialized
   def current_journal
     @current_journal
   end
@@ -28,11 +30,11 @@ class User < Principal
     names
   end
 
-	def create_journal
-		if current_journal
-			current_journal.save
-		end
-	end
+  def create_journal
+    if current_journal
+      current_journal.save
+    end
+  end
 
   def notified_users
     []
@@ -43,7 +45,7 @@ class User < Principal
   end
 
   def self.representative_columns
-    return "firstname" , "lastname"
+    return "firstname", "lastname"
   end
 
   def self.representative_link_path(obj)
