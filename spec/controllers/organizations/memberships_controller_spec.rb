@@ -171,7 +171,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
         end.to change { JournalDetail.count }.by(1)
 
         journal = JournalDetail.last
-        
+
         expect(journal.property).to eq("members_exception")
         expect(journal.prop_key).to eq("members_exception_with_roles_functions")
         if Redmine::Plugin.installed?(:redmine_limited_visibility)
