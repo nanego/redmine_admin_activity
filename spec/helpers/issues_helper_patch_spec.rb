@@ -227,7 +227,7 @@ describe "IssuesHelperPatch" do
 
       it "should IssuesHelper#show_detail with no_html should show a changing functions only" do
         detail = JournalDetail.new(:property => 'members_exception', :old_value => '{"name":"Org A","functions":["function1"]}', :value => '{"name":"Org A","functions":["function1", "function2"]}', :prop_key => 'members_exception_with_functions')
-        expect(show_detail(detail, true)).to eq "Functions of exception member Org A have been changed from [function1] to [function1, function2]"
+        expect(show_detail(detail, true)).to eq "Functional roles of exception member Org A have been changed from [function1] to [function1, function2]"
       end
 
       it "should IssuesHelper#show_detail with no_html should show a changing roles only" do

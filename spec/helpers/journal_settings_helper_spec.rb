@@ -430,7 +430,7 @@ describe "JournalSettingsHelper" do
       expect(custom_field_update_text(journal)).to include(
                                                      "#{l(:label_project_plural)} have been changed from [#{Project.find(1).name}] to [#{Project.find(1).name}, #{Project.find(2).name}]")
       expect(custom_field_update_text(journal)).to include(
-                                                     "#{l(:label_technical_role_plural)} have been changed from [] to [#{Role.find(1).name}]")
+                                                     "#{l(:label_role_plural)} have been changed from [] to [#{Role.find(1).name}]")
     end
 
     it "should generate the right translated sentence, when changing has_and_belongs_to_many association (case of association deleting show(#id))" do
