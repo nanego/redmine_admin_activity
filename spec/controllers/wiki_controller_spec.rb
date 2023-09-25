@@ -31,8 +31,8 @@ describe WikiController, type: :controller do
         .and change { WikiPage.count }.by(-1)
 
       expect(JournalDetail.last.old_value).to eq(wiki_title)
-      expect(JournalDetail.last.prop_key).to eq("wiki")
-      expect(JournalDetail.last.property).to eq("wiki")
+      expect(JournalDetail.last.prop_key).to eq("wiki_page")
+      expect(JournalDetail.last.property).to eq("wiki_page")
       expect(Journal.last.journalized).to eq(project)
     end
 
@@ -44,8 +44,8 @@ describe WikiController, type: :controller do
         .and change { WikiPage.count }.by(-1)
 
       expect(JournalDetail.last.old_value).to eq(parent_page.title)
-      expect(JournalDetail.last.prop_key).to eq("wiki")
-      expect(JournalDetail.last.property).to eq("wiki")
+      expect(JournalDetail.last.prop_key).to eq("wiki_page")
+      expect(JournalDetail.last.property).to eq("wiki_page")
       expect(Journal.last.journalized).to eq(project)
     end
 
@@ -66,8 +66,8 @@ describe WikiController, type: :controller do
         .and change { WikiPage.count }.by(-1)
 
       expect(JournalDetail.last.old_value).to eq(parent_page.title)
-      expect(JournalDetail.last.prop_key).to eq("wiki")
-      expect(JournalDetail.last.property).to eq("wiki")
+      expect(JournalDetail.last.prop_key).to eq("wiki_page")
+      expect(JournalDetail.last.property).to eq("wiki_page")
       expect(Journal.last.journalized).to eq(project)
     end
   end

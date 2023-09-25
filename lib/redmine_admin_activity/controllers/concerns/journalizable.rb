@@ -41,10 +41,10 @@ module RedmineAdminActivity::Journalizable
       old_value: old_value), author: author
   end
 
-  def add_wiki_journal_entry(project:, value: nil, old_value: nil)
+  def add_wiki_page_journal_entry(project:, value: nil, old_value: nil)
     add_journal_entry project, JournalDetail.new(
-        property: 'wiki',
-        prop_key: 'wiki',
+        property: 'wiki_page',
+        prop_key: 'wiki_page',
         value: value,
         old_value: old_value)
   end

@@ -3,7 +3,7 @@ require_dependency 'wiki_controller'
 class WikiController
   include RedmineAdminActivity::Journalizable
 
-  after_action :journalized_wiki_deletion, :only => [:destroy]
+  after_action :journalized_wiki_page_deletion, :only => [:destroy]
   before_action :self_and_descendants, :only => [:destroy]
 
   def self_and_descendants
@@ -11,12 +11,12 @@ class WikiController
     @self_and_descendants +=  @page.descendants.to_a if params[:todo].present? && params[:todo] == 'destroy'
   end
 
-  def journalized_wiki_deletion
+  def journalized_wiki_page_deletion
     return unless @page.present? && @page.destroyed?
 
     @self_and_descendants.each do |wiki|
 
-      add_wiki_journal_entry(project: wiki.project,
+      add_wiki_page_journal_entry(project: wiki.project,
                             value: nil,
                             old_value: wiki.title)
     end
