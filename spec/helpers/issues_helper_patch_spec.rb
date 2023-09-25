@@ -386,4 +386,11 @@ describe "IssuesHelperPatch" do
     detail = JournalDetail.new(:journal => journal, :property => 'creation', :value => User::USER_AUTO_CREATION, :prop_key => 'creation')
     expect(show_detail(detail, true)).to eq "This user has been created automatically."
   end
+
+  it "shoud IssueHelper#show_detail should label property" do
+    page_title = 'page test'
+    detail = JournalDetail.new(:property => 'wiki_page', :old_value => page_title, :prop_key => 'wiki_page')
+    expect(show_detail(detail, true)).to eq "Wiki page deleted (#{page_title})"
+  end
+
 end
