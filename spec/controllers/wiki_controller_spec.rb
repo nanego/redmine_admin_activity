@@ -19,7 +19,7 @@ describe WikiController, type: :controller do
   let(:project) { projects(:projects_001) }
   let(:parent_page) { wiki_pages(:wiki_pages_002) }
 
-  describe "DELETE destroy, logs change on Journal and JournalDetail" do
+  describe "DELETE destroy, logs change in Journal and JournalDetail" do
 
     it "When we delete a page without children" do
       wiki_title = WikiPage.find(6).title
@@ -38,7 +38,7 @@ describe WikiController, type: :controller do
 
     it "When we delete a parent page with option nullify" do
       expect do
-        delete :destroy, :params => {:project_id => project.id, :id => parent_page.title, :todo => 'nullify'}
+        delete :destroy, :params => { :project_id => project.id, :id => parent_page.title, :todo => 'nullify'}
       end.to change { Journal.count }.by(1)
         .and change { JournalDetail.count }.by(1)
         .and change { WikiPage.count }.by(-1)
@@ -58,6 +58,7 @@ describe WikiController, type: :controller do
         .and change { JournalDetail.count }.by(total_size)
         .and change { WikiPage.count }.by(-total_size)
     end
+
     it "When we delete a parent page with option reassign" do
       expect do
         delete :destroy, :params => {:project_id => project.id, :id => parent_page.title, :todo => 'reassign', :reassign_to_id => 1 }
