@@ -41,6 +41,14 @@ module RedmineAdminActivity::Journalizable
       old_value: old_value), author: author
   end
 
+  def add_wiki_page_journal_entry(project:, value: nil, old_value: nil)
+    add_journal_entry project, JournalDetail.new(
+        property: 'wiki_page',
+        prop_key: 'wiki_page',
+        value: value,
+        old_value: old_value)
+  end
+
   def add_member_creation_to_journal(member, role_ids, function_ids = nil)
     prop_key = limited_visibility_plugin_installed? ? 'member_roles_and_functions' : 'member_with_roles'
     add_member_journal_entry(project: member.project, property: 'members', prop_key: prop_key, value: value_hash(member, role_ids, function_ids))

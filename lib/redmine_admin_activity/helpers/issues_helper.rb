@@ -32,6 +32,8 @@ module PluginAdminActivity
       when 'members_exception'
         str = detail.prop_key.delete_prefix! "members_exception_with_"
         show_members_exception_details(detail, str, options)
+      when 'wiki_page'
+        show_label_property_details(detail, no_html, options)
       else
         if detail.property != 'cf' && detail.journal.present? && detail.journal.journalized_type == 'Principal'
           details = show_principal_detail(detail, no_html, options)
@@ -193,6 +195,11 @@ module PluginAdminActivity
     def show_user_creation_details(detail, no_html, options = {})
       label = get_user_creation_label_for_history[detail.value]
       l(:text_journal_create_user_journal_entry, :label => label).html_safe
+    end
+
+    def show_label_property_details(detail, no_html, options = {})
+      label_property = "label_#{detail.property}"
+      l(:text_journal_deleted, :label => l(label_property), :old => detail.old_value).html_safe
     end
 
     def get_project_status_label_for_history
