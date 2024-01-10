@@ -12,8 +12,8 @@ class SettingsController
 
   def intialize_settings_was
     @settings_was = Setting.pluck(:name)
-                        .select { |name| Setting.find_by_name(name).valid? }
-                        .map { |name| [name.to_sym, Setting[name]] }
+                           .select { |name| Setting.find_by_name(name).valid? }
+                           .map { |name| [name.to_sym, Setting[name]] }
   end
 
   def track_settings_was_changes
@@ -36,11 +36,12 @@ class SettingsController
   end
 
   def get_settings_journals_for_pagination
-    @scope = JournalSetting.includes(:user).search_scope(params[:name]).
-    reorder(created_on: :desc).
-    references(:user)
+    @scope = JournalSetting.includes(:user)
+                           .search_scope(params[:name])
+                           .reorder(created_on: :desc)
+                           .references(:user)
     @journal_count = @scope.count
-    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page']
     @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a
     @journals = add_index_to_journal_for_history(@journals)
   end
