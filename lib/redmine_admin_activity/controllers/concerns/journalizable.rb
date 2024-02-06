@@ -85,31 +85,31 @@ module RedmineAdminActivity::Journalizable
   end
 
   def add_member_exception_creation_to_journal(member, role_ids)
-    value = { name: member.organization.name, roles: Role.where(id: role_ids).pluck(:name) }
+    value = { name: member.organization.name, roles: Role.where(id: role_ids).sorted.pluck(:name) }
     add_member_journal_entry(project: member.project, property: 'members_exception', prop_key: 'members_exception_with_roles', value: value)
   end
 
   def add_member_exception_edition_roles_to_journal(member, previous_role_ids, role_ids)
-    value = { name: member.organization.name, roles: Role.where(id: role_ids).pluck(:name) }
-    old_value = { name: member.organization.name, roles: Role.where(id: previous_role_ids).pluck(:name) }
+    value = { name: member.organization.name, roles: Role.where(id: role_ids).sorted.pluck(:name) }
+    old_value = { name: member.organization.name, roles: Role.where(id: previous_role_ids).sorted.pluck(:name) }
     add_member_journal_entry(project: member.project, property: 'members_exception', prop_key: 'members_exception_with_roles', value: value, old_value: old_value)
   end
 
   def add_member_exception_edition_functions_to_journal(member, previous_function_ids, function_ids)
-    value = { name: member.organization.name, functions: Function.where(id: function_ids).pluck(:name) }
-    old_value = { name: member.organization.name, functions: Function.where(id: previous_function_ids).pluck(:name) }
+    value = { name: member.organization.name, functions: Function.where(id: function_ids).sorted.pluck(:name) }
+    old_value = { name: member.organization.name, functions: Function.where(id: previous_function_ids).sorted.pluck(:name) }
     add_member_journal_entry(project: member.project, property: 'members_exception', prop_key: 'members_exception_with_functions', value: value, old_value: old_value)
   end
 
   def add_member_exception_deletion_to_journal(member, previous_role_ids, previous_function_ids)
-    old_value = { name: member.organization.name, roles: Role.where(id: previous_role_ids).pluck(:name) }
-    old_value.merge!({ functions: Function.where(id: previous_function_ids).pluck(:name) }) if limited_visibility_plugin_installed?
+    old_value = { name: member.organization.name, roles: Role.where(id: previous_role_ids).sorted.pluck(:name) }
+    old_value.merge!({ functions: Function.where(id: previous_function_ids).sorted.pluck(:name) }) if limited_visibility_plugin_installed?
     add_member_journal_entry(project: member.project, property: 'members_exception', prop_key: 'members_exception_with_roles_functions', old_value: old_value)
   end
 
   def value_hash(member, role_ids, function_ids)
-    value = { name: member.principal.to_s, roles: Role.where(id: role_ids).pluck(:name) }
-    value.merge!({ functions: Function.where(id: function_ids).pluck(:name) }) if limited_visibility_plugin_installed?
+    value = { name: member.principal.to_s, roles: Role.where(id: role_ids).sorted.pluck(:name) }
+    value.merge!({ functions: Function.where(id: function_ids).sorted.pluck(:name) }) if limited_visibility_plugin_installed?
     value
   end
 
