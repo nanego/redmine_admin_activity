@@ -10,7 +10,7 @@ class ProjectsController
   after_action :journalized_projects_duplication, :only => [:copy]
   after_action :journalized_projects_creation, :only => [:create]
   after_action :journalized_projects_deletion, :only => [:destroy]
-  before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen, :destroy]
+  append_before_action :self_and_descendants_or_ancestors, :only => [:close, :archive, :unarchive, :reopen, :destroy]
   after_action :journalized_projects_activation, :only => [:unarchive]
   after_action :journalized_projects_closing, :only => [:close]
   after_action :journalized_projects_archivation, :only => [:archive]
@@ -18,6 +18,7 @@ class ProjectsController
   append_before_action :get_projects_journals_for_pagination, :only => [:settings]
 
   def init_journal
+    find_project unless @project
     @project.init_journal(User.current)
     @previous_enabled_module_names = @project.enabled_module_names
     @previous_enabled_tracker_ids = @project.tracker_ids
@@ -36,6 +37,8 @@ class ProjectsController
   end
 
   def update_journal
+    @project.init_journal(User.current)
+
     if @previous_enabled_tracker_ids != @project.tracker_ids
       previous_tracker_names = Tracker.where(:id => @previous_enabled_tracker_ids.map(&:to_i)).sorted.pluck(:name)
       add_journal_entry(property: 'trackers',
@@ -60,13 +63,13 @@ class ProjectsController
       previous_issue_templates_titles = IssueTemplate.where(:id => @previous_enabled_template_ids.map(&:to_i)).pluck(:template_title)
       activated_templates_titles = @project.issue_templates.map(&:template_title) - previous_issue_templates_titles
       deactivated_templates_titles = previous_issue_templates_titles - @project.issue_templates.map(&:template_title)
-      activated_templates_titles.each do | temp_title |
+      activated_templates_titles.each do |temp_title|
         add_journal_entry(property: 'templates',
                           prop_key: 'enabled_template',
                           value: temp_title,
                           old_value: nil)
       end
-      deactivated_templates_titles.each do | temp_title |
+      deactivated_templates_titles.each do |temp_title|
         add_journal_entry(property: 'templates',
                           prop_key: 'enabled_template',
                           value: nil,
@@ -245,8 +248,8 @@ class ProjectsController
     find_project unless @project
     @scope = get_journal_for_history(@project.journals)
     @journal_count = @scope.count
-    @journal_pages = Paginator.new @journal_count, per_page_option, params['page'] 
-    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a   
+    @journal_pages = Paginator.new @journal_count, per_page_option, params['page']
+    @journals = @scope.limit(@journal_pages.per_page).offset(@journal_pages.offset).to_a
     @journals = add_index_to_journal_for_history(@journals)
   end
 
