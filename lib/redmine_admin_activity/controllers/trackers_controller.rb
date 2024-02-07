@@ -32,7 +32,7 @@ class TrackersController
 
     changed_project_ids = array_difference(@previous_project_ids, @tracker.project_ids)
 
-    Project.where(id: changed_project_ids).find_each do |project|
+    Project.where(id: changed_project_ids).each do |project|
       journal_detail = JournalDetail.new(
         :property  => :trackers,
         :prop_key  => :trackers

@@ -67,7 +67,7 @@ class CustomFieldsController
 
     changed_project_ids = array_difference(@previous_project_ids, @custom_field.project_ids)
 
-    Project.where(id: changed_project_ids).find_each do |project|
+    Project.where(id: changed_project_ids).each do |project|
       journal_detail = JournalDetail.new(
         :property => :custom_fields,
         :prop_key => :custom_fields

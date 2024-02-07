@@ -150,7 +150,7 @@ jobs:
         env:
           RAILS_ENV: test
         working-directory: redmine
-        run: bundle exec rails redmine:plugins:test NAME=${{ env.PLUGIN_NAME }} RUBYOPT="-W0"
+        run: bundle exec rails redmine:plugins:test NAME=${{ env.PLUGIN_NAME }} RUBYOPT="-W0" --trace
 
       - name: Run uninstall test
         env:
