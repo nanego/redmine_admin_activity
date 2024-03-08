@@ -70,7 +70,7 @@ en:
   text_journal_has_many_changed: "%{class_name} has been changed from [%{old}] to [%{new}]"
   label_customfieldenumeration: Key/value list
   label_customfieldssection: Section
-  label_absence_methodes: TODO Absence of methods implementation representative_link_path or to_s
+  label_missing_methods: TODO Absence of methods implementation representative_link_path or to_s
   label_this_user: "This user"
   label_from_project: "from the project"
   label_to_project: "to the project"

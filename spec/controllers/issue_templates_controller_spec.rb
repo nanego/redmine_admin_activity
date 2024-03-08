@@ -12,7 +12,7 @@ if Redmine::Plugin.installed?(:redmine_templates)
       @request.session[:user_id] = 1
     end
 
-    it "Trace template activation/deactivation in project history" do
+    it "logs template activation/deactivation in project history" do
       # disable the template on project 2, enable it on project 1
       expect do
         patch :update, params: { id: 1, issue_template: { template_project_ids: ["1"] } }

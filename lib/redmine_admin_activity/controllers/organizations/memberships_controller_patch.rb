@@ -1,20 +1,6 @@
-require_dependency 'organizations/memberships_controller'
+require_dependency 'organizations/memberships_controller' if Redmine::VERSION::MAJOR < 5
 
-class Organizations::MembershipsController
-  include RedmineAdminActivity::Journalizable
-
-  before_action :store_previous_values, :only => [:update]
-  after_action :journalized_memberships_edition, :only => [:update]
-  after_action :journalized_non_members_roles_creation, :only => [:create_non_members_roles]
-
-  before_action :store_previous_values_non_members_roles, :only => [:update_non_members_roles, :destroy_non_members_roles, :update_non_members_functions]
-  after_action :journalized_non_members_roles_edition, :only => [:update_non_members_roles]
-  after_action :journalized_non_members_functions_edition, :only => [:update_non_members_functions]
-  after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
-  after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
-
-  private
-
+module RedmineAdminActivity::Controllers::Organizations::MembershipsControllerPatch
   def store_previous_values
     @requested_users = User.where(id: params[:membership][:user_ids].reject(&:empty?))
     @requested_roles = Role.where(id: params[:membership][:role_ids].reject(&:empty?))
@@ -118,5 +104,22 @@ class Organizations::MembershipsController
 
   def add_non_members_deletion_to_journal
     add_member_exception_deletion_to_journal(@member_exception, @previous_roles_ids, @previous_functions_ids)
+  end
+end
+
+if Redmine::Plugin.installed?(:redmine_organizations)
+  class Organizations::MembershipsController < ApplicationController
+    include RedmineAdminActivity::Journalizable
+    include RedmineAdminActivity::Controllers::Organizations::MembershipsControllerPatch
+
+    before_action :store_previous_values, :only => [:update]
+    after_action :journalized_memberships_edition, :only => [:update]
+    after_action :journalized_non_members_roles_creation, :only => [:create_non_members_roles]
+
+    before_action :store_previous_values_non_members_roles, :only => [:update_non_members_roles, :destroy_non_members_roles, :update_non_members_functions]
+    after_action :journalized_non_members_roles_edition, :only => [:update_non_members_roles]
+    after_action :journalized_non_members_functions_edition, :only => [:update_non_members_functions]
+    after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
+    after_action :add_non_members_deletion_to_journal, :only => [:destroy_non_members_roles]
   end
 end

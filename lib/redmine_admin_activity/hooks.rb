@@ -4,37 +4,38 @@ module RedmineAdminActivity
   module Hooks
     class ModelHook < Redmine::Hook::Listener
       def after_plugins_loaded(_context = {})
-        require_relative 'controllers/concerns/journalizable'
+        require_relative 'journalizable'
 
-        require_relative 'controllers/projects_controller' # unless Rails.env.test?
-        require_relative 'controllers/issue_categories_controller'
-        require_relative 'controllers/members_controller'
-        require_relative 'controllers/principal_memberships_controller'
-        require_relative 'controllers/trackers_controller'
-        require_relative 'controllers/custom_fields_controller'
-        require_relative 'controllers/settings_controller'
-        require_relative 'controllers/custom_field_enumerations_controller'
-        require_relative 'controllers/wiki_controller'
+        require_relative 'controllers/projects_controller_patch'
+        require_relative 'jobs/destroy_project_job_patch'
+        require_relative 'controllers/issue_categories_controller_patch'
+        require_relative 'controllers/members_controller_patch'
+        require_relative 'controllers/principal_memberships_controller_patch'
+        require_relative 'controllers/trackers_controller_patch'
+        require_relative 'controllers/custom_fields_controller_patch'
+        require_relative 'controllers/settings_controller_patch'
+        require_relative 'controllers/custom_field_enumerations_controller_patch'
+        require_relative 'controllers/wiki_controller_patch'
 
         if Redmine::Plugin.installed?(:redmine_organizations)
-          require_relative 'controllers/organizations/memberships_controller'
-          require_relative 'controllers/organizations_controller'
-          require_relative 'models/organization'
+          require_relative 'controllers/organizations/memberships_controller_patch'
+          require_relative 'controllers/organizations_controller_patch'
+          require_relative 'models/organization_patch'
         end
 
-        require_relative 'controllers/users_controller'
+        require_relative 'controllers/users_controller_patch'
 
-        require_relative 'models/project'
-        require_relative 'models/member'
-        require_relative 'models/journal'
-        require_relative 'models/version'
-        require_relative 'models/custom_field'
-        require_relative 'models/user'
-        require_relative 'models/issue_template' if Redmine::Plugin.installed?(:redmine_templates)
+        require_relative 'models/project_patch'
+        require_relative 'models/member_patch'
+        require_relative 'models/journal_patch'
+        require_relative 'models/version_patch'
+        require_relative 'models/custom_field_patch'
+        require_relative 'models/user_patch'
+        require_relative 'models/issue_template_patch' if Redmine::Plugin.installed?(:redmine_templates)
 
-        require_relative 'helpers/projects_helper'
-        require_relative 'helpers/issues_helper'
-        require_relative 'helpers/settings_helper'
+        require_relative 'helpers/projects_helper_patch'
+        require_relative 'helpers/issues_helper_patch'
+        require_relative 'helpers/settings_helper_patch'
       end
     end
   end

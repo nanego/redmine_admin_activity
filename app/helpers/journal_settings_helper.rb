@@ -101,7 +101,7 @@ module JournalSettingsHelper
       link_to((journalized.to_s), (journalized.class.send :representative_link_path, journalized)) if journalized.present? && journalized.persisted?
     else
       # case of absence of implementation methods representative_link_path, to_s
-      return l(:label_absence_methodes) if journalized.present?
+      return l(:label_missing_methods) if journalized.present?
     end
   end
 

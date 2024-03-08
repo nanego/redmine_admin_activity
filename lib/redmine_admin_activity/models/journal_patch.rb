@@ -1,8 +1,8 @@
 require_dependency 'journal'
 
-module RedmineAdminActivity
+module RedmineAdminActivity::Models
 
-  module Journal
+  module JournalPatch
 
     def send_notification
       # Do not send any notification after create project's or user's journals
@@ -14,4 +14,4 @@ module RedmineAdminActivity
 
 end
 
-Journal.prepend RedmineAdminActivity::Journal
+Journal.prepend RedmineAdminActivity::Models::JournalPatch

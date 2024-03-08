@@ -1,19 +1,10 @@
-require_dependency 'organization'
+require_dependency 'organization' if Redmine::VERSION::MAJOR < 5
 
-class Organization < ActiveRecord::Base
-
+module RedmineAdminActivity::Models::OrganizationPatch
   # Returns the names of attributes that are journalized when updating the organization
   def journalized_attribute_names
     names = Organization.column_names - %w(id lft rgt created_at updated_at name_with_parents identifier)
     names
-  end
-
-  def self.representative_columns
-    return ["name_with_parents"]
-  end
-
-  def self.representative_link_path(obj)
-    Rails.application.routes.url_helpers.organization_url(obj, only_path: true)
   end
 
   def journalize_creation(user)
@@ -25,5 +16,17 @@ class Organization < ActiveRecord::Base
       :journalized => self,
       :journalized_entry_type => "create",
       )
+  end
+end
+
+class Organization < ActiveRecord::Base
+  prepend RedmineAdminActivity::Models::OrganizationPatch
+
+  def self.representative_columns
+    return ["name_with_parents"]
+  end
+
+  def self.representative_link_path(obj)
+    Rails.application.routes.url_helpers.organization_url(obj, only_path: true)
   end
 end

@@ -1,8 +1,8 @@
 require_dependency 'projects_helper'
 
-module RedmineAdminActivity
+module RedmineAdminActivity::Helpers
 
-  module ProjectsHelper
+  module ProjectsHelperPatch
 
     def project_settings_tabs
       tabs = super
@@ -21,5 +21,5 @@ module RedmineAdminActivity
 
 end
 
-ProjectsHelper.prepend RedmineAdminActivity::ProjectsHelper
+ProjectsHelper.prepend RedmineAdminActivity::Helpers::ProjectsHelperPatch
 ActionView::Base.send(:include, ProjectsHelper)

@@ -127,7 +127,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
       it "creates, adds a new entry in the project journal" do
         expect do
-          post :create_non_members_roles, params: { project_id: project.id, membership: { organization_id: 2 } }
+          post :create_non_members_roles, params: { format: :js, project_id: project.id, membership: { organization_id: 2 } }
         end.to change { JournalDetail.count }.by(1)
 
         journal = JournalDetail.last

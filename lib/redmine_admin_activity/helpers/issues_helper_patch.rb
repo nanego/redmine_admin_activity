@@ -1,8 +1,8 @@
 require_dependency 'issues_helper'
 require 'json'
 
-module PluginAdminActivity
-  module IssuesHelper
+module RedmineAdminActivity::Helpers
+  module IssuesHelperPatch
 
     # Returns the textual representation of a single journal detail
     # Core properties are 'attr', 'attachment' or 'cf' : this patch specify how to display 'modules' journal details
@@ -340,5 +340,5 @@ module PluginAdminActivity
   end
 end
 
-IssuesHelper.prepend PluginAdminActivity::IssuesHelper
+IssuesHelper.prepend RedmineAdminActivity::Helpers::IssuesHelperPatch
 ActionView::Base.prepend IssuesHelper

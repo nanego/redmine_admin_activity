@@ -1,8 +1,8 @@
-name: Tests 5.1.1
+name: Tests 5.1.2
 
 env:
   PLUGIN_NAME: redmine_admin_activity
-  REDMINE_VERSION: 5.1.1
+  REDMINE_VERSION: 5.1.2
   RAILS_ENV: test
 
 on:
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install package dependencies
         run: >
-          sudo apt-get install --yes --quiet
+          sudo apt-get update && sudo apt-get install --yes --quiet
           build-essential
           cmake
           libicu-dev
@@ -89,6 +89,7 @@ jobs:
       - name: Prepare Redmine source
         working-directory: redmine
         run: |
+          rm -f test/integration/routing/plugins_test.rb # Fix routing tests # TODO Remove this line when https://www.redmine.org/issues/38707 is fixed
           sed -i '/rubocop/d' Gemfile
           rm -f .rubocop*
           cp plugins/redmine_base_rspec/spec/support/database-${{ matrix.db }}.yml config/database.yml

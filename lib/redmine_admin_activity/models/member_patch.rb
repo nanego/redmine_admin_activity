@@ -1,11 +1,6 @@
 require_dependency 'member'
 
-class Member < ActiveRecord::Base
-  attr_reader :project_journal
-
-  # after_create :update_project_journal
-  # after_save :save_project_journal
-
+module RedmineAdminActivity::Models::MemberPatch
   def save_project_journal
     if @project_journal
       @project_journal.save
@@ -22,4 +17,13 @@ class Member < ActiveRecord::Base
       :value => self.principal
     )
   end
+end
+
+class Member < ActiveRecord::Base
+  prepend RedmineAdminActivity::Models::MemberPatch
+
+  attr_reader :project_journal
+
+  # after_create :update_project_journal
+  # after_save :save_project_journal
 end

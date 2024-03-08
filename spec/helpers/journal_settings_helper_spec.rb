@@ -3,7 +3,7 @@ require "spec_helper"
 describe "JournalSettingsHelper" do
   include ApplicationHelper
   include JournalSettingsHelper
-  include PluginAdminActivity::IssuesHelper
+  include RedmineAdminActivity::Helpers::IssuesHelperPatch
 
   fixtures :projects, :users
 
