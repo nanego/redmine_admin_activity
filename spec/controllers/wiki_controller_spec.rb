@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe WikiController, type: :controller do
 
@@ -12,7 +12,7 @@ describe WikiController, type: :controller do
     @controller = WikiController.new
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
-    User.current = nil
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
   end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe PrincipalMembershipsController, type: :controller do
   render_views
@@ -15,6 +15,7 @@ describe PrincipalMembershipsController, type: :controller do
   include Redmine::I18n
 
   before do
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
   end
 

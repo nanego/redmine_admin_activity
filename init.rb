@@ -11,3 +11,10 @@ Redmine::Plugin.register :redmine_admin_activity do
   # requires_redmine_plugin :redmine_base_rspec, :version_or_higher => '0.0.4' if Rails.env.test?
   # requires_redmine_plugin :redmine_base_deface, :version_or_higher => '0.0.1'
 end
+
+# Support for Redmine 5
+if Redmine::VERSION::MAJOR < 6
+  class ApplicationRecord < ActiveRecord::Base
+    self.abstract_class = true
+  end
+end

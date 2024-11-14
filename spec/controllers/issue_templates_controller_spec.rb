@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 if Redmine::Plugin.installed?(:redmine_templates)
   describe IssueTemplatesController, type: :controller do
@@ -9,6 +9,7 @@ if Redmine::Plugin.installed?(:redmine_templates)
 
     before do
       User.current = nil
+      @request.session = ActionController::TestSession.new
       @request.session[:user_id] = 1
     end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe MembersController, type: :controller do
   render_views
@@ -15,6 +15,7 @@ describe MembersController, type: :controller do
   include Redmine::I18n
 
   before do
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
     if Redmine::Plugin.installed?(:redmine_limited_visibility)
       member.function_ids = [Function.first.id]

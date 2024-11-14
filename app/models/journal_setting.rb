@@ -1,4 +1,5 @@
-class JournalSetting < ActiveRecord::Base
+class JournalSetting < ApplicationRecord
+
   belongs_to :user, :optional => false
   belongs_to :journalized, :polymorphic => true, :optional => true
 

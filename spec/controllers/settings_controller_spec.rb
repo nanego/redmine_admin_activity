@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe SettingsController, type: :controller do
 
@@ -11,6 +11,7 @@ describe SettingsController, type: :controller do
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
     User.current = nil
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
   end
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 if Redmine::Plugin.installed?(:redmine_organizations)
   describe Organizations::MembershipsController, type: :controller do
@@ -23,6 +23,7 @@ if Redmine::Plugin.installed?(:redmine_organizations)
 
     before do
       User.current = nil
+      @request.session = ActionController::TestSession.new
       @request.session[:user_id] = 1 # permissions are hard
       user.update_attribute(:organization, organization)
       new_user.update_attribute(:organization, organization)

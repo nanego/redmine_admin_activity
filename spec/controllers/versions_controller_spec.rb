@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe VersionsController, type: :controller do
   render_views
@@ -15,6 +15,7 @@ describe VersionsController, type: :controller do
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
     User.current = nil
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
   end
 

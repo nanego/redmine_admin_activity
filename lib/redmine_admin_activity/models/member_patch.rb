@@ -19,7 +19,7 @@ module RedmineAdminActivity::Models::MemberPatch
   end
 end
 
-class Member < ActiveRecord::Base
+class Member < ApplicationRecord
   prepend RedmineAdminActivity::Models::MemberPatch
 
   attr_reader :project_journal

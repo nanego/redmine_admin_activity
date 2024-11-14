@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe "activities", type: :system do
   fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,

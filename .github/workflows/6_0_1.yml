@@ -1,8 +1,8 @@
-name: Tests 4.2.11
+name: Tests 6.0.1
 
 env:
   PLUGIN_NAME: redmine_admin_activity
-  REDMINE_VERSION: 4.2.11
+  REDMINE_VERSION: 6.0.1
   RAILS_ENV: test
 
 on:
@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby: ['2.7']
+        ruby: ['3.3']
         db: ['postgres']
       fail-fast: false
 

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 
 describe CustomFieldEnumerationsController, type: :controller do
   render_views
@@ -12,7 +12,8 @@ describe CustomFieldEnumerationsController, type: :controller do
     @controller = CustomFieldEnumerationsController.new
     @request = ActionDispatch::TestRequest.create
     @response = ActionDispatch::TestResponse.new
-    User.current = nil
+    User.current = User.find(1)
+    @request.session = ActionController::TestSession.new
     @request.session[:user_id] = 1 #permissions are hard
     ProjectCustomField.create(:name => 'field test', field_format: "enumeration")
   end

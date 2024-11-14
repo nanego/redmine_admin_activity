@@ -37,7 +37,7 @@ module RedmineAdminActivity::Models
   end
 end
 
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   prepend RedmineAdminActivity::Models::ProjectPatch
 
   acts_as_watchable

@@ -19,7 +19,7 @@ module RedmineAdminActivity::Models::OrganizationPatch
   end
 end
 
-class Organization < ActiveRecord::Base
+class Organization < ApplicationRecord
   prepend RedmineAdminActivity::Models::OrganizationPatch
 
   def self.representative_columns
