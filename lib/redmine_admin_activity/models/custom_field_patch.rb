@@ -12,7 +12,7 @@ module RedmineAdminActivity::Models::CustomFieldPatch
   end
 end
 
-class CustomField < ApplicationRecord
+class CustomField
   prepend RedmineAdminActivity::Models::CustomFieldPatch
 
   def self.representative_columns

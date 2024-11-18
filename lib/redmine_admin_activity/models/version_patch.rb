@@ -22,7 +22,7 @@ module RedmineAdminActivity::Models
   end
 end
 
-class Version < ApplicationRecord
+class Version
   prepend RedmineAdminActivity::Models::VersionPatch
 
   before_update :save_previous_version
