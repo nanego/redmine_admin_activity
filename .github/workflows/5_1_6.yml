@@ -1,8 +1,8 @@
-name: Tests 6.0.1
+name: Tests 5.1.6
 
 env:
   PLUGIN_NAME: redmine_admin_activity
-  REDMINE_VERSION: 6.0.1
+  REDMINE_VERSION: 5.1.6
   RAILS_ENV: test
 
 on:
@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby: ['3.3']
+        ruby: ['3.2']
         db: ['postgres']
       fail-fast: false
 
@@ -151,7 +151,7 @@ jobs:
         env:
           RAILS_ENV: test
         working-directory: redmine
-        run: bundle exec rails redmine:plugins:test NAME=${{ env.PLUGIN_NAME }} RUBYOPT="-W0" --trace
+        run: bundle exec rails redmine:plugins:test NAME=${{ env.PLUGIN_NAME }} RUBYOPT="-W0"
 
       - name: Run uninstall test
         env:
