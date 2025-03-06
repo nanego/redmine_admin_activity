@@ -28,7 +28,7 @@ module RedmineAdminActivity::Models::IssueTemplatePatch
   end
 end
 
-class IssueTemplate
+class IssueTemplate < ApplicationRecord
   prepend RedmineAdminActivity::Models::IssueTemplatePatch
 
   has_many :template_projects, through: :issue_template_projects, source: :project, before_remove: :journalized_deactivation_template, after_add: :journalized_activation_template
