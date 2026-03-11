@@ -216,6 +216,50 @@ describe "JournalSettingsHelper" do
 
   end
 
+  describe "User update" do
+    it "should generate the right translated sentence for a user email change" do
+      user = User.find(7)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "mails" => ['["old@example.com"]', '["new@example.com"]'] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "update")
+      result = user_update_text(journal)
+      expect(result).to include("Some One")
+      expect(result).to include("has been updated")
+      expect(result).to include(l(:field_mails))
+      expect(result).to include("old@example.com")
+      expect(result).to include("new@example.com")
+    end
+
+    it "should generate the right translated sentence for a user sudoer rights change" do
+      user = User.find(7)
+      # When redmine_sudo is installed, the tracked field is 'sudoer'; otherwise 'admin'.
+      tracked_field = Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin'
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { tracked_field => [false, true] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "update")
+      result = user_update_text(journal)
+      expect(result).to include("Some One")
+      expect(result).to include("has been updated")
+      expect(result).to include(l(("field_" + tracked_field).to_sym))
+      expect(result).to include(l(:label_0))
+      expect(result).to include(l(:label_1))
+    end
+
+    it "should generate the right translated sentence for a user password change" do
+      user = User.find(7)
+      journal = JournalSetting.new(:user_id => User.current.id,
+                                   :value_changes => { "hashed_password" => [nil, nil] },
+                                   :journalized => user,
+                                   :journalized_entry_type => "update")
+      result = user_update_text(journal)
+      expect(result).to include("Some One")
+      expect(result).to include("has been updated")
+      expect(result).to include(l(:text_journal_user_password_changed))
+    end
+  end
+
   describe "User deletion" do
     it "should generate the right translated sentence for a user deletion" do
       user = users(:users_007)

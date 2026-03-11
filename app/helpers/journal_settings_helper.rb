@@ -61,6 +61,20 @@ module JournalSettingsHelper
 
     elsif journal.deletion?
       sanitize l(".text_setting_destroy_user_journal_entry", user_name: journal.value_changes["firstname"][0] + " " + journal.value_changes["lastname"][0])
+
+    elsif journal.updating?
+      user_text = link_to_journalized_if_exists(journal.journalized) ||
+                  name_journalized_if_not_exists(journal.journalized_type, journal.journalized_id)
+      s = sanitize l(".text_setting_update_user_journal_entry", user: user_text)
+      if journal.value_changes.any?
+        items = user_value_changes_to_strings(journal.value_changes)
+        unless items.empty?
+          s += content_tag(:ul, :class => 'details') do
+            items.collect { |item| content_tag(:li, item) }.reduce(:+)
+          end
+        end
+      end
+      s
     end
   end
 
@@ -73,6 +87,23 @@ module JournalSettingsHelper
   end
 
   private
+
+  def user_value_changes_to_strings(value_changes)
+    value_changes.filter_map do |key, values|
+      old_val, new_val = values
+      if key == 'hashed_password'
+        l(:text_journal_user_password_changed)
+      elsif (col = Principal.columns_hash[key]) && col.type == :boolean
+        label = l(("field_" + key).to_sym)
+        old_label = val_to_bool(old_val) ? l(:label_1) : l(:label_0)
+        new_label = val_to_bool(new_val) ? l(:label_1) : l(:label_0)
+        l(:text_journal_changed, :label => label, :old => old_label, :new => new_label)
+      else
+        label = l(("field_" + key).to_sym)
+        l(:text_journal_changed, :label => label, :old => old_val, :new => new_val)
+      end
+    end
+  end
 
   def journalized_update_text(journal, journalized_label, journalized_col)
     if journal.creation?

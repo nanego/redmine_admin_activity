@@ -78,6 +78,8 @@ en:
   label_manual_creation: manually
   label_auto_creation: automatically
   text_setting_auto_create_user_journal_entry: "User <i>%{user}</i> has been created automatically."
+  text_setting_update_user_journal_entry: "User <i>%{user}</i> has been updated."
+  text_journal_user_password_changed: "Password has been changed."
   text_journal_members_exception_changed: "%{prop_key} of exception member %{name} have been changed from [%{old}] to [%{new}]"
   text_journal_members_exception_added: "Exception member %{name} has been added with %{prop_key} [%{new}]"
   text_journal_members_exception_removed: "Exception member %{name}, with %{changes}, has been removed"

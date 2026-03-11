@@ -136,6 +136,56 @@ describe UsersController, type: :controller do
       end
     end
 
+    it "creates a JournalSetting update and a JournalDetail when changing admin rights" do
+      user = User.find(7)
+      # When redmine_sudo is installed, sudoer is the persistent rights flag (admin is a toggle).
+      # The JournalSetting and JournalDetail track sudoer (or admin when sudo is not installed).
+      tracked_field = Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin'
+
+      expect do
+        patch :update, :params => { :id => user.id, :user => { :admin => '1' } }
+      end.to change(JournalSetting.where(journalized_entry_type: "update"), :count).by(1)
+         .and change(JournalDetail, :count).by(1)
+
+      js = JournalSetting.where(journalized_entry_type: "update").last
+      expect(js.journalized_type).to eq("Principal")
+      expect(js.value_changes).to include(tracked_field => [false, true])
+
+      detail = JournalDetail.last
+      expect(detail.property).to eq("attr")
+      expect(detail.prop_key).to eq(tracked_field)
+      expect(detail.old_value).to eq("f").or eq("0").or eq("false")
+      expect(detail.value).to eq("t").or eq("1").or eq("true")
+    end
+
+    it "creates a JournalSetting update with masked password when changing password" do
+      user = User.find(7)
+      expect do
+        patch :update, :params => { :id => user.id,
+                                    :user => { :password => 'newpassword123!',
+                                               :password_confirmation => 'newpassword123!' } }
+      end.to change(JournalSetting.where(journalized_entry_type: "update"), :count).by(1)
+         .and change(JournalDetail, :count).by(1)
+
+      js = JournalSetting.where(journalized_entry_type: "update").last
+      expect(js.journalized_entry_type).to eq("update")
+      expect(js.value_changes.keys).to include("hashed_password")
+      expect(js.value_changes["hashed_password"]).to eq([nil, nil])
+
+      detail = JournalDetail.last
+      expect(detail.prop_key).to eq("hashed_password")
+      expect(detail.old_value).to be_nil
+      expect(detail.value).to be_nil
+    end
+
+    it "does not create a JournalSetting update when only status changes" do
+      user = User.find(7)
+      patch :update, :params => { :id => user.id, :user => { :status => Principal::STATUS_LOCKED } }
+
+      expect(JournalSetting.where(journalized_entry_type: "update").count).to eq(0)
+      expect(JournalSetting.last.journalized_entry_type).to eq("lock")
+    end
+
   end
 
   describe "DELETE destroy" do

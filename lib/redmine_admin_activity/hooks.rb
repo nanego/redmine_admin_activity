@@ -24,6 +24,7 @@ module RedmineAdminActivity
         end
 
         require_relative 'controllers/users_controller_patch'
+        require_relative 'controllers/my_controller_patch'
 
         require_relative 'models/project_patch'
         require_relative 'models/member_patch'

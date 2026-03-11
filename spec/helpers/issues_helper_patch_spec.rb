@@ -379,6 +379,11 @@ describe "IssuesHelperPatch" do
     expect(show_detail(detail, true)).to eq "Mail changed from #{user.mails} to newmails@example.com"
   end
 
+  it 'should IssuesHelper#show_detail should show a password changed message for hashed_password' do
+    detail = JournalDetail.new(:journal => journal, :property => 'attr', :old_value => nil, :value => nil, :prop_key => 'hashed_password')
+    expect(show_detail(detail, true)).to eq l(:text_journal_user_password_changed)
+  end
+
   it 'should IssuesHelper#show_detail should show the creation action for a user' do
     detail = JournalDetail.new(:journal => journal, :property => 'creation', :value => User::USER_MANUAL_CREATION, :prop_key => 'creation')
     expect(show_detail(detail, true)).to eq "This user has been created manually."

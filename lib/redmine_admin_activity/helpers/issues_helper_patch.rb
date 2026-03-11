@@ -325,7 +325,9 @@ module RedmineAdminActivity::Helpers
       elsif detail.property == 'creation'
         show_user_creation_details(detail, no_html, options)
       elsif detail.property == 'attr'
-        if User.reflect_on_all_associations(:belongs_to).select { |a| a.foreign_key == detail.prop_key }.count > 0
+        if detail.prop_key == 'hashed_password'
+          l(:text_journal_user_password_changed)
+        elsif User.reflect_on_all_associations(:belongs_to).select { |a| a.foreign_key == detail.prop_key }.count > 0
           show_belongs_to_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)
         elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean
           show_boolean_details(detail.prop_key, detail.value, detail.old_value, no_html, options)
