@@ -10,11 +10,11 @@ This Redmine plugin keeps a log of all admin actions:
 
 ## Requirements:
 
-* this plugin requires you to install the redmine_base_deface plugin (see [here](https://github.com/jbbarth/redmine_base_deface))
+  * Ruby >= 3.2.0
+  * The [redmine_base_deface](https://github.com/jbbarth/redmine_base_deface) plugin is required to display
+    the history link in user pages (edit/show views).
 
-  ruby >= 3.2.0
-
-To run tests, install the redmine_base_rspec plugin (https://github.com/jbbarth/redmine_base_rspec)
+To run tests, install the [redmine_base_rspec](https://github.com/jbbarth/redmine_base_rspec) plugin.
 
 ## Test status
 
