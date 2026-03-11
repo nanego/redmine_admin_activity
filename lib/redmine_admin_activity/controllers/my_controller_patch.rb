@@ -5,9 +5,15 @@ module RedmineAdminActivity::Controllers
     extend ActiveSupport::Concern
 
     def capture_my_account_state
-      return unless request.put? && User.current.logged?
+      return unless User.current.logged?
 
       @previous_user_mail = User.current.mail
+      @previous_user_hashed_password = User.current.hashed_password
+      @previous_user_profile = {
+        'login'     => User.current.login,
+        'firstname' => User.current.firstname,
+        'lastname'  => User.current.lastname
+      }
     end
 
     def init_my_account_journal
@@ -21,9 +27,13 @@ module RedmineAdminActivity::Controllers
 
       user = User.current
       return unless user.present? && user.persisted?
+      return unless @previous_user_profile.present?
 
-      tracked_columns = %w(login firstname lastname)
-      all_changes = user.previous_changes.select { |k, _| tracked_columns.include?(k) }
+      all_changes = {}
+      @previous_user_profile.each do |field, prev_val|
+        curr_val = user.send(field)
+        all_changes[field] = [prev_val, curr_val] if prev_val != curr_val
+      end
 
       # Email change
       current_mail = user.mail
@@ -48,7 +58,8 @@ module RedmineAdminActivity::Controllers
 
       user = User.current
       return unless user.present? && user.persisted?
-      return unless user.previous_changes.key?('hashed_password')
+      return unless @previous_user_hashed_password.present? &&
+                    @previous_user_hashed_password != user.hashed_password
 
       JournalSetting.create(
         :user_id => user.id,
@@ -73,7 +84,7 @@ end
 class MyController
   include RedmineAdminActivity::Controllers::MyControllerPatch
 
-  before_action :capture_my_account_state, :only => [:account]
+  before_action :capture_my_account_state, :only => [:account, :password]
   before_action :init_my_account_journal, :only => [:account, :password]
   after_action :journalized_my_account_update, :only => [:account]
   after_action :journalized_my_password_change, :only => [:password]

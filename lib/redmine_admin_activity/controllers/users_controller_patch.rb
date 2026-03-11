@@ -29,34 +29,28 @@ module RedmineAdminActivity::Controllers
     def journalized_users_update_status
 
       return unless @user.present? && @user.persisted?
+      return unless @previous_user_attributes.present?
 
-      if @user.previous_changes[:status] == [User::STATUS_REGISTERED, User::STATUS_ACTIVE]
-        JournalSetting.create(
-          :user_id => User.current.id,
-          :value_changes => @user.previous_changes,
-          :journalized => @user,
-          :journalized_entry_type => "active",
-          )
-      end
+      prev_status = @previous_user_attributes['status']
+      curr_status = @user.status
+      return if prev_status == curr_status
 
-      if @user.previous_changes[:status] == [User::STATUS_ACTIVE, User::STATUS_LOCKED]
-        JournalSetting.create(
-          :user_id => User.current.id,
-          :value_changes => @user.previous_changes,
-          :journalized => @user,
-          :journalized_entry_type => "lock",
-          )
-      end
+      status_change = { 'status' => [prev_status, curr_status] }
 
-      if @user.previous_changes[:status] == [User::STATUS_LOCKED, User::STATUS_ACTIVE]
-        JournalSetting.create(
-          :user_id => User.current.id,
-          :value_changes => @user.previous_changes,
-          :journalized => @user,
-          :journalized_entry_type => "unlock",
-          )
-      end
+      entry_type = case [prev_status, curr_status]
+                   when [User::STATUS_REGISTERED, User::STATUS_ACTIVE] then "active"
+                   when [User::STATUS_ACTIVE, User::STATUS_LOCKED]     then "lock"
+                   when [User::STATUS_LOCKED, User::STATUS_ACTIVE]     then "unlock"
+                   end
 
+      return unless entry_type
+
+      JournalSetting.create(
+        :user_id => User.current.id,
+        :value_changes => status_change,
+        :journalized => @user,
+        :journalized_entry_type => entry_type
+      )
     end
 
     def journalized_users_deletion
@@ -75,20 +69,42 @@ module RedmineAdminActivity::Controllers
       return unless @user.present?
 
       @previous_user_mail = @user.mail
+
+      admin_field = Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin'
+      @previous_user_attributes = {
+        'login'          => @user.login,
+        'firstname'      => @user.firstname,
+        'lastname'       => @user.lastname,
+        'status'         => @user.status,
+        admin_field      => @user.send(admin_field),
+        'hashed_password' => @user.hashed_password
+      }
+      if Redmine::Plugin.installed?(:redmine_organizations)
+        @previous_user_attributes['organization_id'] = @user.organization_id
+      end
+      if Redmine::Plugin.installed?(:redmine_scn)
+        %w(staff beta_tester instance_manager trusted_api_user).each do |field|
+          @previous_user_attributes[field] = @user.send(field)
+        end
+      end
     end
 
     def journalized_users_update
       return unless @user.present? && @user.persisted?
+      return unless @previous_user_attributes.present?
 
-      # Track fields for JournalSetting (global history)
-      tracked_columns = %w(login firstname lastname status)
-      tracked_columns << (Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin')
-      tracked_columns |= %w(staff beta_tester instance_manager trusted_api_user) if Redmine::Plugin.installed?(:redmine_scn)
+      all_changes = {}
 
-      all_changes = @user.previous_changes.select { |k, _| tracked_columns.include?(k) }
-
-      # Password change: hide the actual hash values
-      all_changes['hashed_password'] = [nil, nil] if @user.previous_changes.key?('hashed_password')
+      # Compare each tracked field with its captured value
+      @previous_user_attributes.each do |field, prev_val|
+        curr_val = @user.send(field) rescue nil
+        if field == 'hashed_password'
+          # Mask actual hash values
+          all_changes['hashed_password'] = [nil, nil] if prev_val != curr_val
+        else
+          all_changes[field] = [prev_val, curr_val] if prev_val != curr_val
+        end
+      end
 
       # Email change: compare main mail
       current_mail = @user.mail
@@ -97,8 +113,8 @@ module RedmineAdminActivity::Controllers
       end
 
       # Organization change
-      if Redmine::Plugin.installed?(:redmine_organizations) && @user.previous_changes.key?('organization_id')
-        old_org_id, new_org_id = @user.previous_changes['organization_id']
+      if Redmine::Plugin.installed?(:redmine_organizations) && all_changes.key?('organization_id')
+        old_org_id, new_org_id = all_changes.delete('organization_id')
         old_org = old_org_id ? Organization.find_by(:id => old_org_id)&.to_s : nil
         new_org = new_org_id ? Organization.find_by(:id => new_org_id)&.to_s : nil
         all_changes['organization'] = [old_org, new_org]
@@ -117,10 +133,9 @@ module RedmineAdminActivity::Controllers
         )
       end
 
-      # JournalDetails for user-specific history:
-      # Only special cases here (e.g. masked password).
+      # JournalDetails for user history
       if @user.current_journal
-        if @user.previous_changes.key?('hashed_password')
+        if all_changes.key?('hashed_password')
           @user.current_journal.details << JournalDetail.new(
             :property => 'attr',
             :prop_key => 'hashed_password',
