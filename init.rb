@@ -1,3 +1,7 @@
+# Prevent Zeitwerk from trying to autoload override files
+# when the redmine_base_deface plugin is missing
+Rails.autoloaders.main.ignore("#{__dir__}/app/overrides")
+
 require_relative 'lib/redmine_admin_activity/hooks'
 
 Redmine::Plugin.register :redmine_admin_activity do
