@@ -72,12 +72,11 @@ module RedmineAdminActivity::Controllers
 
       admin_field = Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin'
       @previous_user_attributes = {
-        'login'          => @user.login,
-        'firstname'      => @user.firstname,
-        'lastname'       => @user.lastname,
-        'status'         => @user.status,
-        admin_field      => @user.send(admin_field),
-        'hashed_password' => @user.hashed_password
+        'login'     => @user.login,
+        'firstname' => @user.firstname,
+        'lastname'  => @user.lastname,
+        'status'    => @user.status,
+        admin_field => @user.send(admin_field)
       }
       if Redmine::Plugin.installed?(:redmine_organizations)
         @previous_user_attributes['organization_id'] = @user.organization_id
@@ -98,13 +97,11 @@ module RedmineAdminActivity::Controllers
       # Compare each tracked field with its captured value
       @previous_user_attributes.each do |field, prev_val|
         curr_val = @user.send(field) rescue nil
-        if field == 'hashed_password'
-          # Mask actual hash values
-          all_changes['hashed_password'] = [nil, nil] if prev_val != curr_val
-        else
-          all_changes[field] = [prev_val, curr_val] if prev_val != curr_val
-        end
+        all_changes[field] = [prev_val, curr_val] if prev_val != curr_val
       end
+
+      # Password change
+      all_changes['hashed_password'] = [nil, nil] if @user.hashed_password_changed_on_save?
 
       # Email change: compare main mail
       current_mail = @user.mail

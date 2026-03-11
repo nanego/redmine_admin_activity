@@ -26,6 +26,16 @@ module RedmineAdminActivity::Models
       end
     end
 
+    # Flag set in after_save
+    # before after_commit can clear dirty tracking
+    def hashed_password_changed_on_save?
+      @hashed_password_changed_on_save || false
+    end
+
+    def track_hashed_password_change
+      @hashed_password_changed_on_save = previous_changes.key?('hashed_password')
+    end
+
     def notified_users
       []
     end
@@ -45,6 +55,7 @@ class User < Principal
   attr_reader :current_journal
 
   after_save :create_journal
+  after_save :track_hashed_password_change
 
   USER_MANUAL_CREATION = 'manual'
   USER_AUTO_CREATION = 'auto'
