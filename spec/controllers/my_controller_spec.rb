@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe MyController, type: :controller do
 
-  fixtures :users
+  fixtures :users, :email_addresses
 
   include Redmine::I18n
 

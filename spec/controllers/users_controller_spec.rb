@@ -4,7 +4,7 @@ describe UsersController, type: :controller do
 
   render_views
 
-  fixtures :users
+  fixtures :users, :email_addresses
 
   include Redmine::I18n
 

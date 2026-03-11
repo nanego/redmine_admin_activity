@@ -8,6 +8,7 @@ module RedmineAdminActivity::Controllers
       return unless User.current.logged?
 
       @previous_user_mail = User.current.mail
+      @previous_user_hashed_password = User.current.hashed_password
       @previous_user_profile = {
         'login'     => User.current.login,
         'firstname' => User.current.firstname,
@@ -57,7 +58,7 @@ module RedmineAdminActivity::Controllers
 
       user = User.current
       return unless user.present? && user.persisted?
-      return unless user.hashed_password_changed_on_save?
+      return unless @previous_user_hashed_password != user.hashed_password
 
       JournalSetting.create(
         :user_id => user.id,
