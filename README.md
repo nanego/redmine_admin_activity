@@ -20,11 +20,11 @@ To run tests, install the [redmine_base_rspec](https://github.com/jbbarth/redmin
 
 | Plugin branch | Redmine Version | Test Status       |
 |---------------|-----------------|-------------------|
-| master        | 6.0.8           | [![6.0.8 ][1]][5] |
-| master        | 6.1.1           | [![6.1.1][2]][5]  |
-| master        | master          | [![master][4]][5] |
+| master        | 6.0.9           | [![6.0.9 ][1]][5] |
+| master        | 6.1.2           | [![6.1.2][2]][5]  |
+| master        | master          | [![master][3]][5] |
 
-[1]: https://github.com/nanego/redmine_admin_activity/actions/workflows/6_0_8.yml/badge.svg
-[2]: https://github.com/nanego/redmine_admin_activity/actions/workflows/6_1_1.yml/badge.svg
+[1]: https://github.com/nanego/redmine_admin_activity/actions/workflows/6_0_9.yml/badge.svg
+[2]: https://github.com/nanego/redmine_admin_activity/actions/workflows/6_1_2.yml/badge.svg
 [3]: https://github.com/nanego/redmine_admin_activity/actions/workflows/master.yml/badge.svg
 [5]: https://github.com/nanego/redmine_admin_activity/actions
