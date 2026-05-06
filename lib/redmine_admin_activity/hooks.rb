@@ -32,6 +32,7 @@ module RedmineAdminActivity
         require_relative 'models/version_patch'
         require_relative 'models/custom_field_patch'
         require_relative 'models/user_patch'
+        require_relative 'models/email_address_patch'
         require_relative 'models/issue_template_patch' if Redmine::Plugin.installed?(:redmine_templates)
 
         require_relative 'helpers/projects_helper_patch'
