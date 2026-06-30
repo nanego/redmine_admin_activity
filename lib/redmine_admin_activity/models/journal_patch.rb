@@ -10,6 +10,12 @@ module RedmineAdminActivity::Models
       super
     end
 
+    def add_watcher
+      # Auto-watching only applies to issue journals
+      return unless journalized.is_a?(Issue)
+      super
+    end
+
   end
 
 end
