@@ -1,5 +1,5 @@
 <div class="contextual">
-<%= link_to l(:label_profile), user_path(@user), :class => 'icon icon-user' %>
+<%= link_to sprite_icon('user', l(:label_profile)), user_path(@user) %>
 </div>
 <%=
   page_title = title [@user.name, user_path(@user)], l(:label_history)

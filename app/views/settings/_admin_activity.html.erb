@@ -6,7 +6,7 @@
       <label for='name'><%= l(:field_name) %>:</label>
       <%= text_field_tag 'name', params[:name], :size => 30 %>
       <%= button_tag l(:button_apply), value: "admin_activity", type: :submit, :name => 'tab' %>
-      <%= link_to l(:button_clear), settings_path(:tab => 'admin_activity'), :class => 'icon icon-reload' %>
+      <%= link_to sprite_icon('reload', l(:button_clear)), settings_path(:tab => 'admin_activity') %>
     </fieldset>
   <% end %>
   <% if @journals.present? %>

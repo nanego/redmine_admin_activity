@@ -218,12 +218,12 @@ describe UsersController, type: :controller do
     it "Should show the link in profile page" do
       get :show, :params => { id: 1 }
       expect(response).to have_http_status(:success)
-      expect(response.body).to have_css("a[class='icon icon-time']")
+      expect(response.body).to have_css("a[href='#{history_user_path(1)}'] svg use[href$='#icon--time']", visible: :all)
     end
     it "Should show the link in profile page" do
       get :edit, :params => { id: 1 }
       expect(response).to have_http_status(:success)
-      expect(response.body).to have_css("a[class='icon icon-time']")
+      expect(response.body).to have_css("a[href='#{history_user_path(1)}'] svg use[href$='#icon--time']", visible: :all)
     end
   end
 
