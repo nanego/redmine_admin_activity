@@ -87,6 +87,9 @@ module RedmineAdminActivity::Controllers
           @previous_user_attributes[field] = @user.send(field)
         end
       end
+      if Redmine::Plugin.installed?(:redmine_internal_users)
+        @previous_user_attributes['internal_status_mode'] = @user.internal_status_mode
+      end
     end
 
     def journalized_users_update

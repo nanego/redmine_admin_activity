@@ -17,6 +17,7 @@ module RedmineAdminActivity::Models
       names << 'organization' if Redmine::Plugin.installed?(:redmine_organizations)
       names << (Redmine::Plugin.installed?(:redmine_sudo) ? 'sudoer' : 'admin')
       names |= %w(staff beta_tester instance_manager trusted_api_user) if Redmine::Plugin.installed?(:redmine_scn)
+      names << 'internal_status_mode' if Redmine::Plugin.installed?(:redmine_internal_users)
       names
     end
 

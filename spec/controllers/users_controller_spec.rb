@@ -158,6 +158,31 @@ describe UsersController, type: :controller do
       expect(detail.value).to eq("t").or eq("1").or eq("true")
     end
 
+    if Redmine::Plugin.installed?(:redmine_internal_users)
+      it "logs the internal status forced by an administrator" do
+        user = User.find(7)
+
+        expect do
+          patch :update, :params => { :id => user.id, :user => { :internal_forced => 'false' } }
+        end.to change(JournalSetting.where(journalized_entry_type: "update"), :count).by(1)
+           .and change(JournalDetail, :count).by(1)
+
+        js = JournalSetting.where(journalized_entry_type: "update").last
+        expect(js.value_changes).to include('internal_status_mode' => ['auto', 'external'])
+
+        detail = JournalDetail.last
+        expect(detail.prop_key).to eq('internal_status_mode')
+        expect(detail.old_value).to eq('auto')
+        expect(detail.value).to eq('external')
+
+        get :history, :params => { :id => user.id }
+        expect(response.body).to include(
+          ERB::Util.html_escape(l(:text_journal_changed, :label => l(:field_internal_forced),
+                                                         :old => l(:label_internal_status_auto),
+                                                         :new => l(:label_internal_status_forced_external))))
+      end
+    end
+
     it "creates a JournalSetting update with masked password when changing password" do
       user = User.find(7)
       expect do

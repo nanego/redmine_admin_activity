@@ -315,6 +315,16 @@ module RedmineAdminActivity::Helpers
       l(:text_journal_changed, :label => label, :old => val_to_bool(old_value) ? l(:label_1) : l(:label_0), :new => val_to_bool(value) ? l(:label_1) : l(:label_0))
     end
 
+    # Status set by redmine_internal_users: 'auto', 'internal' or 'external'
+    def show_internal_status_mode_details(value, old_value)
+      labels = {
+        'auto' => l(:label_internal_status_auto),
+        'internal' => l(:label_internal_status_forced_internal),
+        'external' => l(:label_internal_status_forced_external)
+      }
+      l(:text_journal_changed, :label => l(:field_internal_forced), :old => labels[old_value], :new => labels[value])
+    end
+
     def show_principal_detail(detail, no_html, options = {})
       if detail.prop_key == 'status'
         show_user_status_details(detail, no_html, options)
@@ -327,6 +337,8 @@ module RedmineAdminActivity::Helpers
       elsif detail.property == 'attr'
         if detail.prop_key == 'hashed_password'
           l(:text_journal_user_password_changed)
+        elsif detail.prop_key == 'internal_status_mode'
+          show_internal_status_mode_details(detail.value, detail.old_value)
         elsif User.reflect_on_all_associations(:belongs_to).select { |a| a.foreign_key == detail.prop_key }.count > 0
           show_belongs_to_details("User", detail.prop_key, detail.value, detail.old_value, no_html, options)
         elsif User.columns_hash[detail.prop_key].present? && User.columns_hash[detail.prop_key].type == :boolean

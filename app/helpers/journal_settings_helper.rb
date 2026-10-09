@@ -93,6 +93,8 @@ module JournalSettingsHelper
       old_val, new_val = values
       if key == 'hashed_password'
         l(:text_journal_user_password_changed)
+      elsif key == 'internal_status_mode'
+        show_internal_status_mode_details(new_val, old_val)
       elsif (col = Principal.columns_hash[key]) && col.type == :boolean
         label = l(("field_" + key).to_sym)
         old_label = val_to_bool(old_val) ? l(:label_1) : l(:label_0)
